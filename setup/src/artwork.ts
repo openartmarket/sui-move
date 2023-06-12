@@ -18,7 +18,7 @@ export async function mintArtwork(
 ) {
   console.log("Mint artwork: %s", name + " by " + artist);
 
-  let signer = getSigner();
+  let { signer } = getSigner();
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -46,10 +46,10 @@ export async function mintArtwork(
       },
     });
 
-    console.log("effects", getExecutionStatus(txRes)?.status);
+    console.log("effects", getExecutionStatus(txRes));
 
     let artworkId = getCreatedObjects(txRes)?.[0].reference.objectId;
-    console.log('artworkId', artworkId);
+    console.log("artworkId", artworkId);
 
     return artworkId;
   } catch (e) {
@@ -57,13 +57,15 @@ export async function mintArtwork(
   }
 }
 
-mintArtwork(
-  5,
-  10,
-  100,
-  "Mona Lisa",
-  "Leonardo da Vinci",
-  "1685548680595",
-  "Choconta painting",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
-);
+if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
+  mintArtwork(
+    500,
+    10,
+    100,
+    "Mona Lisa",
+    "Leonardo da Vinci",
+    "1685548680595",
+    "Choconta painting",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
+  );
+}

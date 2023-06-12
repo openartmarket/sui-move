@@ -4,22 +4,26 @@ import {
   JsonRpcProvider,
   RawSigner,
 } from "@mysten/sui.js";
-import { SUI_NETWORK } from "./config";
+import { SUI_NETWORK, adminPhrase, userPhrase } from "./config";
 
 console.log("Connecting to ", SUI_NETWORK);
 
-export function getSigner() {
+export function getSigner(account: "user" | "admin" = "admin") {
+  let phrase = adminPhrase;
+  if (account === "user") {
+    phrase = userPhrase;
+  }
+
   const connOptions = new Connection({
     fullnode: SUI_NETWORK,
   });
   let provider = new JsonRpcProvider(connOptions);
 
-  const phrase = process.env.ADMIN_PHRASE;
   const keypair = Ed25519Keypair.deriveKeypair(phrase!);
   const signer = new RawSigner(keypair, provider);
 
-  const admin = keypair.getPublicKey().toSuiAddress();
-  console.log("Admin Address = " + admin);
+  const address = keypair.getPublicKey().toSuiAddress();
+  console.log("Signer Address = " + address);
 
-  return signer;
+  return { signer, address };
 }

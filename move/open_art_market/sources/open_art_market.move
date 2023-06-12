@@ -8,6 +8,7 @@ module open_art_market::open_art_market {
     use sui::object::{Self, UID, ID};
     use sui::tx_context::{Self, TxContext};
     use sui::package::{Self};
+    use sui::dynamic_field::{Self as df};
 
     // Error codes
     const EInsufficientShares: u64 = 0;
@@ -21,7 +22,7 @@ module open_art_market::open_art_market {
     // Structs
     // An ArtworkShard NFT
     // Represents shares of an Artwork NFT and it is owned by a shareholder
-    struct ArtworkShard has key, store{
+    struct ArtworkShard has key {
         id: UID,
         artwork_id: ID,
         shares: u64,
@@ -35,6 +36,9 @@ module open_art_market::open_art_market {
 
     // The Artwork NFT struct
     // This object is only created by the admin and should be shared
+    // @todo: make the artwork an NFT that is wrapped around another
+    // struct so we can eventually transfer it outside of the Wrapper once sold
+    // to the buyer (not a requirement right now but seems optimal)
     struct Artwork has key, store{
         id: UID,
         total_supply: u64,
@@ -56,6 +60,11 @@ module open_art_market::open_art_market {
     // One time witness to create the publisher
     struct OPEN_ART_MARKET has drop {}
 
+    struct Shares has store {
+        // user: address,
+        value: u64
+    }
+
     // Functions
     // Called upon contract deployment
     fun init(otw: OPEN_ART_MARKET, ctx: &mut TxContext) {
@@ -63,7 +72,7 @@ module open_art_market::open_art_market {
         let admin_cap = AdminCap {id: object::new(ctx)};
         transfer::public_transfer(admin_cap, tx_context::sender(ctx));
     }
-
+    
     // Create a new Artwork NFT shared object
     public fun mint_artwork_and_share(
         _: &mut AdminCap, total_supply: u64, incoming_price: u64,
@@ -93,7 +102,7 @@ module open_art_market::open_art_market {
     }
 
     // Create an ArtworkShard NFT
-    public fun mint_artwork_shard(_: &mut AdminCap, artwork: &mut Artwork, shares: u64, ctx: &mut TxContext): ArtworkShard {
+    public fun mint_artwork_shard(_: &mut AdminCap, artwork: &mut Artwork, shares: u64, receiver: address, ctx: &mut TxContext) {
         let remaining_shares = artwork.shares;
 
         // Ensure that artwork has sufficient shares available to create the shard
@@ -101,7 +110,17 @@ module open_art_market::open_art_market {
 
         let new_shares_balance = remaining_shares - shares;
         artwork.shares = new_shares_balance;
-        ArtworkShard {
+
+        let is_receiver_shareholder = df::exists_(&artwork.id, receiver);
+
+        if(is_receiver_shareholder){
+            let df_shares = df::borrow_mut<address, Shares>(&mut artwork.id, receiver);
+            df_shares.value = df_shares.value + shares;
+        }else {
+            df::add(&mut artwork.id, receiver, Shares {value: shares} );
+        };
+
+        let artwork_shard = ArtworkShard {
             id: object::new(ctx),
             artwork_id: object::uid_to_inner(&artwork.id),
             shares,
@@ -111,7 +130,28 @@ module open_art_market::open_art_market {
             creation_date: artwork.creation_date,
             description: artwork.description,
             image_url: artwork.image_url,
-        }
+        };
+
+        transfer::transfer(artwork_shard, receiver);
+    }
+
+    public fun transfer_artwork_shard(artwork: &mut Artwork, artwork_shard: ArtworkShard, new_owner: address, ctx: &mut TxContext) {
+        // @todo: what checks need to be made here?
+        let is_receiver_shareholder = df::exists_(&artwork.id, new_owner);
+
+        // Make sure the df share balances of receiver under artwork are kept up to date
+        if(is_receiver_shareholder) {
+            let df_receiver_shares = df::borrow_mut<address, Shares>(&mut artwork.id, new_owner);
+            df_receiver_shares.value = df_receiver_shares.value + artwork_shard.shares;
+        } else {
+            df::add(&mut artwork.id, new_owner, Shares {value: artwork_shard.shares});
+        };
+
+        // Make sure the df share balances of sender under artwork are kept up to date
+        let df_sender_shares = df::borrow_mut<address, Shares>(&mut artwork.id, tx_context::sender(ctx));
+        df_sender_shares.value = df_sender_shares.value - artwork_shard.shares;
+
+        transfer::transfer(artwork_shard, new_owner);
     }
 
     // CAUTION: Internal helper method, this can burn shards with shares in them
@@ -166,6 +206,14 @@ module open_art_market::open_art_market {
 
     public fun get_shard_shares(artwork_shard: &ArtworkShard): u64 {
         artwork_shard.shares
+    }
+
+    public fun get_artwork_id(artwork: &Artwork): &UID {
+        &artwork.id
+    }
+
+    public fun get_user_shares(shares: &Shares): u64 {
+        shares.value
     }
 
 }

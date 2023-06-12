@@ -3,23 +3,18 @@ import {
   getCreatedObjects,
   getExecutionStatus,
 } from "@mysten/sui.js";
-import { ARTWORK_TYPE, publisher } from "./config";
+import { ARTWORK_SHARD_TYPE, publisher } from "./config";
 import { getSigner } from "./helpers";
 
 // This is the function you can update to change the display fields
-function getArtworkDisplayFields(
+function getArtworkShardDisplayFields(
   imageProviderUrlPrefix = "",
   imageProviderUrlPostfix = ""
 ) {
   return {
-    keys: [
-      "name",
-      "description",
-      "image_url",
-      "project_url",
-    ],
+    keys: ["name", "description", "image_url", "project_url"],
     values: [
-      "{name}",
+      "{artwork_name}",
       "{description}",
       `${imageProviderUrlPrefix}{image_url}${imageProviderUrlPostfix}`,
       "https://www.openartmarket.com/",
@@ -27,29 +22,28 @@ function getArtworkDisplayFields(
   };
 }
 
-async function createArtworkDisplay() {
-  let artworkDisplayFields = getArtworkDisplayFields();
+async function createArtworkShardDisplay() {
+  let artworkShardDisplayFields = getArtworkShardDisplayFields();
 
   let tx = new TransactionBlock();
-  let {signer, address} = getSigner('admin');
-
-  let artworkDisplay = tx.moveCall({
+  let { signer, address } = getSigner("admin");
+  let artworkShardDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
     arguments: [
       tx.object(publisher),
-      tx.pure(artworkDisplayFields.keys),
-      tx.pure(artworkDisplayFields.values),
+      tx.pure(artworkShardDisplayFields.keys),
+      tx.pure(artworkShardDisplayFields.values),
     ],
-    typeArguments: [ARTWORK_TYPE],
+    typeArguments: [ARTWORK_SHARD_TYPE],
   });
 
   tx.moveCall({
     target: "0x2::display::update_version",
-    arguments: [artworkDisplay],
-    typeArguments: [ARTWORK_TYPE],
+    arguments: [artworkShardDisplay],
+    typeArguments: [ARTWORK_SHARD_TYPE],
   });
 
-  tx.transferObjects([artworkDisplay], tx.pure(address));
+  tx.transferObjects([artworkShardDisplay], tx.pure(address));
 
   try {
     let txRes = await signer.signAndExecuteTransactionBlock({
@@ -67,4 +61,4 @@ async function createArtworkDisplay() {
   }
 }
 
-createArtworkDisplay();
+createArtworkShardDisplay();

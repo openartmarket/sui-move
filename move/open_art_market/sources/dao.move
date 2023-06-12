@@ -6,11 +6,12 @@ module open_art_market::dao {
     // Sui imports
     use sui::object::{Self, UID, ID};
     use sui::tx_context::{Self, TxContext}; 
-    use sui::table::{Self, Table};
     use sui::transfer::{Self};
+    use sui::dynamic_field::{Self as df};
+
 
     // Module imports
-    use open_art_market::open_art_market::{Self as oam, ArtworkShard, AdminCap};
+    use open_art_market::open_art_market::{Self as oam, Artwork, Shares, AdminCap};
 
     // Error codes
     const ECallerNotAShareHolder: u64 = 0;
@@ -18,8 +19,7 @@ module open_art_market::dao {
     const EVotingPeriodEnded: u64 = 2;
 
     // Structs
-    struct Vote has store, drop {
-        weight: u64,
+    struct Vote has store {
         choice: bool,
     }
 
@@ -28,7 +28,8 @@ module open_art_market::dao {
         id: UID,
         artwork_id: ID,
         request: String,
-        vote_record: Table<address, Vote>, // maps addresses to their vote
+        yes_votes: u64,
+        no_votes: u64,
         is_active: bool,
         // @todo add a way to limit the voting period with the clock
     }
@@ -42,7 +43,8 @@ module open_art_market::dao {
             id: object::new(ctx),
             artwork_id,
             request,
-            vote_record: table::new<address, Vote>(ctx),
+            yes_votes: 0,
+            no_votes: 0,
             is_active: true,
         };
         transfer::public_share_object<VoteRequest>(vote_request);
@@ -51,24 +53,29 @@ module open_art_market::dao {
     /// This function allows shareholder to vote for a vote request
     /// This function assumes that the user has only one shard of an artwork
     /// If the user has more than one shards of an artwork, it should be merged into one shard before voting with open_art_market::merge_artwork_shards
-    public fun vote(artwork_shard: &mut ArtworkShard, vote_request: &mut VoteRequest, choice: bool, ctx: &mut TxContext) {
-
-        // Make sure that the caller has shares of the artwork that the question was posted for and vote request period has not ended yet
-        assert!(oam::get_shard_artwork_id(artwork_shard) == vote_request.artwork_id, ECallerNotAShareHolder);
-        assert!(vote_request.is_active == true, EVotingPeriodEnded);
-
-        // Make sure that the caller has not voted yet
+    public fun vote(artwork: &Artwork, vote_request: &mut VoteRequest, choice: bool, ctx: &mut TxContext) {
         let sender = tx_context::sender(ctx);
-        let has_voted = table::contains<address, Vote>(&vote_request.vote_record, sender);
+
+        // Make sure that the caller has shares of the artwork that the question was posted for
+        let artwork_id = oam::get_artwork_id(artwork);
+        assert!(df::exists_(artwork_id, sender) == true, ECallerNotAShareHolder);
+        // Ensure that vote request period has not ended
+        assert!(vote_request.is_active == true, EVotingPeriodEnded);
+        // Make sure that the caller has not voted yet
+        let has_voted = df::exists_(&mut vote_request.id, sender);
         assert!(has_voted == false, ECallerAlreadyVoted);
 
+        let caller_shares_s = df::borrow<address, Shares>(oam::get_artwork_id(artwork), sender);
+        let caller_shares = oam::get_user_shares(caller_shares_s);
         // Update the vote record
-        let vote = Vote {
-            weight: oam::get_shard_shares(artwork_shard),
-            choice,
+        if(choice == true) {
+            vote_request.yes_votes = vote_request.yes_votes + caller_shares;
+        } else {
+            vote_request.no_votes = vote_request.no_votes + caller_shares;
         };
-        
-        table::add(&mut vote_request.vote_record, sender, vote);
+
+        // Record that this user has already voted
+        df::add(&mut vote_request.id, sender, Vote { choice });
     }
         
 }

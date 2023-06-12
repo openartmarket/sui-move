@@ -50,6 +50,7 @@ ADMIN_CAP_ID=$ADMIN_CAP_ID
 PUBLISHER_ID=$PUBLISHER_ID
 SUI_NETWORK=$NETWORK
 ADMIN_PHRASE=$ADMIN_PHRASE
+USER_PHRASE=$USER_PHRASE
 ENV
 
 echo "Waiting for Fullnode to sync..."
@@ -62,6 +63,9 @@ npm install
 echo "Creating Artwork Display..."
 
 npm run create:artwork-display
+sleep 5
+
+npm run create:artwork-shard-display
 sleep 5
 
 echo "Creating Mona Lisa Artwork..."
