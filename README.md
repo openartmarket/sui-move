@@ -17,7 +17,7 @@ PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)
 - Install dependencies: `npm install` (optional as it is performed by the publish script)
 - Export your ADMIN_PHRASE as an environment variable: `export ADMIN_PHRASE=lost soul ...`
 - Export your USER_PHRASE as an environment variable: `export USER_PHRASE=lost soul ...`
-- Make sure you switched to the admin address before moving forward
+- Make sure you have switched to the admin address before moving forward
 - Publish the contracts: `npm run publish <network>` If you don't specify a network, it will default to `local` 
 - The publish script will deploy the contracts, set the .env variables, create the displays and create an artwork
 
