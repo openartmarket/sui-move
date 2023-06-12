@@ -75,6 +75,7 @@ sui client switch --address <your new address>
 
 # Run publish
 ```sh
+sui start
 cd setup 
 npm install
 npm run publish
