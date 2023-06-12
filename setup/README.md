@@ -52,3 +52,30 @@ In this module the admin can create a new voting request for the shareholders of
 # Setup
 
 We have implemented programmable transactions to test the flow start to end. By running `npm run test:s2e` an Artwork, and then an ArtworkShard will be created, along with a new voting request.
+
+
+# Installing
+```sh
+asdf install
+sui client new-env --alias local --rpc http://127.0.0.1:9000 
+sui client switch --env local
+```
+
+# Setup before running publish
+1. Use `sui` cli tool to create a new address, one for admin and one for buyer
+```sh
+sui client new-address ed25519
+sui client switch --address <your new address>
+```
+2. Install [SUI-Wallet](https://chrome.google.com/webstore/detail/sui-wallet/opcgpfmipidbgpenhmajoajpbobppdil)
+3. Import the address created in step 1
+4. Create a `.envrc` file in the root of the project
+  - Add `export ADMIN_PHRASE=<your admin phrase>` & `export USER_PHRASE=<your user phrase>` to the `.envrc` file
+5. Transfer SUI coin to buyer wallet, for gas fees from SUI- Wallet
+
+# Run publish
+```sh
+cd setup 
+npm install
+npm run publish
+```

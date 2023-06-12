@@ -9,7 +9,7 @@ for i in jq sui; do
 done
 
 # default network is localnet
-NETWORK=http://localhost:9000
+NETWORK=http://127.0.0.1:9000
 
 # If otherwise specified chose testnet or devnet
 if [ $# -ne 0 ]; then
