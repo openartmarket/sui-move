@@ -12,7 +12,7 @@
       </ul>
     </li>
     <li>
-      <a href="#about-the-project">Setup</a>
+      <a href="#setup">Setup</a>
     </li>
   </ol>
 </details>
