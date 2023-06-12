@@ -3,7 +3,7 @@ import { getSigner } from "./helpers";
 import { adminCap, packageId } from "./config";
 
 export async function endRequestVoting(voteRequest: string) {
-  let signer = getSigner();
+  let { signer } = getSigner("admin");
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -20,7 +20,7 @@ export async function endRequestVoting(voteRequest: string) {
       },
     });
 
-    console.log("effects", getExecutionStatus(txRes)?.status, txRes.effects);
+    console.log("effects", getExecutionStatus(txRes));
   } catch (e) {
     console.error("Could not end voting request", e);
   }

@@ -6,11 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "./publish.sh",
-    "create:artwork-display": "tsc && env-cmd -f .env node dist/src/artwork_display",
-    "create:artwork": "tsc && env-cmd -f .env node dist/src/artwork",
-    "create:artwork-shard": "tsc && env-cmd -f .env node dist/src/artwork_shard",
-    "create:vote-request": "tsc && env-cmd -f .env node dist/src/vote_request",
-    "vote": "tsc && env-cmd -f .env node dist/src/vote",
+    "create:artwork-display": "tsc && env-cmd -f .env node dist/src/artwork_display atomic-run",
+    "create:artwork-shard-display": "tsc && env-cmd -f .env node dist/src/artwork_shard_display atomic-run",
+    "create:artwork": "tsc && env-cmd -f .env node dist/src/artwork atomic-run",
+    "create:artwork-shard": "tsc && env-cmd -f .env node dist/src/artwork_shard atomic-run",
+    "create:vote-request": "tsc && env-cmd -f .env node dist/src/vote_request atomic-run",
+    "vote": "tsc && env-cmd -f .env node dist/src/vote atomic-run",
     "test:s2e": "tsc && env-cmd -f .env node dist/test_scenarios/start_to_end"
   },
   "author": "",

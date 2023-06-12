@@ -6,22 +6,17 @@ import {
 import { packageId, adminCap } from "./config";
 import { getSigner } from "./helpers";
 
-export async function mintArtworkShard(
-  artwork: string,
-  shares: number
-) {
+export async function mintArtworkShard(artwork: string, shares: number) {
   console.log("Mint artwork shard for: %s", artwork);
 
-  let signer = getSigner();
-  let admin = await signer.getAddress();
+  let { signer } = getSigner("admin");
+  let { address } = getSigner("user");
   const tx = new TransactionBlock();
 
-  let artwork_shard = tx.moveCall({
+  tx.moveCall({
     target: `${packageId}::open_art_market::mint_artwork_shard`,
-    arguments: [tx.object(adminCap), tx.object(artwork), tx.pure(shares)],
+    arguments: [tx.object(adminCap), tx.object(artwork), tx.pure(shares), tx.pure(address)],
   });
-
-  tx.transferObjects([artwork_shard], tx.pure(admin));
 
   try {
     let txRes = await signer.signAndExecuteTransactionBlock({
@@ -33,7 +28,7 @@ export async function mintArtworkShard(
       },
     });
 
-    console.log("effects", getTransactionEffects(txRes)?.status);
+    console.log("effects", getTransactionEffects(txRes));
     let artwork_shard_id = getCreatedObjects(txRes)?.[0].reference.objectId;
     console.log("artwork_shard_id", artwork_shard_id);
     return artwork_shard_id;
@@ -42,7 +37,9 @@ export async function mintArtworkShard(
   }
 }
 
-mintArtworkShard(
-  "0x3e88c14f87d56779b90429095d5dc30a995e3b4edf27e206366f192275eb4d84",
-  2
-);
+if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
+  mintArtworkShard(
+    "0x3e88c14f87d56779b90429095d5dc30a995e3b4edf27e206366f192275eb4d84",
+    2
+  );
+}
