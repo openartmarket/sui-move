@@ -56,7 +56,7 @@ We have implemented programmable transactions to test the flow start to end. By 
 
 # Installing
 ```sh
-asdf install
+../scripts/bootstrap.sh
 sui client new-env --alias local --rpc http://127.0.0.1:9000 
 sui client switch --env local
 ```
