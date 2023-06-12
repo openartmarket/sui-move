@@ -1,5 +1,5 @@
 # Open Art Market
-PoC contracts for a potential partner: https://www.openartmarket.com/
+PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)
 
 
 ## Quick start guide
