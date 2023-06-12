@@ -1,0 +1,9 @@
+[package]
+name = "open_art_market"
+version = "0.0.1"
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
+
+[addresses]
+open_art_market = "0x0"

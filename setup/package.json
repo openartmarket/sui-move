@@ -1,0 +1,27 @@
+{
+  "name": "setup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "./publish.sh",
+    "create:artwork-display": "tsc && env-cmd -f .env node dist/src/artwork_display",
+    "create:artwork": "tsc && env-cmd -f .env node dist/src/artwork",
+    "create:artwork-shard": "tsc && env-cmd -f .env node dist/src/artwork_shard",
+    "create:vote-request": "tsc && env-cmd -f .env node dist/src/vote_request",
+    "vote": "tsc && env-cmd -f .env node dist/src/vote",
+    "test:s2e": "tsc && env-cmd -f .env node dist/test_scenarios/start_to_end"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mysten/bcs": "^0.6.1",
+    "@mysten/sui.js": "^0.34.1",
+    "dotenv": "^16.0.3",
+    "typescript": "^5.0.2"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0"
+  }
+}
