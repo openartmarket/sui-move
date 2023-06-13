@@ -39,7 +39,7 @@ export async function mintArtworkShard(artwork: string, shares: number) {
 
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
   mintArtworkShard(
-    "0x3e88c14f87d56779b90429095d5dc30a995e3b4edf27e206366f192275eb4d84",
-    2
+    "{artwork}",
+    5
   );
 }

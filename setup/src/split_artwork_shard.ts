@@ -1,16 +1,18 @@
 import { TransactionBlock, getExecutionStatus } from "@mysten/sui.js";
 import { getSigner } from "./helpers";
-import { adminCap, packageId } from "./config";
+import { packageId } from "./config";
 
-export async function endRequestVoting(voteRequest: string) {
-  let { signer } = getSigner("admin");
+export async function splitArtworkShard(artwork: string, artworkShard: string, shares: number) {
+  let { signer } = getSigner("user");
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::dao::end_request_voting`,
-    arguments: [tx.object(adminCap), tx.object(voteRequest)],
+    target: `${packageId}::open_art_market::split_artwork_shard`,
+    arguments: [tx.object(artwork), tx.object(artworkShard), tx.pure(shares)],
   });
 
+  console.log("Split artwork shard for: %s", artwork);
+  
   try {
     let txRes = await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
@@ -22,12 +24,14 @@ export async function endRequestVoting(voteRequest: string) {
 
     console.log("effects", getExecutionStatus(txRes));
   } catch (e) {
-    console.error("Could not end voting request", e);
+    console.error("Could not split artwork shard", e);
   }
 }
 
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  endRequestVoting(
-    "{voteRequest}"
+  splitArtworkShard(
+    "{artwork}",
+    "{artworkShard}",
+    2
   );
 }

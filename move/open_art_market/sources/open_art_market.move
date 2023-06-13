@@ -17,7 +17,9 @@ module open_art_market::open_art_market {
     const EITONotFinished: u64 = 3;
     const EInvalidSupply: u64 = 4;
     const EInvalidIncomingPrice: u64 = 5;
-    const EinvalidOutgoingPrice: u64 = 6;
+    const EInvalidMultiplier: u64 = 6;
+    const EInvalidShares: u64 = 7;
+    const ECallerNotAShareHolder: u64 = 8;
 
     // Structs
     // An ArtworkShard NFT
@@ -45,6 +47,7 @@ module open_art_market::open_art_market {
         shares: u64,
         incoming_price: u64,
         outgoing_price: u64,
+        multiplier: u64,
         name: String,
         artist: String,
         creation_date: u64,
@@ -75,8 +78,7 @@ module open_art_market::open_art_market {
     
     // Create a new Artwork NFT shared object
     public fun mint_artwork_and_share(
-        _: &mut AdminCap, total_supply: u64, incoming_price: u64,
-        outgoing_price: u64, name: String, artist: String,
+        _: &mut AdminCap, total_supply: u64, incoming_price: u64, multiplier: u64, name: String, artist: String,
         creation_date: u64, description: String,
         image_url: String, ctx: &mut TxContext
     ) {
@@ -84,7 +86,9 @@ module open_art_market::open_art_market {
         // Ensure that numeric values are larger than 0
         assert!(total_supply > 0, EInvalidSupply);
         assert!(incoming_price > 0, EInvalidIncomingPrice);
-        assert!(outgoing_price > 0, EinvalidOutgoingPrice);
+        assert!(multiplier > 0, EInvalidMultiplier);
+
+        let outgoing_price = incoming_price * multiplier;
 
         let artwork = Artwork {
             id: object::new(ctx),
@@ -92,6 +96,7 @@ module open_art_market::open_art_market {
             shares: total_supply,
             incoming_price,
             outgoing_price,
+            multiplier,
             name,
             artist,
             creation_date,
@@ -124,7 +129,7 @@ module open_art_market::open_art_market {
             id: object::new(ctx),
             artwork_id: object::uid_to_inner(&artwork.id),
             shares,
-            incoming_price: artwork.incoming_price,
+            incoming_price: (artwork.incoming_price / artwork.total_supply) * shares,
             artwork_name: artwork.name,
             artist: artwork.artist,
             creation_date: artwork.creation_date,
@@ -185,6 +190,7 @@ module open_art_market::open_art_market {
 
     }
 
+    // Function to merge two shards owned by the same user
     public fun merge_artwork_shards(artwork_shard1: &mut ArtworkShard, artwork_shard2: ArtworkShard) {
 
         // Ensure that both shards belong to the same artwork
@@ -196,7 +202,46 @@ module open_art_market::open_art_market {
         
     }
 
-    // @todo: do we need a split method?
+    // Function to split a shard into two shards
+    public fun split_artwork_shard(artwork: &mut Artwork, artwork_shard: &mut ArtworkShard, shares: u64, ctx: &mut TxContext) {
+        let sender = tx_context::sender(ctx);
+
+        // Ensure that the shard belongs to the artwork
+        assert!(object::uid_to_inner(&artwork.id) == artwork_shard.artwork_id, EInvalidArtwork);
+
+        // Ensure that the sender is a shareholder of the artwork
+        assert!(df::exists_(&artwork.id, sender) == true, ECallerNotAShareHolder);
+
+        // Ensure that the original shard has sufficient shares to split
+        assert!(artwork_shard.shares > shares, EInsufficientShares);
+        
+        let shares2 = artwork_shard.shares - shares;
+
+        // Create new shard with remaining shares
+        let artwork_shard2 = ArtworkShard {
+            id: object::new(ctx),
+            artwork_id: artwork_shard.artwork_id,
+            shares: shares2,
+            incoming_price: (artwork_shard.incoming_price / artwork_shard.shares) * shares2,
+            artwork_name: artwork_shard.artwork_name,
+            artist: artwork_shard.artist,
+            creation_date: artwork_shard.creation_date,
+            description: artwork_shard.description,
+            image_url: artwork_shard.image_url,
+        };
+
+        // Update shares and incoming price of original shard
+        artwork_shard.incoming_price = (artwork_shard.incoming_price / artwork_shard.shares) * shares;
+        artwork_shard.shares = shares;
+
+        // Transfer new shard to sender
+        transfer::transfer(artwork_shard2, tx_context::sender(ctx));
+    }
+
+    // Function to update the outgoing price of an Artwork
+    public fun update_outgoing_price(_: &AdminCap, artwork: &mut Artwork, new_outgoing_price: u64) {
+        artwork.outgoing_price = new_outgoing_price;
+    }
 
     // Accessors
 

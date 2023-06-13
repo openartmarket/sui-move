@@ -1,6 +1,7 @@
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
 import { endRequestVoting } from "../src/end_request_voting";
+import { splitArtworkShard } from "../src/split_artwork_shard";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
 
@@ -10,7 +11,7 @@ async function startToEndScenario() {
   let artwork = await mintArtwork(
     1000,
     10,
-    100,
+    2,
     "Mona Lisa",
     "Leonardo da Vinci",
     "1685548680595",
@@ -23,6 +24,9 @@ async function startToEndScenario() {
   let artworkShard = await mintArtworkShard(artwork, 10);
   if (!artworkShard) throw new Error("Could not mint artwork shard");
 
+  // Split artwork shard
+  await splitArtworkShard(artwork, artworkShard, 2);
+  
   // Admin reates a vote request for the artwork
   let voteRequest = await createVoteRequest(
     artwork,
@@ -33,8 +37,8 @@ async function startToEndScenario() {
   // User votes for vote request
   await vote(artwork, voteRequest, true);
 
-  // // End voting for vote request
-  // await endRequestVoting(voteRequest);
+  // End voting for vote request
+  await endRequestVoting(voteRequest);
 }
 
 startToEndScenario();

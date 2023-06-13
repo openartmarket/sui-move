@@ -77,5 +77,10 @@ module open_art_market::dao {
         // Record that this user has already voted
         df::add(&mut vote_request.id, sender, Vote { choice });
     }
+
+    // Function to end the voting period
+    public fun end_request_voting(_: &AdminCap, vote_request: &mut VoteRequest) {
+        vote_request.is_active = false;
+    }
         
 }
