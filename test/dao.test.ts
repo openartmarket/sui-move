@@ -1,10 +1,11 @@
 import assert from "assert";
+
 import { mintArtwork } from "../setup/src/artwork";
 import { mintArtworkShard } from "../setup/src/artwork_shard";
 import { adminPhrase, user1, user2, user3 } from "../setup/src/config";
-import { createVoteRequest } from "../setup/src/vote_request";
-import { vote } from "../setup/src/vote";
 import { endRequestVoting } from "../setup/src/end_request_voting";
+import { vote } from "../setup/src/vote";
+import { createVoteRequest } from "../setup/src/vote_request";
 
 const artworkOptions = {
   totalSupply: 500,
@@ -46,6 +47,16 @@ describe("DAO Voting structure", () => {
     assert.ok(voteRequest);
     const userVote = await vote(artworkId, voteRequest, user1, true);
     assert.ok(userVote);
+  });
+  it("cannot double vote as a shareholder", async () => {
+    const voteRequest = await createVoteRequest(
+      artworkId,
+      "Request to sell artwork to Museum"
+    );
+    assert.ok(voteRequest);
+    const userVote = await vote(artworkId, voteRequest, user1, true);
+    assert.ok(userVote);
+    await assert.rejects(vote(artworkId, voteRequest, user1, true));
   });
   it("cannot vote if not a shareholder", async () => {
     const voteRequest = await createVoteRequest(

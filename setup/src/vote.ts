@@ -1,10 +1,7 @@
-import {
-  TransactionBlock,
-  getExecutionStatus,
-  getTransaction,
-} from "@mysten/sui.js";
-import { getSigner } from "./helpers";
+import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+
 import { packageId, user1 } from "./config";
+import { getSigner } from "./helpers";
 
 export async function vote(
   artwork: string,
@@ -12,7 +9,7 @@ export async function vote(
   voterAccount: string,
   choice: boolean
 ) {
-  let { signer } = getSigner(voterAccount);
+  const { signer } = getSigner(voterAccount);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -21,7 +18,7 @@ export async function vote(
   });
 
   try {
-    let txRes = await signer.signAndExecuteTransactionBlock({
+    const txRes = await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       requestType: "WaitForLocalExecution",
       options: {

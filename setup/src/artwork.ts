@@ -1,9 +1,10 @@
 import {
-  TransactionBlock,
   getCreatedObjects,
   getExecutionStatus,
+  TransactionBlock,
 } from "@mysten/sui.js";
-import { packageId, adminCap, adminPhrase } from "./config";
+
+import { adminCap, adminPhrase, packageId } from "./config";
 import { getSigner } from "./helpers";
 
 export async function mintArtwork(params: {
@@ -29,7 +30,7 @@ export async function mintArtwork(params: {
 
   // console.log("Mint artwork: %s", name + " by " + artist);
 
-  let { signer } = getSigner(adminPhrase);
+  const { signer } = getSigner(adminPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -48,7 +49,7 @@ export async function mintArtwork(params: {
   });
 
   try {
-    let txRes = await signer.signAndExecuteTransactionBlock({
+    const txRes = await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       requestType: "WaitForLocalExecution",
       options: {
@@ -59,7 +60,7 @@ export async function mintArtwork(params: {
 
     // console.log("effects", getExecutionStatus(txRes));
 
-    let artworkId = getCreatedObjects(txRes)?.[0].reference.objectId;
+    const artworkId = getCreatedObjects(txRes)?.[0].reference.objectId;
     // console.log("artworkId", artworkId);
 
     return artworkId;

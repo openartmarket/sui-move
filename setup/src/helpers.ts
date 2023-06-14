@@ -4,15 +4,19 @@ import {
   JsonRpcProvider,
   RawSigner,
 } from "@mysten/sui.js";
+
 import { SUI_NETWORK } from "./config";
 
 // console.log("Connecting to ", SUI_NETWORK);
 
-export function getSigner(phrase: string) {
+export function getSigner(phrase: string): {
+  signer: RawSigner;
+  address: string;
+} {
   const connOptions = new Connection({
     fullnode: SUI_NETWORK,
   });
-  let provider = new JsonRpcProvider(connOptions);
+  const provider = new JsonRpcProvider(connOptions);
 
   const keypair = Ed25519Keypair.deriveKeypair(phrase!);
   const signer = new RawSigner(keypair, provider);

@@ -34,10 +34,10 @@
     "compile:cjs": "tsc --build tsconfig.cjs.json",
     "compile:esm": "tsc --build tsconfig.esm.json",
     "format": "prettier-eslint --write '{setup/src,test}/**/*.{ts,d.ts}'",
+    "lint": "eslint --ext ts --fix --max-warnings 0 '{setup/src,test}/**/*.{ts,d.ts}'",
     "start": "npm run clean && npm run compile && npm run start-node",
     "start-node": "sui start",
     "test": "npm run compile && mocha --config .mocharc.cjs.cjs dist/cjs/test"
-    
   },
   "keywords": [],
   "author": "",
@@ -46,6 +46,7 @@
     "@mysten/bcs": "0.7.1",
     "@mysten/sui.js": "0.35.1",
     "@types/mocha": "10.0.1",
+    "@typescript-eslint/eslint-plugin": "5.59.11",
     "dotenv": "16.1.4",
     "eslint": "8.41.0",
     "eslint-config-prettier": "8.8.0",

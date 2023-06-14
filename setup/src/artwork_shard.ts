@@ -1,9 +1,10 @@
 import {
-  TransactionBlock,
   getCreatedObjects,
   getTransactionEffects,
+  TransactionBlock,
 } from "@mysten/sui.js";
-import { packageId, adminCap, adminPhrase, user1 } from "./config";
+
+import { adminCap, adminPhrase, packageId, user1 } from "./config";
 import { getSigner } from "./helpers";
 
 export async function mintArtworkShard(
@@ -13,8 +14,8 @@ export async function mintArtworkShard(
 ) {
   // console.log("Mint artwork shard for: %s", artwork);
 
-  let { signer } = getSigner(adminPhrase);
-  let { address } = getSigner(account);
+  const { signer } = getSigner(adminPhrase);
+  const { address } = getSigner(account);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -28,7 +29,7 @@ export async function mintArtworkShard(
   });
 
   try {
-    let txRes = await signer.signAndExecuteTransactionBlock({
+    const txRes = await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       requestType: "WaitForLocalExecution",
       options: {
@@ -38,7 +39,7 @@ export async function mintArtworkShard(
     });
 
     // console.log("effects", getTransactionEffects(txRes));
-    let artwork_shard_id = getCreatedObjects(txRes)?.[0].reference.objectId;
+    const artwork_shard_id = getCreatedObjects(txRes)?.[0].reference.objectId;
     // console.log("artwork_shard_id", artwork_shard_id);
     return artwork_shard_id;
   } catch (e) {

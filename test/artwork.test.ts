@@ -1,4 +1,5 @@
 import assert from "assert";
+
 import { mintArtwork } from "../setup/src/artwork";
 import { mintArtworkShard } from "../setup/src/artwork_shard";
 import { adminPhrase, user1, user2, user3 } from "../setup/src/config";
@@ -31,13 +32,6 @@ describe("Artwork issue a contract", () => {
   });
   it("should not issue new shares, when asking for too much", async () => {
     await assert.rejects(mintArtworkShard(artworkId, user1, 501));
-  });
-  it("should not issue new shares, when sold out", async () => {
-    const sale1 = await mintArtworkShard(artworkId, user1, 250);
-    assert.ok(sale1);
-    const sale2 = await mintArtworkShard(artworkId, user2, 250);
-    assert.ok(sale2);
-    await assert.rejects(mintArtworkShard(artworkId, user3, 1));
   });
   it("should not issue new shares, when sold out", async () => {
     const sale1 = await mintArtworkShard(artworkId, user1, 150);
