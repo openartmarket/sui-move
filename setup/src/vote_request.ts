@@ -33,6 +33,7 @@ export async function createVoteRequest(artwork_id: string, request: string) {
     return vote_request_id;
   } catch (e) {
     console.error("Could not create vote request", e);
+    throw new Error("Could not create vote request");
   }
 }
 

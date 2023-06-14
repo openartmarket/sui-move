@@ -23,7 +23,7 @@ export function getSigner(account: "user" | "admin" = "admin") {
   const signer = new RawSigner(keypair, provider);
 
   const address = keypair.getPublicKey().toSuiAddress();
-  console.log("Signer Address = " + address);
+  console.log(account + " signer Address = " + address);
 
   return { signer, address };
 }

@@ -34,6 +34,7 @@ export async function mintArtworkShard(artwork: string, shares: number) {
     return artwork_shard_id;
   } catch (e) {
     console.error("Could not mint artwork shard", e);
+    throw new Error("Could not mint artwork shard");
   }
 }
 

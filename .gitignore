@@ -3,3 +3,4 @@
 .env
 **/.publish.res.json
 output/*.json
+node_modules

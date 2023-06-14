@@ -54,6 +54,7 @@ export async function mintArtwork(
     return artworkId;
   } catch (e) {
     console.error("Could not mint artwork", e);
+    throw new Error("Could not mint artwork");
   }
 }
 

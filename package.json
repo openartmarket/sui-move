@@ -1,0 +1,53 @@
+{
+  "name": "sui-move",
+  "version": "1.0.0",
+  "description": "PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)",
+  "main": "dist/cjs/src/index.js",
+  "files": [
+    "dist/cjs",
+    "dist/esm"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/src/index.js",
+      "require": "./dist/cjs/src/index.js"
+    },
+    "./test-helpers": {
+      "import": "./dist/esm/src/test-helpers/index.js",
+      "require": "./dist/cjs/src/test-helpers/index.js"
+    }
+  },
+  "types": "dist/esm/src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "test-helpers": [
+        "./dist/esm/src/test-helpers/index.d.ts"
+      ]
+    }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "clean": "rm -rf ~/.sui",
+    "start-node": "sui start",
+    "compile": "npm run compile:cjs && npm run compile:esm",
+    "compile:cjs": "tsc --build tsconfig.cjs.json",
+    "compile:esm": "tsc --build tsconfig.esm.json",
+    "test": "mocha --config .mocharc.cjs.cjs dist/cjs/test"
+    
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@mysten/bcs": "0.7.1",
+    "@mysten/sui.js": "0.35.1",
+    "@types/mocha": "10.0.1",
+    "dotenv": "16.1.4",
+    "mocha": "10.2.0",
+    "prettier": "2.8.8",
+    "ts-node": "10.9.1",
+    "typescript": "5.1.3"
+  }
+}
