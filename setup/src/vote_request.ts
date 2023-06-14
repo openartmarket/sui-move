@@ -3,13 +3,13 @@ import {
   getCreatedObjects,
   getExecutionStatus,
 } from "@mysten/sui.js";
-import { packageId, adminCap } from "./config";
+import { packageId, adminCap, adminPhrase } from "./config";
 import { getSigner } from "./helpers";
 
 export async function createVoteRequest(artwork_id: string, request: string) {
-  console.log("Mint artwork shard for: %s", artwork_id);
+  // console.log("Mint artwork shard for: %s", artwork_id);
 
-  let { signer } = getSigner("admin");
+  let { signer } = getSigner(adminPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -27,12 +27,12 @@ export async function createVoteRequest(artwork_id: string, request: string) {
       },
     });
 
-    console.log("effects", getExecutionStatus(txRes));
+    // console.log("effects", getExecutionStatus(txRes));
     let vote_request_id = getCreatedObjects(txRes)?.[0].reference.objectId;
-    console.log("vote request id", vote_request_id);
+    // console.log("vote request id", vote_request_id);
     return vote_request_id;
   } catch (e) {
-    console.error("Could not create vote request", e);
+    // console.error("Could not create vote request", e);
     throw new Error("Could not create vote request");
   }
 }

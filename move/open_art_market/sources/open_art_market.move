@@ -196,8 +196,15 @@ module open_art_market::open_art_market {
         
     }
 
-    // @todo: do we need a split method?
+    // @todo: we need a split ArtworkShard method?
+  
+    // @todo: method for setting the currency type (can be done at minting time)
+    // @todo: method for setting the outgoing price
+    // @todo: method for getting available shares for sale
 
+    // Open Art Market & Artwork Owner (person coming with the artwork to the market) has shares allocated for sale. 
+    // We will create those Artwork Shards as the first action after minting the Artwork
+    
     // Accessors
 
     public fun get_shard_artwork_id(artwork_shard: &ArtworkShard): ID {

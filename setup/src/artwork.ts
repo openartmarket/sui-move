@@ -3,10 +3,10 @@ import {
   getCreatedObjects,
   getExecutionStatus,
 } from "@mysten/sui.js";
-import { packageId, adminCap } from "./config";
+import { packageId, adminCap, adminPhrase } from "./config";
 import { getSigner } from "./helpers";
 
-export async function mintArtwork(
+export async function mintArtwork(params:{
   totalSupply: number,
   ingoingPrice: number,
   outgoingPrice: number,
@@ -15,10 +15,13 @@ export async function mintArtwork(
   creationDate: string,
   description: string,
   image: string
+}
 ) {
-  console.log("Mint artwork: %s", name + " by " + artist);
+  const { totalSupply, ingoingPrice, outgoingPrice, name, artist, creationDate, description, image } = params;
+  
+  // console.log("Mint artwork: %s", name + " by " + artist);
 
-  let { signer } = getSigner();
+  let { signer } = getSigner(adminPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -46,27 +49,28 @@ export async function mintArtwork(
       },
     });
 
-    console.log("effects", getExecutionStatus(txRes));
+    // console.log("effects", getExecutionStatus(txRes));
 
     let artworkId = getCreatedObjects(txRes)?.[0].reference.objectId;
-    console.log("artworkId", artworkId);
+    // console.log("artworkId", artworkId);
 
     return artworkId;
   } catch (e) {
-    console.error("Could not mint artwork", e);
+    // console.error("Could not mint artwork", e);
     throw new Error("Could not mint artwork");
   }
 }
 
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  mintArtwork(
-    500,
-    10,
-    100,
-    "Mona Lisa",
-    "Leonardo da Vinci",
-    "1685548680595",
-    "Choconta painting",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
+  mintArtwork({
+    totalSupply: 500,
+    ingoingPrice: 10,
+    outgoingPrice: 100,
+    name: "Mona Lisa",
+    artist: "Leonardo da Vinci",
+    creationDate: "1685548680595",
+    description: "Choconta painting",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
+  }
   );
 }

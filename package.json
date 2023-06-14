@@ -30,11 +30,13 @@
   },
   "scripts": {
     "clean": "rm -rf ~/.sui",
-    "start-node": "sui start",
     "compile": "npm run compile:cjs && npm run compile:esm",
     "compile:cjs": "tsc --build tsconfig.cjs.json",
     "compile:esm": "tsc --build tsconfig.esm.json",
-    "test": "mocha --config .mocharc.cjs.cjs dist/cjs/test"
+    "format": "prettier-eslint --write '{src,test}/**/*.{ts,d.ts}'",
+    "start": "npm run clean && npm run compile && npm run start-node",
+    "start-node": "sui start",
+    "test": "npm run compile && mocha --config .mocharc.cjs.cjs dist/cjs/test"
     
   },
   "keywords": [],

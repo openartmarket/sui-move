@@ -1,9 +1,9 @@
 import { TransactionBlock, getExecutionStatus } from "@mysten/sui.js";
 import { getSigner } from "./helpers";
-import { adminCap, packageId } from "./config";
+import { adminCap, adminPhrase, packageId } from "./config";
 
 export async function endRequestVoting(voteRequest: string) {
-  let { signer } = getSigner("admin");
+  let { signer } = getSigner(adminPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -20,8 +20,9 @@ export async function endRequestVoting(voteRequest: string) {
       },
     });
 
-    console.log("effects", getExecutionStatus(txRes));
+    return getExecutionStatus(txRes);
   } catch (e) {
-    console.error("Could not end voting request", e);
+    // console.error("Could not end voting request", e);
+    throw new Error("Could not end voting request");
   }
 }

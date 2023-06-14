@@ -5,4 +5,5 @@ module.exports = {
   "require": 'test/mochaHooks.ts',
   "extension": ["ts"],
   "recursive": true,
+  "timeout": 10000,
 }

@@ -42,11 +42,25 @@ server=$(sui client new-address ed25519 --json)
 export ADMIN_PHRASE=$(echo $server | jq -r '.[1]')
 export ADMIN_ADDRESS=$(echo $server | jq '.[0]')
 
-gas=$(sui client gas --json)
+buyer1=$(sui client new-address ed25519 --json)
+export USER1_PHRASE=$(echo "$buyer1" | jq -r '.[1]')
+export USER1_ADDRESS=$(echo "$buyer1" | jq '.[0]')
 
+buyer2=$(sui client new-address ed25519 --json)
+export USER2_PHRASE=$(echo "$buyer2" | jq -r '.[1]')
+export USER2_ADDRESS=$(echo "$buyer2" | jq '.[0]')
+
+buyer3=$(sui client new-address ed25519 --json)
+export USER3_PHRASE=$(echo "$buyer3" | jq -r '.[1]')
+export USER3_ADDRESS=$(echo "$buyer3" | jq '.[0]')
+
+gas=$(sui client gas --json)
 gas_object=$(echo $gas | jq -r '.[0].id.id')
 
 sui client transfer-sui --amount 200000000000000 --to "$(remove_quotes $ADMIN_ADDRESS)" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
+sui client transfer-sui --amount 200000000000000 --to "$(remove_quotes $USER1_ADDRESS)" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
+sui client transfer-sui --amount 200000000000000 --to "$(remove_quotes $USER2_ADDRESS)" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
+sui client transfer-sui --amount 200000000000000 --to "$(remove_quotes $USER3_ADDRESS)" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
 
 sui client switch --address $(remove_quotes $ADMIN_ADDRESS)
 
@@ -54,16 +68,6 @@ sui client active-address
 sui client active-env
 
 mkdir -p output
-
-owner=$(sui client new-address ed25519 --json)
-export OWNER_PHRASE=$(echo "$owner" | jq -r '.[1]')
-
-buyer=$(sui client new-address ed25519 --json)
-export USER1_PHRASE=$(echo "$buyer" | jq -r '.[1]')
-
-buyer2=$(sui client new-address ed25519 --json)
-export USER2_PHRASE=$(echo "$buyer2" | jq -r '.[1]')
-
 
 publish_res=$(sui client publish --gas-budget 200000000 --json ./move/open_art_market)
 echo ${publish_res} >./output/publish.res.json
@@ -88,9 +92,9 @@ output_json "$PACKAGE_ID" "$ADMIN_CAP_ID" "$PUBLISHER_ID" "$SUI_NETWORK" "$ADMIN
 
 cat >./.envrc <<-EOF
 export ADMIN_PHRASE="$ADMIN_PHRASE"
-export OWNER_PHRASE="$OWNER_PHRASE"
 export USER1_PHRASE="$USER1_PHRASE"
 export USER2_PHRASE="$USER2_PHRASE"
+export USER3_PHRASE="$USER3_PHRASE"
 export SUI_NETWORK="http://127.0.0.1:9000"
 export PACKAGE_ID="$PACKAGE_ID"
 export ADMIN_CAP_ID="$ADMIN_CAP_ID"
