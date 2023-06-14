@@ -6,7 +6,11 @@ import {
 import { packageId, adminCap, adminPhrase, user1 } from "./config";
 import { getSigner } from "./helpers";
 
-export async function mintArtworkShard(artwork: string, account:string, shares: number) {
+export async function mintArtworkShard(
+  artwork: string,
+  account: string,
+  shares: number
+) {
   // console.log("Mint artwork shard for: %s", artwork);
 
   let { signer } = getSigner(adminPhrase);
@@ -15,7 +19,12 @@ export async function mintArtworkShard(artwork: string, account:string, shares: 
 
   tx.moveCall({
     target: `${packageId}::open_art_market::mint_artwork_shard`,
-    arguments: [tx.object(adminCap), tx.object(artwork), tx.pure(shares), tx.pure(address)],
+    arguments: [
+      tx.object(adminCap),
+      tx.object(artwork),
+      tx.pure(shares),
+      tx.pure(address),
+    ],
   });
 
   try {

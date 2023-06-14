@@ -6,19 +6,27 @@ import {
 import { packageId, adminCap, adminPhrase } from "./config";
 import { getSigner } from "./helpers";
 
-export async function mintArtwork(params:{
-  totalSupply: number,
-  ingoingPrice: number,
-  outgoingPrice: number,
-  name: string,
-  artist: string,
-  creationDate: string,
-  description: string,
-  image: string
-}
-) {
-  const { totalSupply, ingoingPrice, outgoingPrice, name, artist, creationDate, description, image } = params;
-  
+export async function mintArtwork(params: {
+  totalSupply: number;
+  ingoingPrice: number;
+  outgoingPrice: number;
+  name: string;
+  artist: string;
+  creationDate: string;
+  description: string;
+  image: string;
+}) {
+  const {
+    totalSupply,
+    ingoingPrice,
+    outgoingPrice,
+    name,
+    artist,
+    creationDate,
+    description,
+    image,
+  } = params;
+
   // console.log("Mint artwork: %s", name + " by " + artist);
 
   let { signer } = getSigner(adminPhrase);
@@ -70,7 +78,7 @@ if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
     artist: "Leonardo da Vinci",
     creationDate: "1685548680595",
     description: "Choconta painting",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
-  }
-  );
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+  });
 }

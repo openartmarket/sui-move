@@ -8,8 +8,7 @@ import { SUI_NETWORK } from "./config";
 
 // console.log("Connecting to ", SUI_NETWORK);
 
-export function getSigner(phrase:string) {
-
+export function getSigner(phrase: string) {
   const connOptions = new Connection({
     fullnode: SUI_NETWORK,
   });

@@ -13,12 +13,7 @@ function getArtworkDisplayFields(
   imageProviderUrlPostfix = ""
 ) {
   return {
-    keys: [
-      "name",
-      "description",
-      "image_url",
-      "project_url",
-    ],
+    keys: ["name", "description", "image_url", "project_url"],
     values: [
       "{name}",
       "{description}",
@@ -32,7 +27,7 @@ async function createArtworkDisplay() {
   let artworkDisplayFields = getArtworkDisplayFields();
 
   let tx = new TransactionBlock();
-  let {signer, address} = getSigner(adminPhrase);
+  let { signer, address } = getSigner(adminPhrase);
 
   let artworkDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
