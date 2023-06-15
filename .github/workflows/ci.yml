@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up Docker
-      uses: docker/setup-docker@v1
+      uses: isbang/compose-action@v1.4.1
     - name: Run docker compose
       run: docker-compose up -d
     - run: ./scripts/wait-for-file ../output/contracts.json 120
