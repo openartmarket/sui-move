@@ -1,4 +1,4 @@
-name: Rust
+name: Continuous Integration
 
 on:
   push:
@@ -10,34 +10,27 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-
-    - name: Set up Node.js with asdf
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl git
-        git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.8.1
-        echo '. $HOME/.asdf/asdf.sh' >> ~/.bashrc
-        echo '. $HOME/.asdf/completions/asdf.bash' >> ~/.bashrc
-        export PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
-        source ~/.bashrc
-    - run: cat ./.tool-versions | cut -d' ' -f1 | xargs -n 1 asdf plugin add || echo "asdf plugins installed"
-
-    - name: Install sui dependencies
-      run: ./scripts/bootstrap.sh
-
-    - name: Start Sui
-      run: sui start
-
+    - name: Set up Docker
+      uses: docker/setup-docker@v1
+    - name: Run docker compose
+      run: docker-compose up -d
+    - run: ./scripts/wait-for-file ../output/contracts.json 120
+    - run: |
+        echo "export ADMIN_PHRASE=$(cat ./output/contract.json | jq '.admin_phrase')" >> .envrc
+        echo "export USER1_PHRASE=$(cat ./output/contract.json | jq '.user1_phrase')" >> .envrc
+        echo "export USER2_PHRASE=$(cat ./output/contract.json | jq '.user2_phrase')" >> .envrc
+        echo "export USER3_PHRASE=$(cat ./output/contract.json | jq '.user3_phrase')" >> .envrc
+        echo "export SUI_NETWORK=http://127.0.0.1:9000" >> .envrc
+        echo "export PACKAGE_ID=$(cat ./output/contract.json | jq '.package_id')" >> .envrc
+        echo "export ADMIN_CAP_ID=$(cat ./output/contract.json | jq '.admin_cap_id')" >> .envrc
+        echo "export PUBLISHER_ID=$(cat ./output/contract.json | jq '.publisher_id')" >> .envrc
+                
     - name: Install npm dependencies
       run: npm ci && cd setup && npm ci
 
-    - name: Deploy contracts
-      run: ./scripts/setup-oam-on-local-node.sh
-
     - name: Run tests
       run: direnv exec . npm test
-    
