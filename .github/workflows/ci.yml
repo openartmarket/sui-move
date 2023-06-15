@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - uses: HatsuneMiku3939/direnv-action@v1
     - run: docker compose up -d
     - run: ./scripts/wait-for-file ./output/contract.json 300
     - run: npm ci && cd setup && npm ci

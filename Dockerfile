@@ -2,7 +2,7 @@ FROM ghcr.io/shinamicorp/sui:testnet-v1.3.0
 # FROM mysten/sui-tools:stable
 USER root
 
-RUN apt-get update && apt install -y jq && apt-get install -y direnv
+RUN apt-get update && apt install -y jq
 
 WORKDIR /usr/src/app
 COPY . .
