@@ -1,7 +1,7 @@
 import { getCreatedObjects, getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
-import { ARTWORK_SHARD_TYPE, publisher } from "./config";
-import { adminPhrase } from "./config";
+import { ARTWORK_SHARD_TYPE, PUBLISHER_ID } from "./config";
+import { ADMIN_PHRASE } from "./config";
 import { getSigner } from "./helpers";
 
 // This is the function you can update to change the display fields
@@ -21,11 +21,11 @@ async function createArtworkShardDisplay() {
   const artworkShardDisplayFields = getArtworkShardDisplayFields();
 
   const tx = new TransactionBlock();
-  const { signer, address } = getSigner(adminPhrase);
+  const { signer, address } = getSigner(ADMIN_PHRASE);
   const artworkShardDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
     arguments: [
-      tx.object(publisher),
+      tx.object(PUBLISHER_ID),
       tx.pure(artworkShardDisplayFields.keys),
       tx.pure(artworkShardDisplayFields.values),
     ],

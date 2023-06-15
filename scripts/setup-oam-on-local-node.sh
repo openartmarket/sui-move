@@ -1,5 +1,5 @@
 #!/bin/sh
-set -ex
+set -e
 
 output_json() {
   local package_id=$1
@@ -56,6 +56,7 @@ sui client active-env
 
 mkdir -p output
 
+# This is the publish command
 publish_res=$(sui client publish --gas-budget 200000000 --json ./move/open_art_market)
 echo ${publish_res} >./output/publish.res.json
 
