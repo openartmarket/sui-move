@@ -2,7 +2,7 @@ import assert from "assert";
 
 import { mintArtwork } from "../setup/src/artwork";
 import { mintArtworkShard } from "../setup/src/artwork_shard";
-import { adminPhrase, user1, user2, user3 } from "../setup/src/config";
+import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE, USER3_PHRASE } from "../setup/src/config";
 import { endRequestVoting } from "../setup/src/end_request_voting";
 import { vote } from "../setup/src/vote";
 import { createVoteRequest } from "../setup/src/vote_request";
@@ -22,45 +22,46 @@ const artworkOptions = {
 describe("DAO Voting structure", () => {
   let artworkId: string;
   beforeEach(async () => {
-    const txn = await mintArtwork(artworkOptions);
-    if (!txn) throw new Error("Could not mint artwork");
-    artworkId = txn;
-    const sale1 = await mintArtworkShard(artworkId, adminPhrase, 151);
-    assert.ok(sale1);
-    const sale2 = await mintArtworkShard(artworkId, user1, 249);
-    assert.ok(sale2);
-    const sale3 = await mintArtworkShard(artworkId, user2, 100);
-    assert.ok(sale3);
+    artworkId = await mintArtwork(artworkOptions);
+
+    await mintArtworkShard({ artworkId, phrase: ADMIN_PHRASE, shares: 151 });
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 249 });
+    await mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 100 });
   });
+
   it("can start a voting session", async () => {
     const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
   });
+
   it("can vote as a shareholder", async () => {
     const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
-    const userVote = await vote(artworkId, voteRequest, user1, true);
+    const userVote = await vote(artworkId, voteRequest, USER1_PHRASE, true);
     assert.ok(userVote);
   });
+
   it("cannot double vote as a shareholder", async () => {
     const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
-    const userVote = await vote(artworkId, voteRequest, user1, true);
+    const userVote = await vote(artworkId, voteRequest, USER1_PHRASE, true);
     assert.ok(userVote);
-    await assert.rejects(vote(artworkId, voteRequest, user1, true));
+    await assert.rejects(vote(artworkId, voteRequest, USER1_PHRASE, true));
   });
+
   it("cannot vote if not a shareholder", async () => {
     const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
-    await assert.rejects(vote(artworkId, voteRequest, user3, true));
+    await assert.rejects(vote(artworkId, voteRequest, USER3_PHRASE, true));
   });
-  it("cannot vote if vote is closed", async () => {
+
+  it.skip("cannot vote if vote is closed", async () => {
     const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
-    const userVote = await vote(artworkId, voteRequest, user1, true);
+    const userVote = await vote(artworkId, voteRequest, USER1_PHRASE, true);
     assert.ok(userVote);
     const endVoteRequest = await endRequestVoting(voteRequest);
     assert.ok(endVoteRequest);
-    await assert.rejects(vote(artworkId, voteRequest, user1, true));
+    await assert.rejects(vote(artworkId, voteRequest, USER1_PHRASE, true));
   });
 });

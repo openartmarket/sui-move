@@ -1,10 +1,10 @@
 import assert from "assert";
 
-import { mintArtwork } from "../setup/src/artwork";
+import { mintArtwork, MintArtworkParams } from "../setup/src/artwork";
 import { mintArtworkShard } from "../setup/src/artwork_shard";
-import { adminPhrase, user1, user2, user3 } from "../setup/src/config";
+import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../setup/src/config";
 
-const artworkOptions = {
+const mintArtworkOptions: MintArtworkParams = {
   totalSupply: 500,
   ingoingPrice: 10,
   outgoingPrice: 100,
@@ -19,40 +19,44 @@ const artworkOptions = {
 describe("Artwork issue a contract", () => {
   let artworkId: string;
   beforeEach(async () => {
-    const txn = await mintArtwork(artworkOptions);
-    if (!txn) throw new Error("Could not mint artwork");
-    artworkId = txn;
+    artworkId = await mintArtwork(mintArtworkOptions);
   });
-  it("should issue a new contract", async () => {
-    assert.ok(artworkId);
-  });
+
   it("should issue new shares", async () => {
-    const sale = await mintArtworkShard(artworkId, user1, 2);
-    assert.ok(sale);
+    const artworkShardId = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 2 });
+    assert.ok(artworkShardId);
   });
+
   it("should not issue new shares, when asking for too much", async () => {
-    await assert.rejects(mintArtworkShard(artworkId, user1, 501));
+    await assert.rejects(mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 501 }));
   });
+
   it("should not issue new shares, when sold out", async () => {
-    const sale1 = await mintArtworkShard(artworkId, user1, 150);
-    assert.ok(sale1);
-    const sale2 = await mintArtworkShard(artworkId, user2, 250);
-    assert.ok(sale2);
-    const sale3 = await mintArtworkShard(artworkId, user3, 100);
-    assert.ok(sale3);
-    await assert.rejects(mintArtworkShard(artworkId, user2, 1));
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 150 });
+    await mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 250 });
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 98 });
+    await assert.rejects(mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 3 }));
   });
+
   it("can give shares to OAM and owner", async () => {
-    const oamShare = await mintArtworkShard(artworkId, adminPhrase, 25);
-    assert.ok(oamShare);
-    const ownerShare = await mintArtworkShard(artworkId, user1, 50);
-    assert.ok(ownerShare);
-    const sale1 = await mintArtworkShard(artworkId, user2, 1);
-    assert.ok(sale1);
+    await mintArtworkShard({ artworkId, phrase: ADMIN_PHRASE, shares: 150 });
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 50 });
+    await mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 1 });
   });
-  it.skip("can set a currency of a contract", async () => {});
-  it.skip("can sell some shares to another user", async () => {});
-  it.skip("can sell the whole artwork and change the owner of the artwork", async () => {});
-  it.skip("can set the outgoing sale price of the artwork", async () => {});
-  it.skip("can burn the shares after artwork is sold", async () => {});
+
+  it.skip("can set a currency of a contract", async () => {
+    assert.ok(false);
+  });
+  it.skip("can sell some shares to another user", async () => {
+    assert.ok(false);
+  });
+  it.skip("can sell the whole artwork and change the owner of the artwork", async () => {
+    assert.ok(false);
+  });
+  it.skip("can set the outgoing sale price of the artwork", async () => {
+    assert.ok(false);
+  });
+  it.skip("can burn the shares after artwork is sold", async () => {
+    assert.ok(false);
+  });
 });

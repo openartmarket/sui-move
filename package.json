@@ -37,7 +37,8 @@
     "lint": "eslint --ext ts --fix --max-warnings 0 '{setup/src,test}/**/*.{ts,d.ts}'",
     "start": "npm run clean && npm run compile && npm run start-node",
     "start-node": "sui start",
-    "test": "npm run compile && mocha --config .mocharc.cjs.cjs dist/cjs/test"
+    "test": "npm run compile && mocha --config .mocharc.cjs.cjs dist/cjs/test",
+    "upgrade": "npm-check-updates --upgrade"
   },
   "keywords": [],
   "author": "",
@@ -55,6 +56,7 @@
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-simple-import-sort": "10.0.0",
     "mocha": "10.2.0",
+    "npm-check-updates": "16.10.12",
     "prettier": "2.8.8",
     "prettier-eslint-cli": "7.1.0",
     "ts-node": "10.9.1",

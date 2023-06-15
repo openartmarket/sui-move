@@ -8,12 +8,13 @@ export function getSigner(phrase: string): {
   signer: RawSigner;
   address: string;
 } {
+  if (!phrase) throw new Error("No phrase provided");
   const connOptions = new Connection({
     fullnode: SUI_NETWORK,
   });
   const provider = new JsonRpcProvider(connOptions);
 
-  const keypair = Ed25519Keypair.deriveKeypair(phrase!);
+  const keypair = Ed25519Keypair.deriveKeypair(phrase);
   const signer = new RawSigner(keypair, provider);
 
   const address = keypair.getPublicKey().toSuiAddress();

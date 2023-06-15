@@ -1,0 +1,36 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: HatsuneMiku3939/direnv-action@v1
+    - run: docker compose up -d
+    - run: ./scripts/wait-for-file ./output/contract.json 300
+    - run: npm ci && cd setup && npm ci
+    - run: ./scripts/json-to-env.sh
+    - run: direnv allow
+    - run: cd setup && direnv exec . npm run create:artwork-display
+    - run: cd setup && direnv exec . npm run create:artwork-shard-display
+    - run: direnv exec . npm test
+    - run: npm run format
+    - run: npm run lint
+    - run: npm run compile
+    - run: ./scripts/fail-if-dirty
+    - name: Print docker logs
+      run: |
+        docker compose logs > docker.log
+        cat docker.log
+      if: ${{ always() }}
+
+    
