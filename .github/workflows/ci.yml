@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: docker compose up -d
-    - run: ./scripts/wait-for-file ../output/contracts.json 120
+    - run: ./scripts/wait-for-file ../output/contract.json 120
     - run: npm ci && cd setup && npm ci
     - run: ./scripts/json-to-env.sh && npm run create:artwork-display
     - run: ./scripts/json-to-env.sh && npm run create:artwork-shard-display
