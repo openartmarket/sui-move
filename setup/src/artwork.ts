@@ -20,16 +20,8 @@ export type MintArtworkParams = {
  * @returns the artwork id
  */
 export async function mintArtwork(params: MintArtworkParams): Promise<string> {
-  const {
-    totalSupply,
-    ingoingPrice,
-    multiplier,
-    name,
-    artist,
-    creationDate,
-    description,
-    image,
-  } = params;
+  const { totalSupply, ingoingPrice, multiplier, name, artist, creationDate, description, image } =
+    params;
 
   // console.log("Mint artwork: %s", name + " by " + artist);
 

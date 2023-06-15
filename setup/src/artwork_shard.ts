@@ -38,9 +38,9 @@ export async function mintArtworkShard(params: MintArtworkShardParams): Promise<
   return artworkShardId;
 }
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  mintArtworkShard(
-    "{artwork}",
-    user1,
-    2
-  );
+  mintArtworkShard({
+    artworkId: "{artwork}",
+    phrase: USER1_PHRASE,
+    shares: 2,
+  });
 }
