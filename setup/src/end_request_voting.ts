@@ -1,15 +1,15 @@
 import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
-import { adminCap, adminPhrase, packageId } from "./config";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
 export async function endRequestVoting(voteRequest: string) {
-  const { signer } = getSigner(adminPhrase);
+  const { signer } = getSigner(ADMIN_PHRASE);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::dao::end_request_voting`,
-    arguments: [tx.object(adminCap), tx.object(voteRequest)],
+    target: `${PACKAGE_ID}::dao::end_request_voting`,
+    arguments: [tx.object(ADMIN_CAP_ID), tx.object(voteRequest)],
   });
 
   try {

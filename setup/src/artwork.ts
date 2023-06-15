@@ -1,9 +1,9 @@
-import { getCreatedObjects, getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
 
-import { adminCap, adminPhrase, packageId } from "./config";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
-export async function mintArtwork(params: {
+export type MintArtworkParams = {
   totalSupply: number;
   ingoingPrice: number;
   outgoingPrice: number;
@@ -12,7 +12,14 @@ export async function mintArtwork(params: {
   creationDate: string;
   description: string;
   image: string;
-}) {
+};
+
+/**
+ * Mints a new artwork
+ * @param params 
+ * @returns the artwork id
+ */
+export async function mintArtwork(params: MintArtworkParams): Promise<string> {
   const {
     totalSupply,
     ingoingPrice,
@@ -26,13 +33,13 @@ export async function mintArtwork(params: {
 
   // console.log("Mint artwork: %s", name + " by " + artist);
 
-  const { signer } = getSigner(adminPhrase);
+  const { signer } = getSigner(ADMIN_PHRASE);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::open_art_market::mint_artwork_and_share`,
+    target: `${PACKAGE_ID}::open_art_market::mint_artwork_and_share`,
     arguments: [
-      tx.object(adminCap),
+      tx.object(ADMIN_CAP_ID),
       tx.pure(totalSupply),
       tx.pure(ingoingPrice),
       tx.pure(outgoingPrice),
@@ -44,26 +51,19 @@ export async function mintArtwork(params: {
     ],
   });
 
-  try {
-    const txRes = await signer.signAndExecuteTransactionBlock({
-      transactionBlock: tx,
-      requestType: "WaitForLocalExecution",
-      options: {
-        showObjectChanges: true,
-        showEffects: true,
-      },
-    });
+  const txRes = await signer.signAndExecuteTransactionBlock({
+    transactionBlock: tx,
+    requestType: "WaitForLocalExecution",
+    options: {
+      showObjectChanges: true,
+      showEffects: true,
+    },
+  });
 
-    // console.log("effects", getExecutionStatus(txRes));
+  const artworkId = getCreatedObjects(txRes)?.[0].reference.objectId;
+  if (!artworkId) throw new Error("Could not mint artwork");
 
-    const artworkId = getCreatedObjects(txRes)?.[0].reference.objectId;
-    // console.log("artworkId", artworkId);
-
-    return artworkId;
-  } catch (e) {
-    // console.error("Could not mint artwork", e);
-    throw new Error("Could not mint artwork");
-  }
+  return artworkId;
 }
 
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
