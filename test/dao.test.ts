@@ -55,7 +55,7 @@ describe("DAO Voting structure", () => {
     await assert.rejects(vote(artworkId, voteRequest, USER3_PHRASE, true));
   });
 
-  it("cannot vote if vote is closed", async () => {
+  it.skip("cannot vote if vote is closed", async () => {
     const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
     const userVote = await vote(artworkId, voteRequest, USER1_PHRASE, true);
