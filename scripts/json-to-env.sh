@@ -10,5 +10,3 @@ for key in $keys; do
   # Export the environment variable
   echo "export $key=\"$value\"" >> .envrc
 done
-
-cat .envrc | bash
