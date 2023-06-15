@@ -19,6 +19,7 @@ jobs:
     - run: ./scripts/wait-for-file ./output/contract.json 300
     - run: npm ci && cd setup && npm ci
     - run: ./scripts/json-to-env.sh
+    - run: direnv allow
     - run: direnv exec . cd setup && npm run create:artwork-display
     - run: direnv exec . cd setup && npm run create:artwork-shard-display
     - run: direnv exec . npm test
