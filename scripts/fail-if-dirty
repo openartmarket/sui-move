@@ -6,7 +6,6 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ROOT_DIR=${SCRIPT_DIR}/..
 
 # Some files are allowed to be dirty. We'll restore these before checking.
-git checkout ${ROOT_DIR}/output/contract.json
 git checkout ${ROOT_DIR}/.envrc
 
 diff=$(git diff)
