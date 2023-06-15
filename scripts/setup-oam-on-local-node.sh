@@ -66,7 +66,7 @@ UPGRADE_CAP_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::pack
 jq -n --arg package_id "$PACKAGE_ID" \
       --arg admin_cap_id "$ADMIN_CAP_ID" \
       --arg publisher_id "$PUBLISHER_ID" \
-      --arg network "$SUI_NETWORK" \
+      --arg sui_network "$SUI_NETWORK" \
       --arg admin_phrase "$ADMIN_PHRASE" \
       --arg user1_phrase "$USER1_PHRASE" \
       --arg user2_phrase "$USER2_PHRASE" \
@@ -75,7 +75,7 @@ jq -n --arg package_id "$PACKAGE_ID" \
         "PACKAGE_ID": $package_id, 
         "ADMIN_CAP_ID": $admin_cap_id, 
         "PUBLISHER_ID": $publisher_id, 
-        "NETWORK": $network, 
+        "SUI_NETWORK": $sui_network, 
         "ADMIN_PHRASE": $admin_phrase, 
         "USER1_PHRASE": $user1_phrase,
         "USER2_PHRASE": $user2_phrase,
