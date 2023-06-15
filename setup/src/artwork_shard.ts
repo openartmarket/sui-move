@@ -4,10 +4,10 @@ import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "./config";
 import { getSigner } from "./helpers";
 
 export type MintArtworkShardParams = {
-  artworkId: string,
-  phrase: string,
-  shares: number
-}
+  artworkId: string;
+  phrase: string;
+  shares: number;
+};
 
 /**
  * Mints an artwork shard
@@ -34,7 +34,7 @@ export async function mintArtworkShard(params: MintArtworkShardParams): Promise<
   });
 
   const artworkShardId = getCreatedObjects(txRes)?.[0].reference.objectId;
-  if (!artworkShardId) throw new Error("Failed to mint artwork shard")
+  if (!artworkShardId) throw new Error("Failed to mint artwork shard");
   return artworkShardId;
 }
 
@@ -42,6 +42,6 @@ if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
   mintArtworkShard({
     artworkId: "0x3e88c14f87d56779b90429095d5dc30a995e3b4edf27e206366f192275eb4d84",
     phrase: USER1_PHRASE,
-    shares: 2
+    shares: 2,
   });
 }

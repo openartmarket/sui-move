@@ -23,6 +23,11 @@ jobs:
     - run: cd setup && direnv exec . npm run create:artwork-display
     - run: cd setup && direnv exec . npm run create:artwork-shard-display
     - run: direnv exec . npm test
+    - run: npm run format
+    # Don't throw error if linting fails for now
+    - run: npm run lint
+    - run: npm run compile
+    - run: ./scripts/fail-if-dirty
     - name: Print docker logs
       run: |
         docker compose logs > docker.log

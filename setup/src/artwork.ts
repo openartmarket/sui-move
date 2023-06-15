@@ -16,7 +16,7 @@ export type MintArtworkParams = {
 
 /**
  * Mints a new artwork
- * @param params 
+ * @param params
  * @returns the artwork id
  */
 export async function mintArtwork(params: MintArtworkParams): Promise<string> {

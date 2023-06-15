@@ -1,6 +1,6 @@
 import assert from "assert";
 
-import { MintArtworkParams, mintArtwork } from "../setup/src/artwork";
+import { mintArtwork,MintArtworkParams } from "../setup/src/artwork";
 import { mintArtworkShard } from "../setup/src/artwork_shard";
 import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE, USER3_PHRASE } from "../setup/src/config";
 
@@ -23,25 +23,25 @@ describe("Artwork issue a contract", () => {
   });
 
   it("should issue new shares", async () => {
-    const artworkShardId = await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 2});
+    const artworkShardId = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 2 });
     assert.ok(artworkShardId);
   });
 
   it("should not issue new shares, when asking for too much", async () => {
-    await assert.rejects(mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 501}));
+    await assert.rejects(mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 501 }));
   });
 
   it("should not issue new shares, when sold out", async () => {
-    await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 150});
-    await mintArtworkShard({artworkId, phrase: USER2_PHRASE, shares: 250});
-    await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 98});
-    await assert.rejects(mintArtworkShard({artworkId, phrase: USER2_PHRASE, shares: 3}));
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 150 });
+    await mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 250 });
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 98 });
+    await assert.rejects(mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 3 }));
   });
 
   it("can give shares to OAM and owner", async () => {
-    await mintArtworkShard({artworkId, phrase: ADMIN_PHRASE, shares: 150});
-    await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 50});
-    await mintArtworkShard({artworkId, phrase: USER2_PHRASE, shares: 1});
+    await mintArtworkShard({ artworkId, phrase: ADMIN_PHRASE, shares: 150 });
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 50 });
+    await mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 1 });
   });
 
   it.skip("can set a currency of a contract", async () => {});

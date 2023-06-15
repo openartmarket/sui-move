@@ -24,9 +24,9 @@ describe("DAO Voting structure", () => {
   beforeEach(async () => {
     artworkId = await mintArtwork(artworkOptions);
 
-    await mintArtworkShard({artworkId, phrase: ADMIN_PHRASE, shares: 151});
-    await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 249});
-    await mintArtworkShard({artworkId, phrase: USER2_PHRASE, shares: 100});
+    await mintArtworkShard({ artworkId, phrase: ADMIN_PHRASE, shares: 151 });
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 249 });
+    await mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 100 });
   });
 
   it("can start a voting session", async () => {
