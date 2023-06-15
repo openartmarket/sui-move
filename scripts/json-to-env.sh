@@ -11,4 +11,4 @@ for key in $keys; do
   echo "export $key=\"$value\"" >> .envrc
 done
 
-source .envrc
+cat .envrc | bash
