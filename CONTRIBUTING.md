@@ -5,32 +5,66 @@ We would love for the community to review and improve our code. If you are inter
 ## Development
 To get started with development, run the following commands:
 
+
+## Local environment
+
+### Option 1: Run a local sui node
+
 #### Install dependencies of the project
+Install dependencies of the project and run sui locally
+
 ```sh
 ./scripts/bootstrap.sh
 ```
 This command will install the dependencies of this project.
 
-## Testing the contracts
-Run the test suite, two terminals are required:
+Run the test suite, two shells are required:
 
-`Terminal 1` - run the SUI node
+`shell 1` - run the SUI node
 ```sh
 rm -rf ~/.sui
 sui start
 ```
 
-`Terminal 2` - deploy the contracts, and write environment variables for tests
+`shell 2` - deploy the contracts, and write environment variables for tests
 ```sh
 ./scripts/setup-oam-on-local-node.sh
+./scripts/json-to-env.sh
+direnv allow
+cd setup
+npm run create:artwork-display
+npm run create:artwork-shard-display
+
 ```
 
-When this is done, you are ready to run the tests, in the same terminal run:
+### Option 2: Run tests against a docker container
+Run it as we do in CI, in a Docker container, two shells are required:
+
+`shell 1` - run the SUI node
+```sh
+docker compose up
+```
+`shell 2` - deploy the contracts, and write environment variables for tests
+```sh
+./scripts/json-to-env.sh
+direnv allow
+cd setup
+npm run create:artwork-display
+npm run create:artwork-shard-display
+```
+
+## Testing the contracts
+
+When you have setup local environment, you are ready to run the tests, in the shell 2 run:
+
 ```sh
 npm test
 ```
-
 You can rerun tests without redeploying the contracts. Just run `npm test` again.
+
+### Viewing on local blockchain explorer
+Go to [SUI Explorer](https://suiexplorer.com/?network=local)
+
 
 
 ## Coding practices
