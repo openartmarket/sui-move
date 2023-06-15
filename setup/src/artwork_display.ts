@@ -1,23 +1,13 @@
-import {
-  TransactionBlock,
-  getCreatedObjects,
-  getExecutionStatus,
-} from "@mysten/sui.js";
+import { getCreatedObjects, getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+
 import { ARTWORK_TYPE, publisher } from "./config";
+import { adminPhrase } from "./config";
 import { getSigner } from "./helpers";
 
 // This is the function you can update to change the display fields
-function getArtworkDisplayFields(
-  imageProviderUrlPrefix = "",
-  imageProviderUrlPostfix = ""
-) {
+function getArtworkDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
   return {
-    keys: [
-      "name",
-      "description",
-      "image_url",
-      "project_url",
-    ],
+    keys: ["name", "description", "image_url", "project_url"],
     values: [
       "{name}",
       "{description}",
@@ -28,12 +18,12 @@ function getArtworkDisplayFields(
 }
 
 async function createArtworkDisplay() {
-  let artworkDisplayFields = getArtworkDisplayFields();
+  const artworkDisplayFields = getArtworkDisplayFields();
 
-  let tx = new TransactionBlock();
-  let {signer, address} = getSigner('admin');
+  const tx = new TransactionBlock();
+  const { signer, address } = getSigner(adminPhrase);
 
-  let artworkDisplay = tx.moveCall({
+  const artworkDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
     arguments: [
       tx.object(publisher),
@@ -52,7 +42,7 @@ async function createArtworkDisplay() {
   tx.transferObjects([artworkDisplay], tx.pure(address));
 
   try {
-    let txRes = await signer.signAndExecuteTransactionBlock({
+    const txRes = await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       requestType: "WaitForLocalExecution",
       options: {
@@ -60,10 +50,10 @@ async function createArtworkDisplay() {
       },
     });
 
-    console.log("display", getCreatedObjects(txRes)?.[0]?.reference?.objectId);
-    console.log("effects", getExecutionStatus(txRes)?.status, txRes.effects);
+    // console.log("display", getCreatedObjects(txRes)?.[0]?.reference?.objectId);
+    // console.log("effects", getExecutionStatus(txRes)?.status, txRes.effects);
   } catch (e) {
-    console.error("Could not create display", e);
+    // console.error("Could not create display", e);
   }
 }
 

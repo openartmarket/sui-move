@@ -2,4 +2,5 @@
 **/dist
 .env
 **/.publish.res.json
-.address/
+output/*.json
+node_modules

@@ -1,16 +1,13 @@
-import {
-  TransactionBlock,
-  getCreatedObjects,
-  getTransactionEffects,
-} from "@mysten/sui.js";
-import { packageId, adminCap } from "./config";
+import { getCreatedObjects, getTransactionEffects, TransactionBlock } from "@mysten/sui.js";
+
+import { adminCap, adminPhrase, packageId, user1 } from "./config";
 import { getSigner } from "./helpers";
 
-export async function mintArtworkShard(artwork: string, shares: number) {
-  console.log("Mint artwork shard for: %s", artwork);
+export async function mintArtworkShard(artwork: string, account: string, shares: number) {
+  // console.log("Mint artwork shard for: %s", artwork);
 
-  let { signer } = getSigner("admin");
-  let { address } = getSigner("user");
+  const { signer } = getSigner(adminPhrase);
+  const { address } = getSigner(account);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -19,7 +16,7 @@ export async function mintArtworkShard(artwork: string, shares: number) {
   });
 
   try {
-    let txRes = await signer.signAndExecuteTransactionBlock({
+    const txRes = await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       requestType: "WaitForLocalExecution",
       options: {
@@ -28,18 +25,20 @@ export async function mintArtworkShard(artwork: string, shares: number) {
       },
     });
 
-    console.log("effects", getTransactionEffects(txRes));
-    let artwork_shard_id = getCreatedObjects(txRes)?.[0].reference.objectId;
-    console.log("artwork_shard_id", artwork_shard_id);
+    // console.log("effects", getTransactionEffects(txRes));
+    const artwork_shard_id = getCreatedObjects(txRes)?.[0].reference.objectId;
+    // console.log("artwork_shard_id", artwork_shard_id);
     return artwork_shard_id;
   } catch (e) {
-    console.error("Could not mint artwork shard", e);
+    // console.error("Could not mint artwork shard", e);
+    throw new Error("Could not mint artwork shard");
   }
 }
 
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
   mintArtworkShard(
     "{artwork}",
-    5
+    user1,
+    2
   );
 }

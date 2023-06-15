@@ -1,15 +1,12 @@
-import {
-  TransactionBlock,
-  getCreatedObjects,
-  getExecutionStatus,
-} from "@mysten/sui.js";
-import { packageId, adminCap } from "./config";
+import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
+
+import { adminCap, adminPhrase, packageId } from "./config";
 import { getSigner } from "./helpers";
 
 export async function createVoteRequest(artwork_id: string, request: string) {
-  console.log("Mint artwork shard for: %s", artwork_id);
+  // console.log("Mint artwork shard for: %s", artwork_id);
 
-  let { signer } = getSigner("admin");
+  const { signer } = getSigner(adminPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -18,7 +15,7 @@ export async function createVoteRequest(artwork_id: string, request: string) {
   });
 
   try {
-    let txRes = await signer.signAndExecuteTransactionBlock({
+    const txRes = await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       requestType: "WaitForLocalExecution",
       options: {
@@ -27,12 +24,13 @@ export async function createVoteRequest(artwork_id: string, request: string) {
       },
     });
 
-    console.log("effects", getExecutionStatus(txRes));
-    let vote_request_id = getCreatedObjects(txRes)?.[0].reference.objectId;
-    console.log("vote request id", vote_request_id);
+    // console.log("effects", getExecutionStatus(txRes));
+    const vote_request_id = getCreatedObjects(txRes)?.[0].reference.objectId;
+    // console.log("vote request id", vote_request_id);
     return vote_request_id;
   } catch (e) {
-    console.error("Could not create vote request", e);
+    // console.error("Could not create vote request", e);
+    throw new Error("Could not create vote request");
   }
 }
 

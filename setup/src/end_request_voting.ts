@@ -1,9 +1,10 @@
-import { TransactionBlock, getExecutionStatus } from "@mysten/sui.js";
+import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+
+import { adminCap, adminPhrase, packageId } from "./config";
 import { getSigner } from "./helpers";
-import { adminCap, packageId } from "./config";
 
 export async function endRequestVoting(voteRequest: string) {
-  let { signer } = getSigner("admin");
+  const { signer } = getSigner(adminPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -12,7 +13,7 @@ export async function endRequestVoting(voteRequest: string) {
   });
 
   try {
-    let txRes = await signer.signAndExecuteTransactionBlock({
+    const txRes = await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       requestType: "WaitForLocalExecution",
       options: {
@@ -20,9 +21,10 @@ export async function endRequestVoting(voteRequest: string) {
       },
     });
 
-    console.log("effects", getExecutionStatus(txRes));
+    return getExecutionStatus(txRes);
   } catch (e) {
-    console.error("Could not end voting request", e);
+    // console.error("Could not end voting request", e);
+    throw new Error("Could not end voting request");
   }
 }
 

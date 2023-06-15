@@ -202,6 +202,12 @@ module open_art_market::open_art_market {
         
     }
 
+        // @todo: method for setting the currency type (can be done at minting time)
+    // @todo: method for setting the outgoing price
+    // @todo: method for getting available shares for sale
+
+    // Open Art Market & Artwork Owner (person coming with the artwork to the market) has shares allocated for sale. 
+    // We will create those Artwork Shards as the first action after minting the Artwork
     // Function to split a shard into two shards
     public fun split_artwork_shard(artwork: &mut Artwork, artwork_shard: &mut ArtworkShard, shares: u64, ctx: &mut TxContext) {
         let sender = tx_context::sender(ctx);
