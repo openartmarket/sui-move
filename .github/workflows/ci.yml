@@ -20,4 +20,10 @@ jobs:
     - run: ./scripts/json-to-env.sh && npm run create:artwork-display
     - run: ./scripts/json-to-env.sh && npm run create:artwork-shard-display
     - run: ./scripts/json-to-env.sh && npm test
+    - name: Print docker logs
+      run: |
+        docker compose logs > docker.log
+        cat docker.log
+      if: ${{ always() }}
+
     
