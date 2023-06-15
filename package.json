@@ -55,6 +55,7 @@
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-simple-import-sort": "10.0.0",
     "mocha": "10.2.0",
+    "npm-check-updates": "16.10.12",
     "prettier": "2.8.8",
     "prettier-eslint-cli": "7.1.0",
     "ts-node": "10.9.1",
