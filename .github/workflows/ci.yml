@@ -16,15 +16,8 @@ jobs:
     - uses: actions/checkout@v3
     - run: docker compose up -d
     - run: ./scripts/wait-for-file ../output/contracts.json 120
-    - name: Export environment variables
-      run: |
-        echo "export ADMIN_PHRASE=$(cat ./output/contract.json | jq '.admin_phrase')" >> .envrc
-        echo "export USER1_PHRASE=$(cat ./output/contract.json | jq '.user1_phrase')" >> .envrc
-        echo "export USER2_PHRASE=$(cat ./output/contract.json | jq '.user2_phrase')" >> .envrc
-        echo "export USER3_PHRASE=$(cat ./output/contract.json | jq '.user3_phrase')" >> .envrc
-        echo "export SUI_NETWORK=http://127.0.0.1:9000" >> .envrc
-        echo "export PACKAGE_ID=$(cat ./output/contract.json | jq '.package_id')" >> .envrc
-        echo "export ADMIN_CAP_ID=$(cat ./output/contract.json | jq '.admin_cap_id')" >> .envrc
-        echo "export PUBLISHER_ID=$(cat ./output/contract.json | jq '.publisher_id')" >> .envrc            
     - run: npm ci && cd setup && npm ci
-    - run: direnv exec . npm test
+    - run: ./scripts/json-to-env.sh && npm run create:artwork-display
+    - run: ./scripts/json-to-env.sh && npm run create:artwork-shard-display
+    - run: ./scripts/json-to-env.sh && npm test
+    

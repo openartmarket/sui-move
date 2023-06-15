@@ -1,22 +1,9 @@
 #!/bin/sh
 set -e
 
-output_json() {
-  local package_id=$1
-  local admin_cap_id=$2
-  local publisher_id=$3
-  local network=$4
-  local admin_phrase=$5
-  local user1_phrase=$6
 
-  jq -n --arg package_id "$package_id" \
-        --arg admin_cap_id "$admin_cap_id" \
-        --arg publisher_id "$publisher_id" \
-        --arg network "$network" \
-        --arg admin_phrase "$admin_phrase" \
-        --arg user1_phrase "$user1_phrase" \
-        '{"package_id": $package_id, "admin_cap_id": $admin_cap_id, "publisher_id": $publisher_id, "network": $network, "admin_phrase": $admin_phrase, "user1_phrase": $user1_phrase}'
-}
+sui start &
+sleep 10
 
 original_address=$(sui client active-address)
 envs=$(sui client active-env)
@@ -76,37 +63,24 @@ ADMIN_CAP_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::open_a
 PUBLISHER_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::Publisher")).objectId')
 UPGRADE_CAP_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::package::UpgradeCap")).objectId')
 
-output_json "$PACKAGE_ID" "$ADMIN_CAP_ID" "$PUBLISHER_ID" "$SUI_NETWORK" "$ADMIN_PHRASE" "$USER1_PHRASE" > output/contract.json
-
-cat >./.envrc <<-EOF
-export ADMIN_PHRASE="$ADMIN_PHRASE"
-export USER1_PHRASE="$USER1_PHRASE"
-export USER2_PHRASE="$USER2_PHRASE"
-export USER3_PHRASE="$USER3_PHRASE"
-export SUI_NETWORK="http://127.0.0.1:9000"
-export PACKAGE_ID="$PACKAGE_ID"
-export ADMIN_CAP_ID="$ADMIN_CAP_ID"
-export PUBLISHER_ID="$PUBLISHER_ID"
-EOF
-
-direnv allow
-
-cd setup
-
-echo "Waiting for Fullnode to sync..."
-sleep 5
-
-echo "Installing dependencies..."
-
-npm install
-
-echo "Creating Artwork Display..."
-
-npm run create:artwork-display
-sleep 5
-
-npm run create:artwork-shard-display
-sleep 5
+jq -n --arg package_id "$PACKAGE_ID" \
+      --arg admin_cap_id "$ADMIN_CAP_ID" \
+      --arg publisher_id "$PUBLISHER_ID" \
+      --arg network "$SUI_NETWORK" \
+      --arg admin_phrase "$ADMIN_PHRASE" \
+      --arg user1_phrase "$USER1_PHRASE" \
+      --arg user2_phrase "$USER2_PHRASE" \
+      --arg user3_phrase "$USER3_PHRASE" \
+      '{
+        "PACKAGE_ID": $package_id, 
+        "ADMIN_CAP_ID": $admin_cap_id, 
+        "PUBLISHER_ID": $publisher_id, 
+        "NETWORK": $network, 
+        "ADMIN_PHRASE": $admin_phrase, 
+        "USER1_PHRASE": $user1_phrase,
+        "USER2_PHRASE": $user2_phrase,
+        "USER3_PHRASE": $user3_phrase
+      }' > output/contract.json
 
 
 tail -f /dev/null
