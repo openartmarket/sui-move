@@ -37,7 +37,8 @@
     "lint": "eslint --ext ts --fix --max-warnings 0 '{setup/src,test}/**/*.{ts,d.ts}'",
     "start": "npm run clean && npm run compile && npm run start-node",
     "start-node": "sui start",
-    "test": "npm run compile && mocha --config .mocharc.cjs.cjs dist/cjs/test"
+    "test": "npm run compile && mocha --config .mocharc.cjs.cjs dist/cjs/test",
+    "upgrade": "npm-check-updates --upgrade"
   },
   "keywords": [],
   "author": "",
