@@ -80,7 +80,7 @@ jq -n --arg package_id "$PACKAGE_ID" \
         "USER1_PHRASE": $user1_phrase,
         "USER2_PHRASE": $user2_phrase,
         "USER3_PHRASE": $user3_phrase
-      }' > output/contract.json
+      }' > ./output/contract.json
 
 echo "Contract details are saved in output/contract.json"
 tail -f /dev/null
