@@ -8,7 +8,10 @@ sleep 10
 original_address=$(sui client active-address)
 envs=$(sui client active-env)
 
+SUI_NETWORK="http://127.0.0.1:9000"
+
 if [[ $envs != *"localnet"* ]]; then
+  
   sui client switch --env localnet
 fi
 
