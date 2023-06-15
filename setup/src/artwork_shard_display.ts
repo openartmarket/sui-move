@@ -1,4 +1,4 @@
-import { getCreatedObjects, getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
 import { ARTWORK_SHARD_TYPE, PUBLISHER_ID } from "./config";
 import { ADMIN_PHRASE } from "./config";
@@ -40,20 +40,13 @@ async function createArtworkShardDisplay() {
 
   tx.transferObjects([artworkShardDisplay], tx.pure(address));
 
-  try {
-    const txRes = await signer.signAndExecuteTransactionBlock({
-      transactionBlock: tx,
-      requestType: "WaitForLocalExecution",
-      options: {
-        showEffects: true,
-      },
-    });
-
-    // console.log("display", getCreatedObjects(txRes)?.[0]?.reference?.objectId);
-    // console.log("effects", getExecutionStatus(txRes)?.status, txRes.effects);
-  } catch (e) {
-    // console.error("Could not create display", e);
-  }
+  await signer.signAndExecuteTransactionBlock({
+    transactionBlock: tx,
+    requestType: "WaitForLocalExecution",
+    options: {
+      showEffects: true,
+    },
+  });
 }
 
 createArtworkShardDisplay();

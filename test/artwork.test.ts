@@ -1,8 +1,8 @@
 import assert from "assert";
 
-import { mintArtwork,MintArtworkParams } from "../setup/src/artwork";
+import { mintArtwork, MintArtworkParams } from "../setup/src/artwork";
 import { mintArtworkShard } from "../setup/src/artwork_shard";
-import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE, USER3_PHRASE } from "../setup/src/config";
+import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../setup/src/config";
 
 const mintArtworkOptions: MintArtworkParams = {
   totalSupply: 500,
