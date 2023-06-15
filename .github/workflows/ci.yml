@@ -20,9 +20,9 @@ jobs:
     - run: npm ci && cd setup && npm ci
     - run: ./scripts/json-to-env.sh
     - run: direnv allow
-    - run: direnv exec . cd setup && npm run create:artwork-display
-    - run: direnv exec . cd setup && npm run create:artwork-shard-display
-    - run: direnv exec . npm test
+    - run: direnv exec . && cd setup && npm run create:artwork-display
+    - run: direnv exec . && cd setup && npm run create:artwork-shard-display
+    - run: direnv exec . && npm test
     - name: Print docker logs
       run: |
         docker compose logs > docker.log
