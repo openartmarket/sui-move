@@ -1,5 +1,5 @@
 cmake 3.26.4
 direnv 2.32.2
 jq 1.6
-node 18.13.0
 rust 1.70.0
+nodejs 18.16.0
