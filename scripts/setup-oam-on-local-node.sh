@@ -52,7 +52,7 @@ if [[ "$publish_res" =~ "error" ]]; then
   echo "Error during move contract publishing.  Details : $publish_res"
   exit 1
 fi
-
+echo "Contract published successfully"
 # switch back to original address
 sui client switch --address $original_address
 
@@ -82,5 +82,5 @@ jq -n --arg package_id "$PACKAGE_ID" \
         "USER3_PHRASE": $user3_phrase
       }' > output/contract.json
 
-
+echo "Contract details are saved in output/contract.json"
 tail -f /dev/null
