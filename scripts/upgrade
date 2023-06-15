@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -e
+[ $TRACE ] && set -x
+
+projects=( . setup )
+for project in "${projects[@]}"
+do
+	pushd "$project"
+  npm install --ignore-scripts
+  npm run upgrade
+  # rm -rf package-lock.json node_modules
+  npm install --ignore-scripts
+  popd
+done
+
+echo "*********************************"
+echo "* Upgrading done.               *"
+echo "* Push this to a branch to make *"
+echo "* sure thew upgrades are good.  *"
+echo "*********************************"
