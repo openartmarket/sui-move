@@ -14,14 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Docker
-      uses: isbang/compose-action@v1.4.1
-      with:
-        compose-files: |
-          docker-compose.yml
-        
+    - run: docker compose up -d
     - run: ./scripts/wait-for-file ../output/contracts.json 120
-    - run: |
+    - name: Export environment variables
+      run: |
         echo "export ADMIN_PHRASE=$(cat ./output/contract.json | jq '.admin_phrase')" >> .envrc
         echo "export USER1_PHRASE=$(cat ./output/contract.json | jq '.user1_phrase')" >> .envrc
         echo "export USER2_PHRASE=$(cat ./output/contract.json | jq '.user2_phrase')" >> .envrc
@@ -29,10 +25,6 @@ jobs:
         echo "export SUI_NETWORK=http://127.0.0.1:9000" >> .envrc
         echo "export PACKAGE_ID=$(cat ./output/contract.json | jq '.package_id')" >> .envrc
         echo "export ADMIN_CAP_ID=$(cat ./output/contract.json | jq '.admin_cap_id')" >> .envrc
-        echo "export PUBLISHER_ID=$(cat ./output/contract.json | jq '.publisher_id')" >> .envrc
-                
-    - name: Install npm dependencies
-      run: npm ci && cd setup && npm ci
-
-    - name: Run tests
-      run: direnv exec . npm test
+        echo "export PUBLISHER_ID=$(cat ./output/contract.json | jq '.publisher_id')" >> .envrc            
+    - run: npm ci && cd setup && npm ci
+    - run: direnv exec . npm test
