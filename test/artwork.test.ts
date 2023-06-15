@@ -44,9 +44,19 @@ describe("Artwork issue a contract", () => {
     await mintArtworkShard({ artworkId, phrase: USER2_PHRASE, shares: 1 });
   });
 
-  it.skip("can set a currency of a contract", async () => {});
-  it.skip("can sell some shares to another user", async () => {});
-  it.skip("can sell the whole artwork and change the owner of the artwork", async () => {});
-  it.skip("can set the outgoing sale price of the artwork", async () => {});
-  it.skip("can burn the shares after artwork is sold", async () => {});
+  it.skip("can set a currency of a contract", async () => {
+    assert.ok(false);
+  });
+  it.skip("can sell some shares to another user", async () => {
+    assert.ok(false);
+  });
+  it.skip("can sell the whole artwork and change the owner of the artwork", async () => {
+    assert.ok(false);
+  });
+  it.skip("can set the outgoing sale price of the artwork", async () => {
+    assert.ok(false);
+  });
+  it.skip("can burn the shares after artwork is sold", async () => {
+    assert.ok(false);
+  });
 });
