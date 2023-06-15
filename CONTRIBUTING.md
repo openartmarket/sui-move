@@ -16,7 +16,7 @@ Run the test suite, two terminals are required:
 
 `Terminal 1` - run the SUI node
 ```sh
-rm ~/.sui -rf
+rm -rf ~/.sui
 sui start
 ```
 
