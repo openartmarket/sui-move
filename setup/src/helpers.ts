@@ -1,9 +1,4 @@
-import {
-  Connection,
-  Ed25519Keypair,
-  JsonRpcProvider,
-  RawSigner,
-} from "@mysten/sui.js";
+import { Connection, Ed25519Keypair, JsonRpcProvider, RawSigner } from "@mysten/sui.js";
 
 import { SUI_NETWORK } from "./config";
 

@@ -1,8 +1,4 @@
-import {
-  getCreatedObjects,
-  getExecutionStatus,
-  TransactionBlock,
-} from "@mysten/sui.js";
+import { getCreatedObjects, getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
 import { adminCap, adminPhrase, packageId } from "./config";
 import { getSigner } from "./helpers";

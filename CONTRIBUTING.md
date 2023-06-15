@@ -30,16 +30,20 @@ When this is done, you are ready to run the tests, in the same terminal run:
 npm test
 ```
 
+You can rerun tests without redeploying the contracts. Just run `npm test` again.
+
+
 ## Coding practices
 1. We use tests to verify the code works as expected.
-2. We use [prettier] to format the code.
-3. We use [eslint] to check for common errors.
+2. We use prettier to format the code.
+3. We use eslint to check for common errors.
 4. We need to get a test-coverage tool, so we know that we have test all the permutations of the code.
 
 
 ### Formatting
 
 The code is autoformatted when running this command
+Configuration for the formatter is in the `.prettierrc` file
 
 ```sh
 npm run format
@@ -47,7 +51,8 @@ npm run format
 
 ### Linting
 
-The code is linted when running this command
+The code is linted for warnings and errors when running this command
+Configuration for the linter is in the `.eslintrc.json` file
 
 ```sh
 npm run lint
@@ -56,6 +61,7 @@ npm run lint
 ### Compile
 
 The code is compiled when running this command
+We compile the code for both cjs and esm modules
 
 ```sh
 npm run compile

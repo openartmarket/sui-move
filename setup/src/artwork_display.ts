@@ -1,18 +1,11 @@
-import {
-  getCreatedObjects,
-  getExecutionStatus,
-  TransactionBlock,
-} from "@mysten/sui.js";
+import { getCreatedObjects, getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
 import { ARTWORK_TYPE, publisher } from "./config";
 import { adminPhrase } from "./config";
 import { getSigner } from "./helpers";
 
 // This is the function you can update to change the display fields
-function getArtworkDisplayFields(
-  imageProviderUrlPrefix = "",
-  imageProviderUrlPostfix = ""
-) {
+function getArtworkDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
   return {
     keys: ["name", "description", "image_url", "project_url"],
     values: [

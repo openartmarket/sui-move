@@ -33,44 +33,29 @@ describe("DAO Voting structure", () => {
     assert.ok(sale3);
   });
   it("can start a voting session", async () => {
-    const voteRequest = await createVoteRequest(
-      artworkId,
-      "Request to sell artwork to Museum"
-    );
+    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
   });
   it("can vote as a shareholder", async () => {
-    const voteRequest = await createVoteRequest(
-      artworkId,
-      "Request to sell artwork to Museum"
-    );
+    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
     const userVote = await vote(artworkId, voteRequest, user1, true);
     assert.ok(userVote);
   });
   it("cannot double vote as a shareholder", async () => {
-    const voteRequest = await createVoteRequest(
-      artworkId,
-      "Request to sell artwork to Museum"
-    );
+    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
     const userVote = await vote(artworkId, voteRequest, user1, true);
     assert.ok(userVote);
     await assert.rejects(vote(artworkId, voteRequest, user1, true));
   });
   it("cannot vote if not a shareholder", async () => {
-    const voteRequest = await createVoteRequest(
-      artworkId,
-      "Request to sell artwork to Museum"
-    );
+    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
     await assert.rejects(vote(artworkId, voteRequest, user3, true));
   });
   it("cannot vote if vote is closed", async () => {
-    const voteRequest = await createVoteRequest(
-      artworkId,
-      "Request to sell artwork to Museum"
-    );
+    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
     const userVote = await vote(artworkId, voteRequest, user1, true);
     assert.ok(userVote);
