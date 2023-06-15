@@ -17,8 +17,8 @@ jobs:
     - run: docker compose up -d
     - run: ./scripts/wait-for-file ./output/contract.json 300
     - run: npm ci && cd setup && npm ci
-    - run: ./scripts/json-to-env.sh && npm run create:artwork-display
-    - run: ./scripts/json-to-env.sh && npm run create:artwork-shard-display
+    - run: ./scripts/json-to-env.sh && cd setup && npm run create:artwork-display
+    - run: ./scripts/json-to-env.sh && cd setup && npm run create:artwork-shard-display
     - run: ./scripts/json-to-env.sh && npm test
     - name: Print docker logs
       run: |
