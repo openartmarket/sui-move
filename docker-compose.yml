@@ -12,10 +12,4 @@ services:
       - ./output:/usr/src/app/output
 
 volumes:
-  localstack:
-  hardhat-node-modules:
-
-networks:
-  supabase:
-    name: supabase_network_openartmarket
-    external: true
+  output:
