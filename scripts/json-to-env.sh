@@ -8,7 +8,7 @@ for key in $keys; do
   value=$(echo "$json" | jq -r ".$key")
 
   # Export the environment variable
-  echo "export $key=\"$value\"" >> .envrc
+  echo "$key=\"$value\"" >> .envrc
 done
 
 source .envrc
