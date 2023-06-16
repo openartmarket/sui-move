@@ -3,7 +3,7 @@ import assert from "assert";
 import { mintArtwork } from "../setup/src/artwork";
 import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE, USER3_PHRASE } from "../setup/src/config";
 import { endRequestVoting } from "../setup/src/end_request_voting";
-import { mintArtworkShard } from "../setup/src/mintArtworkShard";
+import { mintArtworkShard } from "../setup/src/artwork_shard";
 import { vote } from "../setup/src/vote";
 import { createVoteRequest } from "../setup/src/vote_request";
 

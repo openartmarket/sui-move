@@ -1,7 +1,7 @@
 import { mintArtwork } from "../setup/src/artwork";
 import { USER1_PHRASE } from "../setup/src/config";
-import { mintArtworkShard } from "../setup/src/mintArtworkShard";
-import { splitArtworkShard } from "../setup/src/splitArtworkShard";
+import { mintArtworkShard } from "../setup/src/artwork_shard";
+import { splitArtworkShard } from "../setup/src/split_artwork_shard";
 import { mintArtworkOptions } from "./testdata";
 
 describe('splitArtworkShard', () => {

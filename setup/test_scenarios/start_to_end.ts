@@ -1,8 +1,8 @@
 import { mintArtwork } from "../src/artwork";
 import { USER1_PHRASE } from "../src/config";
 import { endRequestVoting } from "../src/end_request_voting";
-import { mintArtworkShard } from "../src/mintArtworkShard";
-import { splitArtworkShard } from "../src/splitArtworkShard";
+import { mintArtworkShard } from "../src/artwork_shard";
+import { splitArtworkShard } from "../src/split_artwork_shard";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
 

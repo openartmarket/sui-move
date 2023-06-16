@@ -2,7 +2,7 @@ import assert from "assert";
 
 import { mintArtwork } from "../setup/src/artwork";
 import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../setup/src/config";
-import { mintArtworkShard } from "../setup/src/mintArtworkShard";
+import { mintArtworkShard } from "../setup/src/artwork_shard";
 import { mintArtworkOptions } from "./testdata";
 
 describe("mintArtworkShard", () => {
