@@ -1,6 +1,8 @@
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
 import { USER1_PHRASE } from "../src/config";
+import { endRequestVoting } from "../src/end_request_voting";
+import { splitArtworkShard } from "../src/split_artwork_shard";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
 
@@ -9,8 +11,8 @@ async function startToEndScenario() {
   // Admin mints an artwork
   const artworkId = await mintArtwork({
     totalSupply: 1000,
-    ingoingPrice: 10,
-    outgoingPrice: 100,
+    sharePrice: 10,
+    multiplier: 2,
     name: "Mona Lisa",
     artist: "Leonardo da Vinci",
     creationDate: "1685548680595",
@@ -19,8 +21,11 @@ async function startToEndScenario() {
   });
 
   // Admin creates an artwork shard and sends to user
-  await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 10});
+  const artworkShard = await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 10});
 
+  // Split artwork shard
+  await splitArtworkShard(artworkShard, 2);
+  
   // Admin reates a vote request for the artwork
   const voteRequest = await createVoteRequest(
     artworkId,
@@ -31,8 +36,8 @@ async function startToEndScenario() {
   // User votes for vote request
   await vote(artworkId, voteRequest, USER1_PHRASE, true);
 
-  // // End voting for vote request
-  // await endRequestVoting(voteRequest);
+  // End voting for vote request
+  await endRequestVoting(voteRequest);
 }
 
 startToEndScenario();

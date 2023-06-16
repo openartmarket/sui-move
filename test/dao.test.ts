@@ -9,8 +9,8 @@ import { createVoteRequest } from "../setup/src/vote_request";
 
 const artworkOptions = {
   totalSupply: 500,
-  ingoingPrice: 10,
-  outgoingPrice: 100,
+  sharePrice: 10,
+  multiplier: 100,
   name: "Mona Lisa",
   artist: "Leonardo da Vinci",
   creationDate: "1685548680595",
@@ -55,7 +55,7 @@ describe("DAO Voting structure", () => {
     await assert.rejects(vote(artworkId, voteRequest, USER3_PHRASE, true));
   });
 
-  it.skip("cannot vote if vote is closed", async () => {
+  it("cannot vote if vote is closed", async () => {
     const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
     assert.ok(voteRequest);
     const userVote = await vote(artworkId, voteRequest, USER1_PHRASE, true);

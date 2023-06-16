@@ -27,3 +27,7 @@ export async function endRequestVoting(voteRequest: string) {
     throw new Error("Could not end voting request");
   }
 }
+
+if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
+  endRequestVoting("{voteRequest}");
+}

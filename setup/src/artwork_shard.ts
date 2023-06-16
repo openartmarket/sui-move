@@ -37,10 +37,9 @@ export async function mintArtworkShard(params: MintArtworkShardParams): Promise<
   if (!artworkShardId) throw new Error("Failed to mint artwork shard");
   return artworkShardId;
 }
-
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
   mintArtworkShard({
-    artworkId: "0x3e88c14f87d56779b90429095d5dc30a995e3b4edf27e206366f192275eb4d84",
+    artworkId: "{artwork}",
     phrase: USER1_PHRASE,
     shares: 2,
   });

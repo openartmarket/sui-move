@@ -6,8 +6,8 @@ import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../setup/src/config";
 
 const mintArtworkOptions: MintArtworkParams = {
   totalSupply: 500,
-  ingoingPrice: 10,
-  outgoingPrice: 100,
+  sharePrice: 10,
+  multiplier: 100,
   name: "Mona Lisa",
   artist: "Leonardo da Vinci",
   creationDate: "1685548680595",

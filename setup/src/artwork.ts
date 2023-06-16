@@ -5,8 +5,8 @@ import { getSigner } from "./helpers";
 
 export type MintArtworkParams = {
   totalSupply: number;
-  ingoingPrice: number;
-  outgoingPrice: number;
+  sharePrice: number;
+  multiplier: number;
   name: string;
   artist: string;
   creationDate: string;
@@ -20,16 +20,8 @@ export type MintArtworkParams = {
  * @returns the artwork id
  */
 export async function mintArtwork(params: MintArtworkParams): Promise<string> {
-  const {
-    totalSupply,
-    ingoingPrice,
-    outgoingPrice,
-    name,
-    artist,
-    creationDate,
-    description,
-    image,
-  } = params;
+  const { totalSupply, sharePrice, multiplier, name, artist, creationDate, description, image } =
+    params;
 
   // console.log("Mint artwork: %s", name + " by " + artist);
 
@@ -41,8 +33,8 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
     arguments: [
       tx.object(ADMIN_CAP_ID),
       tx.pure(totalSupply),
-      tx.pure(ingoingPrice),
-      tx.pure(outgoingPrice),
+      tx.pure(sharePrice),
+      tx.pure(multiplier),
       tx.pure(name),
       tx.pure(artist),
       tx.pure(creationDate),
@@ -69,8 +61,8 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
   mintArtwork({
     totalSupply: 500,
-    ingoingPrice: 10,
-    outgoingPrice: 100,
+    sharePrice: 10,
+    multiplier: 2,
     name: "Mona Lisa",
     artist: "Leonardo da Vinci",
     creationDate: "1685548680595",

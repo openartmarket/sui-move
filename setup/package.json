@@ -9,9 +9,12 @@
     "create:artwork-display": "tsc && node dist/src/artwork_display atomic-run",
     "create:artwork-shard-display": "tsc && node dist/src/artwork_shard_display atomic-run",
     "create:artwork": "tsc && node dist/src/artwork atomic-run",
+    "update:artwork-outgoing-price": "tsc && env-cmd -f .env node dist/src/update_artwork_outgoing_price atomic-run",
     "create:artwork-shard": "tsc && node dist/src/artwork_shard atomic-run",
+    "split:artwork-shard": "tsc && env-cmd -f .env node dist/src/split_artwork_shard atomic-run",
     "create:vote-request": "tsc && node dist/src/vote_request atomic-run",
     "vote": "tsc && node dist/src/vote atomic-run",
+    "end:vote-request": "tsc && env-cmd -f .env node dist/src/end_request_voting atomic-run",
     "test:s2e": "tsc && node dist/test_scenarios/start_to_end",
     "upgrade": "npm-check-updates --upgrade"
   },
