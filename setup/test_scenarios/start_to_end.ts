@@ -11,7 +11,7 @@ async function startToEndScenario() {
   // Admin mints an artwork
   const artworkId = await mintArtwork({
     totalSupply: 1000,
-    ingoingPrice: 10,
+    sharePrice: 10,
     multiplier: 2,
     name: "Mona Lisa",
     artist: "Leonardo da Vinci",
@@ -24,7 +24,7 @@ async function startToEndScenario() {
   const artworkShard = await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 10});
 
   // Split artwork shard
-  await splitArtworkShard(artworkId, artworkShard, 2);
+  await splitArtworkShard(artworkShard, 2);
   
   // Admin reates a vote request for the artwork
   const voteRequest = await createVoteRequest(

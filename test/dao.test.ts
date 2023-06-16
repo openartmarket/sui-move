@@ -9,7 +9,7 @@ import { createVoteRequest } from "../setup/src/vote_request";
 
 const artworkOptions = {
   totalSupply: 500,
-  ingoingPrice: 10,
+  sharePrice: 10,
   multiplier: 100,
   name: "Mona Lisa",
   artist: "Leonardo da Vinci",

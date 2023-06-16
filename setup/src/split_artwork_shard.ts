@@ -3,16 +3,16 @@ import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 import { PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
-export async function splitArtworkShard(artwork: string, artworkShard: string, shares: number) {
+export async function splitArtworkShard(artworkShard: string, shares: number) {
   const { signer } = getSigner("user");
   const tx = new TransactionBlock();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::open_art_market::split_artwork_shard`,
-    arguments: [tx.object(artwork), tx.object(artworkShard), tx.pure(shares)],
+    arguments: [tx.object(artworkShard), tx.pure(shares)],
   });
 
-  console.log("Split artwork shard for: %s", artwork);
+  console.log("Split artwork shard: %s", artworkShard);
 
   try {
     const txRes = await signer.signAndExecuteTransactionBlock({
@@ -30,5 +30,5 @@ export async function splitArtworkShard(artwork: string, artworkShard: string, s
 }
 
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  splitArtworkShard("{artwork}", "{artworkShard}", 2);
+  splitArtworkShard("{artworkShard}", 2);
 }
