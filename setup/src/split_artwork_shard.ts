@@ -3,7 +3,10 @@ import { ExecutionStatus, getExecutionStatus, TransactionBlock } from "@mysten/s
 import { PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
-export async function splitArtworkShard(artworkShard: string, shares: number): Promise<ExecutionStatus | undefined> {
+export async function splitArtworkShard(
+  artworkShard: string,
+  shares: number
+): Promise<ExecutionStatus | undefined> {
   const { signer } = getSigner("user");
   const tx = new TransactionBlock();
 
