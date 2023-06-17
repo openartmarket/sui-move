@@ -1,9 +1,9 @@
-import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
 
 import { PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
-export async function splitArtworkShard(artworkShard: string, shares: number) {
+export async function splitArtworkShard(artworkShard: string, shares: number):Promise<string> {
   const { signer } = getSigner("user");
   const tx = new TransactionBlock();
 
@@ -14,19 +14,16 @@ export async function splitArtworkShard(artworkShard: string, shares: number) {
 
   console.log("Split artwork shard: %s", artworkShard);
 
-  try {
-    const txRes = await signer.signAndExecuteTransactionBlock({
-      transactionBlock: tx,
-      requestType: "WaitForLocalExecution",
-      options: {
-        showEffects: true,
-      },
-    });
-
-    console.log("effects", getExecutionStatus(txRes));
-  } catch (e) {
-    console.error("Could not split artwork shard", e);
-  }
+  const txRes = await signer.signAndExecuteTransactionBlock({
+    transactionBlock: tx,
+    requestType: "WaitForLocalExecution",
+    options: {
+      showEffects: true,
+    },
+  });
+  const artworkShardId = getCreatedObjects(txRes)?.[0].reference.objectId;
+  if(!artworkShardId) throw new Error("Failed to split artwork shard");
+  return artworkShardId;
 }
 
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {

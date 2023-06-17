@@ -1,8 +1,9 @@
 import assert from "assert";
 
 import { mintArtwork, MintArtworkParams } from "../setup/src/artwork";
-import { mintArtworkShard } from "../setup/src/artwork_shard";
+import { mintArtworkShard, transferArtworkShard } from "../setup/src/artwork_shard";
 import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../setup/src/config";
+import { splitArtworkShard } from "../setup/src/split_artwork_shard";
 
 const mintArtworkOptions: MintArtworkParams = {
   totalSupply: 500,
@@ -47,8 +48,21 @@ describe("Artwork issue a contract", () => {
   it.skip("can set a currency of a contract", async () => {
     assert.ok(false);
   });
-  it.skip("can sell some shares to another user", async () => {
-    assert.ok(false);
+  it.only("can sell shares to another user", async () => {
+    const artworkShardId = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 150 });
+    const transferShard = await transferArtworkShard({ artworkId, artworkShardId, currentOwner: USER1_PHRASE, newOwner: USER2_PHRASE });
+    assert.ok(transferShard);
+
+    
+  });
+  it.only("can sell shares some shares to another user", async () => {
+    const artworkShardId = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 150 });
+    const splitShardId = await splitArtworkShard(artworkShardId, 110);
+    assert.ok(splitShardId);
+    const transferShard = await transferArtworkShard({ artworkId, artworkShardId: splitShardId, currentOwner: USER1_PHRASE, newOwner: USER2_PHRASE });
+    assert.ok(transferShard);
+
+    
   });
   it.skip("can sell the whole artwork and change the owner of the artwork", async () => {
     assert.ok(false);
