@@ -5,9 +5,10 @@ import { getSigner } from "./helpers";
 
 export async function splitArtworkShard(
   artworkShard: string,
+  fromUser: string,
   shares: number
 ): Promise<ExecutionStatus | undefined> {
-  const { signer } = getSigner(USER1_PHRASE);
+  const { signer } = getSigner(fromUser);
   const tx = new TransactionBlock();
 
   tx.moveCall({

@@ -1,7 +1,7 @@
 import { mintArtwork } from "../src/artwork";
+import { mintArtworkShard } from "../src/artwork_shard";
 import { USER1_PHRASE } from "../src/config";
 import { endRequestVoting } from "../src/end_request_voting";
-import { mintArtworkShard } from "../src/artwork_shard";
 import { splitArtworkShard } from "../src/split_artwork_shard";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
@@ -24,7 +24,7 @@ async function startToEndScenario() {
   const artworkShard = await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 10});
 
   // Split artwork shard
-  await splitArtworkShard(artworkShard, 2);
+  await splitArtworkShard(artworkShard, USER1_PHRASE, 2);
   
   // Admin reates a vote request for the artwork
   const voteRequest = await createVoteRequest(
