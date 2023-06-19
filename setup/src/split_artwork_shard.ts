@@ -1,13 +1,13 @@
 import { ExecutionStatus, getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
-import { PACKAGE_ID } from "./config";
+import { PACKAGE_ID, USER1_PHRASE } from "./config";
 import { getSigner } from "./helpers";
 
 export async function splitArtworkShard(
   artworkShard: string,
   shares: number
 ): Promise<ExecutionStatus | undefined> {
-  const { signer } = getSigner("user");
+  const { signer } = getSigner(USER1_PHRASE);
   const tx = new TransactionBlock();
 
   tx.moveCall({

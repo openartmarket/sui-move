@@ -1,3 +1,5 @@
+import assert from "assert";
+
 import { mintArtwork } from "../setup/src/artwork";
 import { mintArtworkShard } from "../setup/src/artwork_shard";
 import { USER1_PHRASE } from "../setup/src/config";
@@ -10,9 +12,10 @@ describe("splitArtworkShard", () => {
     artworkId = await mintArtwork(mintArtworkOptions);
   });
 
-  it("should split an artwork shard", async () => {
+  it.only("should split an artwork shard", async () => {
     const artworkShardId = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 10 });
 
-    await splitArtworkShard(artworkShardId, 2);
+    const splitArtworkShardId = await splitArtworkShard(artworkShardId, 2);
+    assert.ok(splitArtworkShardId);
   });
 });
