@@ -202,8 +202,7 @@ module open_art_market::open_art_market {
         
     }
 
-        // @todo: method for setting the currency type (can be done at minting time)
-    // @todo: method for getting available shares for sale
+    // @todo: method for setting the currency type (can be done at minting time)
 
     // Open Art Market & Artwork Owner (person coming with the artwork to the market) has shares allocated for sale. 
     // We will create those Artwork Shards as the first action after minting the Artwork
@@ -254,6 +253,11 @@ module open_art_market::open_art_market {
 
     public fun get_user_shares(shares: &Shares): u64 {
         shares.value
+    }
+
+    // Function for getting available shares for sale
+    public fun get_available_shares_for_sale(artwork: &Artwork): u64 {
+        artwork.shares
     }
 
 }
