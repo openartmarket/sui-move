@@ -202,6 +202,7 @@ module open_art_market::open_art_market {
         
     }
 
+
     // @todo: method for setting the currency type (can be done at minting time)
 
     // Open Art Market & Artwork Owner (person coming with the artwork to the market) has shares allocated for sale. 
