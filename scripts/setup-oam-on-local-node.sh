@@ -1,9 +1,8 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-
-sui start &
-sleep 10
+# sui start &
+# sleep 10
 
 original_address=$(sui client active-address)
 envs=$(sui client active-env)
@@ -86,4 +85,4 @@ jq -n --arg package_id "$PACKAGE_ID" \
       }' > ./output/contract.json
 
 echo "Contract details are saved in output/contract.json"
-tail -f /dev/null
+# tail -f /dev/null

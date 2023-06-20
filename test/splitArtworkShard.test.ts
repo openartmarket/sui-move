@@ -16,13 +16,13 @@ describe("splitArtworkShard", () => {
   it.only("should split an artwork shard", async () => {
     const { artworkShardId, digest } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 10 });
 
-    await provider.waitForTransactionBlock({ 
-      timeout: 20000, 
-      digest, 
-      options: { showEffects: true }, 
-    }); 
+    // await provider.waitForTransactionBlock({ 
+    //   timeout: 20000, 
+    //   digest, 
+    //   options: { showEffects: true }, 
+    // }); 
 
-    // await new Promise((resolve) => setTimeout(resolve, 5_000));
+    await new Promise((resolve) => setTimeout(resolve, 5_000));
     await splitArtworkShard(artworkShardId, USER1_PHRASE, 2);
   }).timeout(30_000);
 });
