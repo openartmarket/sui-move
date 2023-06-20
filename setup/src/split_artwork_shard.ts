@@ -23,5 +23,8 @@ export async function splitArtworkShard(
       showEffects: true,
     },
   });
+
+  console.log('confirmedLocalExecution', txRes.confirmedLocalExecution)
+
   return getExecutionStatus(txRes);
 }

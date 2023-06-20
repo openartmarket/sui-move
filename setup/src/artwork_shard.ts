@@ -9,11 +9,16 @@ export type MintArtworkShardParams = {
   shares: number;
 };
 
+export type MintArtworkShardResult = {
+  artworkShardId: string
+  digest: string
+}
+
 /**
  * Mints an artwork shard
  * @returns artwork shard id
  */
-export async function mintArtworkShard(params: MintArtworkShardParams): Promise<string> {
+export async function mintArtworkShard(params: MintArtworkShardParams): Promise<MintArtworkShardResult> {
   const { artworkId, phrase, shares } = params;
   const { signer } = getSigner(ADMIN_PHRASE);
   const { address } = getSigner(phrase);
@@ -35,7 +40,11 @@ export async function mintArtworkShard(params: MintArtworkShardParams): Promise<
 
   const artworkShardId = getCreatedObjects(txRes)?.[0].reference.objectId;
   if (!artworkShardId) throw new Error("Failed to mint artwork shard");
-  return artworkShardId;
+  const { digest } = txRes
+
+  console.log(JSON.stringify(txRes, null, 2))
+
+  return { artworkShardId, digest };
 }
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
   mintArtworkShard({

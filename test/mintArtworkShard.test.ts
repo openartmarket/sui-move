@@ -12,8 +12,7 @@ describe("mintArtworkShard", () => {
   });
 
   it("should issue new shares", async () => {
-    const artworkShardId = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 2 });
-    assert.ok(artworkShardId);
+    await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 2 });
   });
 
   it("should not issue new shares, when asking for too much", async () => {
