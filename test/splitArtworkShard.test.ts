@@ -15,9 +15,9 @@ describe("splitArtworkShard", () => {
   it.only("should split an artwork shard", async () => {
     const artworkShardId = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 10 });
     console.log({artworkShardId});
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, 20_000));
     const splitArtworkShardId = await splitArtworkShard(artworkShardId, USER1_PHRASE, 2);
     console.log({splitArtworkShardId});
     assert.ok(splitArtworkShardId);
-  });
+  }).timeout(30_000);
 });
