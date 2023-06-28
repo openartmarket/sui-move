@@ -10,15 +10,17 @@ export type MintArtworkShardParams = {
 };
 
 export type MintArtworkShardResult = {
-  artworkShardId: string
-  digest: string
-}
+  artworkShardId: string;
+  digest: string;
+};
 
 /**
  * Mints an artwork shard
  * @returns artwork shard id
  */
-export async function mintArtworkShard(params: MintArtworkShardParams): Promise<MintArtworkShardResult> {
+export async function mintArtworkShard(
+  params: MintArtworkShardParams
+): Promise<MintArtworkShardResult> {
   const { artworkId, phrase, shares } = params;
   const { signer } = getSigner(ADMIN_PHRASE);
   const { address } = getSigner(phrase);
@@ -38,11 +40,13 @@ export async function mintArtworkShard(params: MintArtworkShardParams): Promise<
     },
   });
 
-  const artworkShardId = getCreatedObjects(txRes)?.[0].reference.objectId;
+  const artworkShardId = getCreatedObjects(txRes)?.find(
+    (obj: any) => obj?.owner?.AddressOwner === address
+  )?.reference.objectId;
   if (!artworkShardId) throw new Error("Failed to mint artwork shard");
-  const { digest } = txRes
+  const { digest } = txRes;
 
-  console.log(JSON.stringify(txRes, null, 2))
+  console.log(JSON.stringify(txRes, null, 2));
 
   return { artworkShardId, digest };
 }
