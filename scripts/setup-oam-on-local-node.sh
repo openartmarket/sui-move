@@ -65,6 +65,7 @@ ADMIN_CAP_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::open_a
 PUBLISHER_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::Publisher")).objectId')
 UPGRADE_CAP_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::package::UpgradeCap")).objectId')
 
+# TODO: Write an .envrc file instead
 jq -n --arg package_id "$PACKAGE_ID" \
       --arg admin_cap_id "$ADMIN_CAP_ID" \
       --arg publisher_id "$PUBLISHER_ID" \

@@ -1,6 +1,7 @@
-import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
 import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "./config";
+import { findObjectIdWithOwnerAddress} from "./findObjectIdWithOwnerAddress"
 import { getSigner } from "./helpers";
 
 export type MintArtworkShardParams = {
@@ -40,14 +41,8 @@ export async function mintArtworkShard(
     },
   });
 
-  const artworkShardId = getCreatedObjects(txRes)?.find(
-    (obj: any) => obj?.owner?.AddressOwner === address
-  )?.reference.objectId;
-  if (!artworkShardId) throw new Error("Failed to mint artwork shard");
+  const artworkShardId = findObjectIdWithOwnerAddress(txRes, address)
   const { digest } = txRes;
-
-  console.log(JSON.stringify(txRes, null, 2));
-
   return { artworkShardId, digest };
 }
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
@@ -57,3 +52,5 @@ if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
     shares: 2,
   });
 }
+
+

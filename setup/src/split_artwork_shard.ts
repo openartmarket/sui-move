@@ -1,14 +1,15 @@
-import { ExecutionStatus, getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
 import { PACKAGE_ID } from "./config";
+import { findObjectIdWithOwnerAddress} from "./findObjectIdWithOwnerAddress"
 import { getSigner } from "./helpers";
 
 export async function splitArtworkShard(
   artworkShard: string,
   fromUser: string,
   shares: number
-): Promise<ExecutionStatus | undefined> {
-  const { signer } = getSigner(fromUser);
+): Promise<string> {
+  const { signer, address } = getSigner(fromUser);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -24,7 +25,17 @@ export async function splitArtworkShard(
     },
   });
 
-  console.log('confirmedLocalExecution', txRes.confirmedLocalExecution)
-
-  return getExecutionStatus(txRes);
+  const status = getExecutionStatus(txRes);
+  if(status === undefined) {
+    throw new Error("Failed to get execution status");
+  }
+  if(status.error) {
+    throw new Error(status.error);
+  }
+  if(status.status !== "success") {
+    throw new Error(`Transaction failed with status: ${status.status}`);
+  }
+  
+  const artworkShardId = findObjectIdWithOwnerAddress(txRes, address)
+  return artworkShardId;
 }
