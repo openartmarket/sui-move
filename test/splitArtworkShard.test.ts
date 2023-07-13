@@ -19,15 +19,64 @@ describe("splitArtworkShard", () => {
     const splitShardId = await splitArtworkShard(artworkShardId, USER1_PHRASE, 2);
 
     // Get the shard and check that it has 2 shares
-    const newShard = await getObject(splitShardId)
+    const splitShard = await getObject(splitShardId)
+    const oldShard = await getObject(artworkShardId)
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    assert.strictEqual(newShard.data.content.fields.shares, '2');
+    assert.strictEqual(splitShard.data.content.fields.shares, '2');
 
-    const oldShard = await getObject(artworkShardId)
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(oldShard.data.content.fields.shares, '8');
 
-  }).timeout(30_000);
+  }).timeout(10_000);
+
+  it.only("should split a split shard", async () => {
+    const { artworkShardId } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 12 });
+
+    const splitShardId = await splitArtworkShard(artworkShardId, USER1_PHRASE, 5);
+    const splitAgainShardId = await splitArtworkShard(splitShardId, USER1_PHRASE, 3);
+
+    const oldShard = await getObject(artworkShardId)
+    const splitShard = await getObject(splitShardId)
+    const splitAgainShard = await getObject(splitAgainShardId)
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    assert.strictEqual(oldShard.data.content.fields.shares, '7');
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    assert.strictEqual(splitShard.data.content.fields.shares, '2');
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    assert.strictEqual(splitAgainShard.data.content.fields.shares, '3');
+
+  }).timeout(10_000);
+
+  it.only("should split a split shard", async () => {
+    const { artworkShardId } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 12 });
+
+    const splitShardId1 = await splitArtworkShard(artworkShardId, USER1_PHRASE, 5);
+    const splitShardId2 = await splitArtworkShard(artworkShardId, USER1_PHRASE, 3);
+
+    const oldShard = await getObject(artworkShardId)
+    const splitShard = await getObject(splitShardId1)
+    const splitAgainShard = await getObject(splitShardId2)
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    assert.strictEqual(oldShard.data.content.fields.shares, '4');
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    assert.strictEqual(splitShard.data.content.fields.shares, '5');
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    assert.strictEqual(splitAgainShard.data.content.fields.shares, '3');
+
+  }).timeout(10_000);
 });
