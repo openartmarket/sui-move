@@ -1,4 +1,5 @@
-FROM ghcr.io/shinamicorp/sui:testnet-v1.3.0
+# Keep the version in sync with bootstrap.sh and Move.toml
+FROM ghcr.io/shinamicorp/sui:testnet-v1.5.0
 # FROM mysten/sui-tools:stable
 USER root
 
