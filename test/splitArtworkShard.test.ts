@@ -13,7 +13,7 @@ describe("splitArtworkShard", () => {
     artworkId = await mintArtwork(mintArtworkOptions);
   });
 
-  it.only("should split an artwork shard", async () => {
+  it("should split an artwork shard", async () => {
     const { artworkShardId } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 10 });
 
     const splitShardId = await splitArtworkShard(artworkShardId, USER1_PHRASE, 2);
@@ -32,7 +32,7 @@ describe("splitArtworkShard", () => {
 
   }).timeout(10_000);
 
-  it.only("should split a split shard", async () => {
+  it("should split a split shard", async () => {
     const { artworkShardId } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 12 });
 
     const splitShardId = await splitArtworkShard(artworkShardId, USER1_PHRASE, 5);
@@ -56,7 +56,7 @@ describe("splitArtworkShard", () => {
 
   }).timeout(10_000);
 
-  it.only("should split a split shard", async () => {
+  it("should split a split shard", async () => {
     const { artworkShardId } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 12 });
 
     const splitShardId1 = await splitArtworkShard(artworkShardId, USER1_PHRASE, 5);
