@@ -26,7 +26,6 @@ export async function vote(
       },
     });
 
-    console.log("getExecutionStatus", getExecutionStatus(txRes));
     return getExecutionStatus(txRes);
   } catch (e) {
     // console.error("Could not vote", e);

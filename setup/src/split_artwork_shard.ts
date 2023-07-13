@@ -1,10 +1,15 @@
 import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
 import { PACKAGE_ID } from "./config";
+import { findObjectIdWithOwnerAddress} from "./findObjectIdWithOwnerAddress"
 import { getSigner } from "./helpers";
 
-export async function splitArtworkShard(artworkShard: string, shares: number) {
-  const { signer } = getSigner("user");
+export async function splitArtworkShard(
+  artworkShard: string,
+  fromUser: string,
+  shares: number
+): Promise<string> {
+  const { signer, address } = getSigner(fromUser);
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -12,23 +17,25 @@ export async function splitArtworkShard(artworkShard: string, shares: number) {
     arguments: [tx.object(artworkShard), tx.pure(shares)],
   });
 
-  console.log("Split artwork shard: %s", artworkShard);
+  const txRes = await signer.signAndExecuteTransactionBlock({
+    transactionBlock: tx,
+    requestType: "WaitForLocalExecution",
+    options: {
+      showEffects: true,
+    },
+  });
 
-  try {
-    const txRes = await signer.signAndExecuteTransactionBlock({
-      transactionBlock: tx,
-      requestType: "WaitForLocalExecution",
-      options: {
-        showEffects: true,
-      },
-    });
-
-    console.log("effects", getExecutionStatus(txRes));
-  } catch (e) {
-    console.error("Could not split artwork shard", e);
+  const status = getExecutionStatus(txRes);
+  if(status === undefined) {
+    throw new Error("Failed to get execution status");
   }
-}
-
-if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  splitArtworkShard("{artworkShard}", 2);
+  if(status.error) {
+    throw new Error(status.error);
+  }
+  if(status.status !== "success") {
+    throw new Error(`Transaction failed with status: ${status.status}`);
+  }
+  
+  const artworkShardId = findObjectIdWithOwnerAddress(txRes, address)
+  return artworkShardId;
 }

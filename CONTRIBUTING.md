@@ -62,6 +62,12 @@ npm test
 ```
 You can rerun tests without redeploying the contracts. Just run `npm test` again.
 
+### Running a single test
+
+While you're developing, you may want to run only the single test you're working with.
+
+Change `it('...')` to `it.only('...')`, and `npm test` will *only* run that test.
+
 ### Viewing on local blockchain explorer
 Go to [SUI Explorer](https://suiexplorer.com/?network=local)
 
