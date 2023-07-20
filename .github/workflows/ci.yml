@@ -21,7 +21,7 @@ jobs:
     # - run: cargo install --git https://github.com/move-language/move move-analyzer --branch sui-move --features "address32"
     # - run: asdf reshim
     - run: rm -rf ~/.sui
-    - run: sui start > sui.log 2>&1
+    - run: sui start > sui.log 2>&1 &
     - run: sleep 5
     - run: ./scripts/setup-oam-on-local-node.sh
     - run: npm ci && cd setup && npm ci
