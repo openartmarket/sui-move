@@ -15,7 +15,7 @@ export type MintArtworkShardParams = {
  */
 export async function mintArtworkShard(params: MintArtworkShardParams): Promise<string> {
   const { artworkId, phrase, shares } = params;
-  const { signer } = getSigner(ADMIN_PHRASE);
+  const { signer } = getSigner('gadget fall ginger unit clerk arctic cool silly cream phone praise acid');
   const { address } = getSigner(phrase);
   const tx = new TransactionBlock();
 
@@ -36,11 +36,4 @@ export async function mintArtworkShard(params: MintArtworkShardParams): Promise<
   const artworkShardId = getCreatedObjects(txRes)?.[0].reference.objectId;
   if (!artworkShardId) throw new Error("Failed to mint artwork shard");
   return artworkShardId;
-}
-if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  mintArtworkShard({
-    artworkId: "{artwork}",
-    phrase: USER1_PHRASE,
-    shares: 2,
-  });
 }
