@@ -11,7 +11,7 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: oam-runners
     steps:
     - uses: actions/checkout@v3
     - uses: HatsuneMiku3939/direnv-action@v1
