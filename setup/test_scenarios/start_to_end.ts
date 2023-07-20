@@ -21,10 +21,10 @@ async function startToEndScenario() {
   });
 
   // Admin creates an artwork shard and sends to user
-  const artworkShard = await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 10});
+  const { artworkShardId } = await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 10});
 
   // Split artwork shard
-  await splitArtworkShard(artworkShard, 2);
+  await splitArtworkShard(artworkShardId, USER1_PHRASE, 2);
   
   // Admin reates a vote request for the artwork
   const voteRequest = await createVoteRequest(

@@ -1,6 +1,6 @@
 #!/bin/bash
 json=$(cat output/contract.json)
-touch .envrc
+rm -f .envrc
 # Iterate over the keys
 keys=$(echo "$json" | jq -r 'keys[]')
 for key in $keys; do

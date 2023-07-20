@@ -1,6 +1,7 @@
-import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "./config";
+import { ADMIN_CAP_ID, PACKAGE_ID } from "./config";
+import { findObjectIdWithOwnerAddress} from "./findObjectIdWithOwnerAddress"
 import { getSigner } from "./helpers";
 
 export type MintArtworkShardParams = {
@@ -9,11 +10,18 @@ export type MintArtworkShardParams = {
   shares: number;
 };
 
+export type MintArtworkShardResult = {
+  artworkShardId: string;
+  digest: string;
+};
+
 /**
  * Mints an artwork shard
  * @returns artwork shard id
  */
-export async function mintArtworkShard(params: MintArtworkShardParams): Promise<string> {
+export async function mintArtworkShard(
+  params: MintArtworkShardParams
+): Promise<MintArtworkShardResult> {
   const { artworkId, phrase, shares } = params;
   const { signer } = getSigner('gadget fall ginger unit clerk arctic cool silly cream phone praise acid');
   const { address } = getSigner(phrase);
@@ -33,7 +41,9 @@ export async function mintArtworkShard(params: MintArtworkShardParams): Promise<
     },
   });
 
-  const artworkShardId = getCreatedObjects(txRes)?.[0].reference.objectId;
-  if (!artworkShardId) throw new Error("Failed to mint artwork shard");
-  return artworkShardId;
+  const artworkShardId = findObjectIdWithOwnerAddress(txRes, address)
+  const { digest } = txRes;
+  return { artworkShardId, digest };
 }
+
+
