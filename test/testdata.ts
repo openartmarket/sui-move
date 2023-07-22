@@ -1,4 +1,4 @@
-import { MintArtworkParams } from "../setup/src/artwork";
+import { MintArtworkParams } from "../src/artwork";
 
 export const mintArtworkOptions: MintArtworkParams = {
   totalSupply: 500,

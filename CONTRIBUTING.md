@@ -31,7 +31,6 @@ sui start
 ./scripts/setup-oam-on-local-node.sh
 ./scripts/json-to-env.sh
 direnv allow
-cd setup
 npm run create:artwork-display
 npm run create:artwork-shard-display
 

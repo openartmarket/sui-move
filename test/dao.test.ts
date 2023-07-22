@@ -1,11 +1,11 @@
 import assert from "assert";
 
-import { mintArtwork } from "../setup/src/artwork";
-import { mintArtworkShard } from "../setup/src/artwork_shard";
-import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE, USER3_PHRASE } from "../setup/src/config";
-import { endRequestVoting } from "../setup/src/end_request_voting";
-import { vote } from "../setup/src/vote";
-import { createVoteRequest } from "../setup/src/vote_request";
+import { mintArtwork } from "../src/artwork";
+import { mintArtworkShard } from "../src/artwork_shard";
+import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE, USER3_PHRASE } from "../src/config";
+import { endRequestVoting } from "../src/end_request_voting";
+import { vote } from "../src/vote";
+import { createVoteRequest } from "../src/vote_request";
 
 const artworkOptions = {
   totalSupply: 500,

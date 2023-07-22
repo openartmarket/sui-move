@@ -17,11 +17,11 @@ jobs:
     - uses: HatsuneMiku3939/direnv-action@v1
     - run: docker compose up -d
     - run: ./scripts/wait-for-file ./output/contract.json 300
-    - run: npm ci && cd setup && npm ci
+    - run: npm ci
     - run: ./scripts/json-to-env.sh
     - run: direnv allow
-    - run: cd setup && direnv exec . npm run create:artwork-display
-    - run: cd setup && direnv exec . npm run create:artwork-shard-display
+    - run: direnv exec . npm run create:artwork-display
+    - run: direnv exec . npm run create:artwork-shard-display
     - run: direnv exec . npm test
     - run: npm run format
     - run: npm run lint
