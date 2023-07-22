@@ -1,6 +1,6 @@
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { USER1_PHRASE } from "../src/config";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "../src/config";
 import { endRequestVoting } from "../src/end_request_voting";
 import { splitArtworkShard } from "../src/split_artwork_shard";
 import { vote } from "../src/vote";
@@ -10,6 +10,9 @@ import { createVoteRequest } from "../src/vote_request";
 async function startToEndScenario() {
   // Admin mints an artwork
   const artworkId = await mintArtwork({
+    signerPhrase: ADMIN_PHRASE,
+    packageId: PACKAGE_ID,
+    adminCapId: ADMIN_CAP_ID,
     totalSupply: 1000,
     sharePrice: 10,
     multiplier: 2,
@@ -22,7 +25,7 @@ async function startToEndScenario() {
   });
 
   // Admin creates an artwork shard and sends to user
-  const { artworkShardId } = await mintArtworkShard({artworkId, phrase: USER1_PHRASE, shares: 10});
+  const { artworkShardId } = await mintArtworkShard({artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 10});
 
   // Split artwork shard
   await splitArtworkShard(artworkShardId, USER1_PHRASE, 2);
