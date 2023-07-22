@@ -1,8 +1,8 @@
 import assert from "assert";
 
-import { mintArtwork } from "../setup/src/artwork";
-import { mintArtworkShard } from "../setup/src/artwork_shard";
-import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../setup/src/config";
+import { mintArtwork } from "../src/artwork";
+import { mintArtworkShard } from "../src/artwork_shard";
+import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../src/config";
 import { mintArtworkOptions } from "./testdata";
 
 describe("mintArtworkShard", () => {

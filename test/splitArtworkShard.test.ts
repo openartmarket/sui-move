@@ -1,9 +1,9 @@
 import assert from "assert";
 
-import { mintArtwork } from "../setup/src/artwork";
-import { mintArtworkShard } from "../setup/src/artwork_shard";
-import { USER1_PHRASE } from "../setup/src/config";
-import { splitArtworkShard } from "../setup/src/split_artwork_shard";
+import { mintArtwork } from "../src/artwork";
+import { mintArtworkShard } from "../src/artwork_shard";
+import { USER1_PHRASE } from "../src/config";
+import { splitArtworkShard } from "../src/split_artwork_shard";
 import { getObject } from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
 

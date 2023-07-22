@@ -33,6 +33,7 @@ module open_art_market::open_art_market {
         artist: String,
         creation_date: u64,
         description: String,
+        currency: String,
         image_url: String,
     }
 
@@ -52,6 +53,7 @@ module open_art_market::open_art_market {
         artist: String,
         creation_date: u64,
         description: String,
+        currency: String,
         image_url: String,
     }
 
@@ -79,7 +81,7 @@ module open_art_market::open_art_market {
     // Create a new Artwork NFT shared object
     public fun mint_artwork_and_share(
         _: &mut AdminCap, total_supply: u64, share_price: u64, multiplier: u64, name: String, artist: String,
-        creation_date: u64, description: String,
+        creation_date: u64, description: String, currency: String,
         image_url: String, ctx: &mut TxContext
     ) {
 
@@ -101,6 +103,7 @@ module open_art_market::open_art_market {
             artist,
             creation_date,
             description,
+            currency,
             image_url
         };
         transfer::public_share_object<Artwork>(artwork);
@@ -134,6 +137,7 @@ module open_art_market::open_art_market {
             artist: artwork.artist,
             creation_date: artwork.creation_date,
             description: artwork.description,
+            currency: artwork.currency,
             image_url: artwork.image_url,
         };
 
@@ -170,6 +174,7 @@ module open_art_market::open_art_market {
             artist: _,
             creation_date: _,
             description: _,
+            currency: _,
             image_url: _,
         } = artwork_shard;
 
@@ -222,6 +227,7 @@ module open_art_market::open_art_market {
             artist: artwork_shard.artist,
             creation_date: artwork_shard.creation_date,
             description: artwork_shard.description,
+            currency: artwork_shard.currency,
             image_url: artwork_shard.image_url,
         };
 

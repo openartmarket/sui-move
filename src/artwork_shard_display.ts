@@ -7,10 +7,11 @@ import { getSigner } from "./helpers";
 // This is the function you can update to change the display fields
 function getArtworkShardDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
   return {
-    keys: ["name", "description", "image_url", "project_url"],
+    keys: ["name", "description", "currency", "image_url", "project_url"],
     values: [
-      "{artwork_name}",
+      "{name}",
       "{description}",
+      "{currency}",
       `${imageProviderUrlPrefix}{image_url}${imageProviderUrlPostfix}`,
       "https://www.openartmarket.com/",
     ],
