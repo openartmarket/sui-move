@@ -3,6 +3,8 @@ import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
 import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
+export type Currency = "USD" | "EUR" | "GBP" | "NOK" ;
+
 export type MintArtworkParams = {
   totalSupply: number;
   sharePrice: number;
@@ -11,6 +13,7 @@ export type MintArtworkParams = {
   artist: string;
   creationDate: string;
   description: string;
+  currency: Currency;
   image: string;
 };
 
@@ -20,7 +23,7 @@ export type MintArtworkParams = {
  * @returns the artwork id
  */
 export async function mintArtwork(params: MintArtworkParams): Promise<string> {
-  const { totalSupply, sharePrice, multiplier, name, artist, creationDate, description, image } =
+  const { totalSupply, sharePrice, multiplier, name, artist, creationDate, description, currency, image } =
     params;
 
   // console.log("Mint artwork: %s", name + " by " + artist);
@@ -39,6 +42,7 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
       tx.pure(artist),
       tx.pure(creationDate),
       tx.pure(description),
+      tx.pure(currency),
       tx.pure(image),
     ],
   });
@@ -67,6 +71,7 @@ if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
     artist: "Leonardo da Vinci",
     creationDate: "1685548680595",
     description: "Choconta painting",
+    currency: "USD",
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
   });

@@ -1,6 +1,6 @@
 import assert from "assert";
 
-import { mintArtwork } from "../src/artwork";
+import { Currency, mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
 import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE, USER3_PHRASE } from "../src/config";
 import { endRequestVoting } from "../src/end_request_voting";
@@ -15,6 +15,7 @@ const artworkOptions = {
   artist: "Leonardo da Vinci",
   creationDate: "1685548680595",
   description: "Choconta painting",
+  currency: "NOK" as Currency,
   image:
     "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
 };

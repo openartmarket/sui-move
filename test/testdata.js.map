@@ -1,1 +1,0 @@
-{"version":3,"file":"testdata.js","sourceRoot":"","sources":["testdata.ts"],"names":[],"mappings":"AAEA,MAAM,CAAC,MAAM,kBAAkB,GAAsB;IACnD,WAAW,EAAE,GAAG;IAChB,UAAU,EAAE,EAAE;IACd,UAAU,EAAE,GAAG;IACf,IAAI,EAAE,WAAW;IACjB,MAAM,EAAE,mBAAmB;IAC3B,YAAY,EAAE,eAAe;IAC7B,WAAW,EAAE,mBAAmB;IAChC,KAAK,EACH,6LAA6L;CAChM,CAAC"}
