@@ -2,7 +2,14 @@ import assert from "assert";
 
 import { Currency, mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE, USER2_PHRASE, USER3_PHRASE } from "../src/config";
+import {
+  ADMIN_CAP_ID,
+  ADMIN_PHRASE,
+  PACKAGE_ID,
+  USER1_PHRASE,
+  USER2_PHRASE,
+  USER3_PHRASE,
+} from "../src/config";
 import { endRequestVoting } from "../src/end_request_voting";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
@@ -27,9 +34,24 @@ describe("DAO Voting structure", () => {
   let artworkId: string;
   beforeEach(async () => {
     artworkId = await mintArtwork(artworkOptions);
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: ADMIN_PHRASE, shares: 151 });
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 249 });
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER2_PHRASE, shares: 100 });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: ADMIN_PHRASE,
+      shares: 151,
+    });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER1_PHRASE,
+      shares: 249,
+    });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER2_PHRASE,
+      shares: 100,
+    });
   });
 
   it("can start a voting session", async () => {

@@ -12,24 +12,73 @@ describe("mintArtworkShard", () => {
   });
 
   it("should issue new shares", async () => {
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 2 });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER1_PHRASE,
+      shares: 2,
+    });
   });
 
   it("should not issue new shares, when asking for too much", async () => {
-    await assert.rejects(mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 501 }));
+    await assert.rejects(
+      mintArtworkShard({
+        artworkId,
+        signerPhrase: ADMIN_PHRASE,
+        recieverPhrase: USER1_PHRASE,
+        shares: 501,
+      })
+    );
   });
 
   it("should not issue new shares, when sold out", async () => {
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 150 });
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER2_PHRASE, shares: 250 });
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 98 });
-    await assert.rejects(mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER2_PHRASE, shares: 3 }));
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER1_PHRASE,
+      shares: 150,
+    });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER2_PHRASE,
+      shares: 250,
+    });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER1_PHRASE,
+      shares: 98,
+    });
+    await assert.rejects(
+      mintArtworkShard({
+        artworkId,
+        signerPhrase: ADMIN_PHRASE,
+        recieverPhrase: USER2_PHRASE,
+        shares: 3,
+      })
+    );
   });
 
   it("can give shares to OAM and owner", async () => {
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: ADMIN_PHRASE, shares: 150 });
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 50 });
-    await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER2_PHRASE, shares: 1 });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: ADMIN_PHRASE,
+      shares: 150,
+    });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER1_PHRASE,
+      shares: 50,
+    });
+    await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER2_PHRASE,
+      shares: 1,
+    });
   });
 
   it.skip("can set a currency of a contract", async () => {
