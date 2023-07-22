@@ -40,6 +40,8 @@
     "test": "npm run compile && mocha --config .mocharc.cjs.cjs dist/cjs/test",
     "create:artwork-display": "tsc && node dist/cjs/src/artwork_display atomic-run",
     "create:artwork-shard-display": "tsc && node dist/cjs/src/artwork_shard_display atomic-run",
+    "create:ci-artwork-display": "tsc && node dist/src/artwork_display atomic-run",
+    "create:ci-artwork-shard-display": "tsc && node dist/src/artwork_shard_display atomic-run",
     "create:artwork": "tsc && node dist/cjs/src/artwork atomic-run",
     "update:artwork-outgoing-price": "tsc && env-cmd -f .env node dist/cjs/src/update_artwork_outgoing_price atomic-run",
     "create:artwork-shard": "tsc && node dist/cjs/src/artwork_shard atomic-run",
