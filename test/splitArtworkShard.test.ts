@@ -2,7 +2,7 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { USER1_PHRASE } from "../src/config";
+import { ADMIN_PHRASE, USER1_PHRASE } from "../src/config";
 import { splitArtworkShard } from "../src/split_artwork_shard";
 import { getObject } from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
@@ -14,7 +14,7 @@ describe("splitArtworkShard", () => {
   });
 
   it("should split an artwork shard", async () => {
-    const { artworkShardId } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 10 });
+    const { artworkShardId } = await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 10 });
 
     const splitShardId = await splitArtworkShard(artworkShardId, USER1_PHRASE, 2);
 
@@ -33,7 +33,7 @@ describe("splitArtworkShard", () => {
   }).timeout(10_000);
 
   it("should split a split shard", async () => {
-    const { artworkShardId } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 12 });
+    const { artworkShardId } = await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 12 });
 
     const splitShardId = await splitArtworkShard(artworkShardId, USER1_PHRASE, 5);
     const splitAgainShardId = await splitArtworkShard(splitShardId, USER1_PHRASE, 3);
@@ -57,7 +57,7 @@ describe("splitArtworkShard", () => {
   }).timeout(10_000);
 
   it("should split a split shard", async () => {
-    const { artworkShardId } = await mintArtworkShard({ artworkId, phrase: USER1_PHRASE, shares: 12 });
+    const { artworkShardId } = await mintArtworkShard({ artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 12 });
 
     const splitShardId1 = await splitArtworkShard(artworkShardId, USER1_PHRASE, 5);
     const splitShardId2 = await splitArtworkShard(artworkShardId, USER1_PHRASE, 3);

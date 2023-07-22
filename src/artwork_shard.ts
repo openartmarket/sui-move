@@ -6,7 +6,8 @@ import { getSigner } from "./helpers";
 
 export type MintArtworkShardParams = {
   artworkId: string;
-  phrase: string;
+  signerPhrase: string;
+  recieverPhrase: string;
   shares: number;
 };
 
@@ -22,9 +23,9 @@ export type MintArtworkShardResult = {
 export async function mintArtworkShard(
   params: MintArtworkShardParams
 ): Promise<MintArtworkShardResult> {
-  const { artworkId, phrase, shares } = params;
-  const { signer } = getSigner('gadget fall ginger unit clerk arctic cool silly cream phone praise acid');
-  const { address } = getSigner(phrase);
+  const { artworkId, signerPhrase, recieverPhrase, shares } = params;
+  const { signer } = getSigner(signerPhrase);
+  const { address } = getSigner(recieverPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({

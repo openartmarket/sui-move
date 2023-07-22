@@ -6,6 +6,9 @@ import { getSigner } from "./helpers";
 export type Currency = "USD" | "EUR" | "GBP" | "NOK" ;
 
 export type MintArtworkParams = {
+  signerPhrase: string;
+  packageId: string;
+  adminCapId: string;
   totalSupply: number;
   sharePrice: number;
   multiplier: number;
@@ -23,18 +26,18 @@ export type MintArtworkParams = {
  * @returns the artwork id
  */
 export async function mintArtwork(params: MintArtworkParams): Promise<string> {
-  const { totalSupply, sharePrice, multiplier, name, artist, creationDate, description, currency, image } =
+  const {adminCapId, packageId, signerPhrase, totalSupply, sharePrice, multiplier, name, artist, creationDate, description, currency, image } =
     params;
 
   // console.log("Mint artwork: %s", name + " by " + artist);
 
-  const { signer } = getSigner(ADMIN_PHRASE);
+  const { signer } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${PACKAGE_ID}::open_art_market::mint_artwork_and_share`,
+    target: `${packageId}::open_art_market::mint_artwork_and_share`,
     arguments: [
-      tx.object(ADMIN_CAP_ID),
+      tx.object(adminCapId),
       tx.pure(totalSupply),
       tx.pure(sharePrice),
       tx.pure(multiplier),
@@ -64,6 +67,9 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
 
 if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
   mintArtwork({
+    signerPhrase: ADMIN_PHRASE,
+    packageId: PACKAGE_ID,
+    adminCapId: ADMIN_CAP_ID,
     totalSupply: 500,
     sharePrice: 10,
     multiplier: 2,

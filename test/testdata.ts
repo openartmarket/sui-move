@@ -1,6 +1,11 @@
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID } from "$lib/config";
+
 import { MintArtworkParams } from "../src/artwork";
 
 export const mintArtworkOptions: MintArtworkParams = {
+  signerPhrase: ADMIN_PHRASE,
+  packageId: PACKAGE_ID,
+  adminCapId: ADMIN_CAP_ID,
   totalSupply: 500,
   sharePrice: 10,
   multiplier: 100,
