@@ -34,9 +34,3 @@ export async function createVoteRequest(artwork_id: string, request: string) {
   }
 }
 
-if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  createVoteRequest(
-    "0x3e88c14f87d56779b90429095d5dc30a995e3b4edf27e206366f192275eb4d84",
-    "Request to sell artwork to Bob"
-  );
-}

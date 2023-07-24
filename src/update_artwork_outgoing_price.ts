@@ -1,4 +1,4 @@
-import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
 import { ADMIN_CAP_ID, PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
@@ -13,7 +13,7 @@ export async function updateOutgoingPrice(artwork: string, newOutgoingPrice: num
   });
 
   try {
-    const txRes = await signer.signAndExecuteTransactionBlock({
+    await signer.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       requestType: "WaitForLocalExecution",
       options: {
@@ -21,12 +21,8 @@ export async function updateOutgoingPrice(artwork: string, newOutgoingPrice: num
       },
     });
 
-    //console.log("effects", getExecutionStatus(txRes));
+    
   } catch (e) {
     console.error("Could not update artwork outgoing price", e);
   }
-}
-
-if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  updateOutgoingPrice("{artwork}", 150);
 }

@@ -28,6 +28,3 @@ export async function endRequestVoting(voteRequest: string) {
   }
 }
 
-if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  endRequestVoting("{voteRequest}");
-}
