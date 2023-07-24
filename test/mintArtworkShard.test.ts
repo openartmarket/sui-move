@@ -2,7 +2,7 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../src/config";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE, USER2_PHRASE } from "../src/config";
 import { mintArtworkOptions } from "./testdata";
 
 describe("mintArtworkShard", () => {
@@ -17,6 +17,8 @@ describe("mintArtworkShard", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 2,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
   });
 
@@ -27,6 +29,8 @@ describe("mintArtworkShard", () => {
         signerPhrase: ADMIN_PHRASE,
         recieverPhrase: USER1_PHRASE,
         shares: 501,
+        packageId: PACKAGE_ID,
+        adminCapId: ADMIN_CAP_ID,
       })
     );
   });
@@ -37,18 +41,24 @@ describe("mintArtworkShard", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 150,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER2_PHRASE,
       shares: 250,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 98,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
     await assert.rejects(
       mintArtworkShard({
@@ -56,6 +66,8 @@ describe("mintArtworkShard", () => {
         signerPhrase: ADMIN_PHRASE,
         recieverPhrase: USER2_PHRASE,
         shares: 3,
+        packageId: PACKAGE_ID,
+        adminCapId: ADMIN_CAP_ID,
       })
     );
   });
@@ -66,30 +78,27 @@ describe("mintArtworkShard", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: ADMIN_PHRASE,
       shares: 150,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 50,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER2_PHRASE,
       shares: 1,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
   });
 
-  it.skip("can set a currency of a contract", async () => {
-    assert.ok(false);
-  });
-  it.skip("can sell some shares to another user", async () => {
-    assert.ok(false);
-  });
-  it.skip("can sell the whole artwork and change the owner of the artwork", async () => {
-    assert.ok(false);
-  });
   it.skip("can set the outgoing sale price of the artwork", async () => {
     assert.ok(false);
   });
