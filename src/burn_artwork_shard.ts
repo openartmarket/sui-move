@@ -1,27 +1,26 @@
 import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
 import { PACKAGE_ID } from "./config";
-import { findObjectIdWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
 import { getSigner } from "./helpers";
 
-export type SplitArtworkShardParams = {
+export type BurnArtworkParams = {
+  artworkId: string,
   artworkShardId: string,
   signerPhrase: string,
-  shares: number
 }
-export type SplitArtworkShardResult = {
-  artworkShardId: string,
+export type BurnArtworkResult = {
+  success: boolean,
   owner: string
 }
 
-export async function splitArtworkShard( params:SplitArtworkShardParams ): Promise<SplitArtworkShardResult> {
-  const { artworkShardId, signerPhrase, shares } = params;
+export async function burnArtworkShard( params:BurnArtworkParams ): Promise<BurnArtworkResult> {
+  const { artworkShardId, artworkId, signerPhrase } = params;
   const { signer, address } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${PACKAGE_ID}::open_art_market::split_artwork_shard`,
-    arguments: [tx.object(artworkShardId), tx.pure(shares)],
+    target: `${PACKAGE_ID}::open_art_market::safe_burn_artwork_shard`,
+    arguments: [tx.object(artworkId),tx.object(artworkShardId)],
   });
 
   const txRes = await signer.signAndExecuteTransactionBlock({
@@ -42,9 +41,9 @@ export async function splitArtworkShard( params:SplitArtworkShardParams ): Promi
   if(status.status !== "success") {
     throw new Error(`Transaction failed with status: ${status.status}`);
   }
-  const newArtworkShardId = findObjectIdWithOwnerAddress(txRes, address);
   return {
-    artworkShardId: newArtworkShardId,
+    success: true,
     owner: address
+
   };
 }

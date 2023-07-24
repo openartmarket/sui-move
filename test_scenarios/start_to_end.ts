@@ -28,7 +28,7 @@ async function startToEndScenario() {
   const { artworkShardId } = await mintArtworkShard({artworkId, signerPhrase: ADMIN_PHRASE, recieverPhrase: USER1_PHRASE, shares: 10});
 
   // Split artwork shard
-  await splitArtworkShard(artworkShardId, USER1_PHRASE, 2);
+  await splitArtworkShard({artworkShardId, signerPhrase: USER1_PHRASE, shares: 2});
   
   // Admin reates a vote request for the artwork
   const voteRequest = await createVoteRequest(

@@ -4,7 +4,7 @@ import {
   PaginatedObjectsResponse,
   SuiObjectResponse,
 } from "@mysten/sui.js";
-const provider = new JsonRpcProvider(localnetConnection);
+const provider: JsonRpcProvider = new JsonRpcProvider(localnetConnection);
 
 export async function getObject(objectId: string): Promise<SuiObjectResponse> {
   return await provider.getObject({

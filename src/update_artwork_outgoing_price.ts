@@ -21,7 +21,7 @@ export async function updateOutgoingPrice(artwork: string, newOutgoingPrice: num
       },
     });
 
-    console.log("effects", getExecutionStatus(txRes));
+    //console.log("effects", getExecutionStatus(txRes));
   } catch (e) {
     console.error("Could not update artwork outgoing price", e);
   }

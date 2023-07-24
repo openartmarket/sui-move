@@ -201,9 +201,9 @@ module open_art_market::open_art_market {
         // Ensure that both shards belong to the same artwork
         assert!(artwork_shard1.artwork_id == artwork_shard2.artwork_id, EIncompatibleShardTypes);
 
-        let artowork_shard2_shares = burn_artwork_shard(artwork_shard2);
+        let artwork_shard2_shares = burn_artwork_shard(artwork_shard2);
 
-        artwork_shard1.shares = artwork_shard1.shares + artowork_shard2_shares;
+        artwork_shard1.shares = artwork_shard1.shares + artwork_shard2_shares;
         
     }
 
