@@ -1,6 +1,6 @@
 import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
-import { PACKAGE_ID, USER1_PHRASE } from "./config";
+import { PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
 export async function vote(

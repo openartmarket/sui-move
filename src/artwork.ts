@@ -1,6 +1,5 @@
 import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
 
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
 export type Currency = "USD" | "EUR" | "GBP" | "NOK" ;
