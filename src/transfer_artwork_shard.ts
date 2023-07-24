@@ -1,11 +1,11 @@
 import { TransactionBlock } from "@mysten/sui.js";
 
-import { PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
 export type TransferArtworkShardParams = {
     artworkId: string;
     artworkShardId: string;
+    packageId: string;
     signerPhrase: string;
     recieverPhrase: string;
 };
@@ -23,7 +23,7 @@ export type TransferArtworkShardResult = {
 export async function transferArtworkShard(
   params: TransferArtworkShardParams
 ): Promise<TransferArtworkShardResult> {
-  const { artworkId, signerPhrase, recieverPhrase, artworkShardId } = params;
+  const { artworkId, signerPhrase, recieverPhrase, artworkShardId, packageId } = params;
   const { signer } = getSigner(signerPhrase);
   const { address } = getSigner(recieverPhrase);
   //console.log('New receiver', address)
@@ -31,7 +31,7 @@ export async function transferArtworkShard(
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${PACKAGE_ID}::open_art_market::transfer_artwork_shard`,
+    target: `${packageId}::open_art_market::transfer_artwork_shard`,
     arguments: [tx.object(artworkId), tx.pure(artworkShardId), tx.pure(address)],
   });
 

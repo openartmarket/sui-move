@@ -2,7 +2,7 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_PHRASE, USER1_PHRASE, USER2_PHRASE } from "../src/config";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE, USER2_PHRASE } from "../src/config";
 import {
   findObjectIdInOwnedObjectList,
   OwnedObjectList,
@@ -24,6 +24,8 @@ describe("transferArtworkShard", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 12,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
 
     await transferArtworkShard({
@@ -31,6 +33,7 @@ describe("transferArtworkShard", () => {
       artworkShardId,
       signerPhrase: USER1_PHRASE,
       recieverPhrase: USER2_PHRASE,
+      packageId: PACKAGE_ID,
     });
 
     const transferredShard = await getObject(artworkShardId);
@@ -45,12 +48,15 @@ describe("transferArtworkShard", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 12,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
 
     const splitShardId1 = await splitArtworkShard({
       artworkShardId,
       signerPhrase: USER1_PHRASE,
       shares: 5,
+      packageId: PACKAGE_ID,
     });
 
     const oldShard = await getObject(artworkShardId);
@@ -68,6 +74,7 @@ describe("transferArtworkShard", () => {
       artworkShardId: splitShardId1.artworkShardId,
       signerPhrase: USER1_PHRASE,
       recieverPhrase: USER2_PHRASE,
+      packageId: PACKAGE_ID,
     });
 
     const ownedObjects = await getOwnedObjects(transferArtworkShardResponse.address);

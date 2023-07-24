@@ -1,9 +1,9 @@
 import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
-import { PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
 export type MergeArtworkShardParams = {
+  packageId: string;
   artworkShard1Id: string,
   artworkShard2Id: string,
   signerPhrase: string,
@@ -14,12 +14,12 @@ export type MergeArtworkShardResult = {
 }
 
 export async function mergeArtworkShard( params:MergeArtworkShardParams ): Promise<MergeArtworkShardResult> {
-  const { artworkShard1Id, artworkShard2Id, signerPhrase } = params;
+  const { artworkShard1Id, artworkShard2Id, signerPhrase, packageId } = params;
   const { signer, address } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${PACKAGE_ID}::open_art_market::merge_artwork_shards`,
+    target: `${packageId}::open_art_market::merge_artwork_shards`,
     arguments: [tx.object(artworkShard1Id),tx.object(artworkShard2Id)],
   });
 

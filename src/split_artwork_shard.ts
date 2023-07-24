@@ -1,10 +1,10 @@
 import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
-import { PACKAGE_ID } from "./config";
 import { findObjectIdWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
 import { getSigner } from "./helpers";
 
 export type SplitArtworkShardParams = {
+  packageId: string;
   artworkShardId: string,
   signerPhrase: string,
   shares: number
@@ -15,12 +15,12 @@ export type SplitArtworkShardResult = {
 }
 
 export async function splitArtworkShard( params:SplitArtworkShardParams ): Promise<SplitArtworkShardResult> {
-  const { artworkShardId, signerPhrase, shares } = params;
+  const { artworkShardId, signerPhrase, shares, packageId } = params;
   const { signer, address } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${PACKAGE_ID}::open_art_market::split_artwork_shard`,
+    target: `${packageId}::open_art_market::split_artwork_shard`,
     arguments: [tx.object(artworkShardId), tx.pure(shares)],
   });
 

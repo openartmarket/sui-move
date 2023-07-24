@@ -2,7 +2,7 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_PHRASE, USER1_PHRASE } from "../src/config";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "../src/config";
 import { splitArtworkShard } from "../src/split_artwork_shard";
 import { getObject } from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
@@ -19,12 +19,15 @@ describe("splitArtworkShard", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 10,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
 
     const splitShardId = await splitArtworkShard({
       artworkShardId,
       signerPhrase: USER1_PHRASE,
       shares: 2,
+      packageId: PACKAGE_ID,
     });
 
     // Get the shard and check that it has 2 shares
@@ -46,17 +49,21 @@ describe("splitArtworkShard", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 12,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
 
     const splitShardId = await splitArtworkShard({
       artworkShardId,
       signerPhrase: USER1_PHRASE,
       shares: 5,
+      packageId: PACKAGE_ID,
     });
     const splitAgainShardId = await splitArtworkShard({
       artworkShardId: splitShardId.artworkShardId,
       signerPhrase: USER1_PHRASE,
       shares: 3,
+      packageId: PACKAGE_ID,
     });
 
     const oldShard = await getObject(artworkShardId);

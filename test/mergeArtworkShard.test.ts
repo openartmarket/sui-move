@@ -2,7 +2,7 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_PHRASE, USER1_PHRASE } from "../src/config";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "../src/config";
 import { mergeArtworkShard } from "../src/merge_artwork_shard";
 import { getObject } from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
@@ -19,18 +19,23 @@ describe("mergeArtworkShard", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 10,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
     const { artworkShardId: artworkShard2Id } = await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 10,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
 
     const mergeArtworkShards = await mergeArtworkShard({
       artworkShard1Id: artworkShardId,
       artworkShard2Id,
       signerPhrase: USER1_PHRASE,
+      packageId: PACKAGE_ID,
     });
     const burnedShard = await getObject(artworkShard2Id);
     const newShard = await getObject(mergeArtworkShards.artworkShardId);

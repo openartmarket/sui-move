@@ -39,54 +39,116 @@ describe("DAO Voting structure", () => {
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: ADMIN_PHRASE,
       shares: 151,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER1_PHRASE,
       shares: 249,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
       recieverPhrase: USER2_PHRASE,
       shares: 100,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
     });
   });
 
   it("can start a voting session", async () => {
-    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
+    const voteRequest = await createVoteRequest({
+      artwork_id: artworkId,
+      request: "Request to sell artwork to Museum",
+      packageId: PACKAGE_ID,
+      signerPhrase: ADMIN_PHRASE,
+      adminCapId: ADMIN_CAP_ID,
+    });
     assert.ok(voteRequest);
   });
 
   it("can vote as a shareholder", async () => {
-    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
+    const voteRequest = await createVoteRequest({
+      artwork_id: artworkId,
+      request: "Request to sell artwork to Museum",
+      packageId: PACKAGE_ID,
+      signerPhrase: ADMIN_PHRASE,
+      adminCapId: ADMIN_CAP_ID,
+    });
     assert.ok(voteRequest);
-    const userVote = await vote(artworkId, voteRequest, USER1_PHRASE, true);
+    const userVote = await vote({
+      artwork: artworkId,
+      voteRequest,
+      voterAccount: USER1_PHRASE,
+      choice: true,
+    });
     assert.ok(userVote);
   });
 
   it("cannot double vote as a shareholder", async () => {
-    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
+    const voteRequest = await createVoteRequest({
+      artwork_id: artworkId,
+      request: "Request to sell artwork to Museum",
+      packageId: PACKAGE_ID,
+      signerPhrase: ADMIN_PHRASE,
+      adminCapId: ADMIN_CAP_ID,
+    });
     assert.ok(voteRequest);
-    const userVote = await vote(artworkId, voteRequest, USER1_PHRASE, true);
+    const userVote = await vote({
+      artwork: artworkId,
+      voteRequest,
+      voterAccount: USER1_PHRASE,
+      choice: true,
+    });
     assert.ok(userVote);
-    await assert.rejects(vote(artworkId, voteRequest, USER1_PHRASE, true));
+    await assert.rejects(
+      vote({ artwork: artworkId, voteRequest, voterAccount: USER1_PHRASE, choice: true })
+    );
   });
 
   it("cannot vote if not a shareholder", async () => {
-    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
+    const voteRequest = await createVoteRequest({
+      artwork_id: artworkId,
+      request: "Request to sell artwork to Museum",
+      packageId: PACKAGE_ID,
+      signerPhrase: ADMIN_PHRASE,
+      adminCapId: ADMIN_CAP_ID,
+    });
     assert.ok(voteRequest);
-    await assert.rejects(vote(artworkId, voteRequest, USER3_PHRASE, true));
+    await assert.rejects(
+      vote({ artwork: artworkId, voteRequest, voterAccount: USER3_PHRASE, choice: true })
+    );
   });
 
   it("cannot vote if vote is closed", async () => {
-    const voteRequest = await createVoteRequest(artworkId, "Request to sell artwork to Museum");
+    const voteRequest = await createVoteRequest({
+      artwork_id: artworkId,
+      request: "Request to sell artwork to Museum",
+      packageId: PACKAGE_ID,
+      signerPhrase: ADMIN_PHRASE,
+      adminCapId: ADMIN_CAP_ID,
+    });
     assert.ok(voteRequest);
-    const userVote = await vote(artworkId, voteRequest, USER1_PHRASE, true);
+    const userVote = await vote({
+      artwork: artworkId,
+      voteRequest,
+      voterAccount: USER1_PHRASE,
+      choice: true,
+    });
     assert.ok(userVote);
-    const endVoteRequest = await endRequestVoting(voteRequest);
+    const endVoteRequest = await endRequestVoting({
+      voteRequest,
+      packageId: PACKAGE_ID,
+      signerPhrase: ADMIN_PHRASE,
+      adminCapId: ADMIN_CAP_ID,
+    });
     assert.ok(endVoteRequest);
-    await assert.rejects(vote(artworkId, voteRequest, USER1_PHRASE, true));
+    await assert.rejects(
+      vote({ artwork: artworkId, voteRequest, voterAccount: USER1_PHRASE, choice: true })
+    );
   });
 });

@@ -2,13 +2,14 @@ import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
 import { PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
+type VoteParams = { 
+  artwork: string; 
+  voteRequest: string; 
+  voterAccount: string; 
+  choice: boolean; 
+}
 
-export async function vote(
-  artwork: string,
-  voteRequest: string,
-  voterAccount: string,
-  choice: boolean
-) {
+export async function vote({ artwork, voteRequest, voterAccount, choice }: VoteParams) {
   const { signer } = getSigner(voterAccount);
   const tx = new TransactionBlock();
 

@@ -1,17 +1,24 @@
 import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
 
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
-export async function createVoteRequest(artwork_id: string, request: string) {
+type VoteRequestParams = { 
+  artwork_id: string; 
+  request: string; 
+  packageId: string;
+  adminCapId: string;
+  signerPhrase: string;
+}
+
+export async function createVoteRequest({ artwork_id, request, adminCapId, packageId, signerPhrase }: VoteRequestParams) {
   // console.log("Mint artwork shard for: %s", artwork_id);
 
-  const { signer } = getSigner(ADMIN_PHRASE);
+  const { signer } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${PACKAGE_ID}::dao::create_vote_request`,
-    arguments: [tx.object(ADMIN_CAP_ID), tx.pure(artwork_id), tx.pure(request)],
+    target: `${packageId}::dao::create_vote_request`,
+    arguments: [tx.object(adminCapId), tx.pure(artwork_id), tx.pure(request)],
   });
 
   try {

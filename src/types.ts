@@ -1,0 +1,1 @@
+export type ContractMethod = 'vote' | 'merge_artwork_shards' | 'mint_artwork_shard' | 'split_artwork_shard' | 'safe_burn_artwork_shard';
