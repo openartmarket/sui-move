@@ -7,7 +7,7 @@ import {
   SuiTransactionBlockResponse,
 } from "@mysten/sui.js";
 
-import { SUI_NETWORK } from "./config";
+import { SUI_NETWORK } from "../test/test-helpers";
 
 // console.log("Connecting to ", SUI_NETWORK);
 const connOptions = new Connection({

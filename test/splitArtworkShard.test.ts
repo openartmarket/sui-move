@@ -3,9 +3,14 @@ import { beforeEach, describe, it } from "mocha";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { PACKAGE_ID } from "../src/config";
 import { splitArtworkShard } from "../src/split_artwork_shard";
-import { ADMIN_CAP_ID, ADMIN_PHRASE, USER1_ADDRESS, USER1_PHRASE } from "./test-helpers";
+import {
+  ADMIN_CAP_ID,
+  ADMIN_PHRASE,
+  PACKAGE_ID,
+  USER1_ADDRESS,
+  USER1_PHRASE,
+} from "./test-helpers";
 import { getObject } from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
 

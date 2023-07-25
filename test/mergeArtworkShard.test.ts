@@ -2,9 +2,15 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { PACKAGE_ID } from "../src/config";
 import { mergeArtworkShard } from "../src/merge_artwork_shard";
-import { ADMIN_CAP_ID, ADMIN_PHRASE, getObject, USER1_ADDRESS, USER1_PHRASE } from "./test-helpers";
+import {
+  ADMIN_CAP_ID,
+  ADMIN_PHRASE,
+  getObject,
+  PACKAGE_ID,
+  USER1_ADDRESS,
+  USER1_PHRASE,
+} from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
 
 describe("mergeArtworkShard", () => {

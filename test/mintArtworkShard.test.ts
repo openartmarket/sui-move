@@ -3,11 +3,11 @@ import { beforeEach, describe, it } from "mocha";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { PACKAGE_ID } from "../src/config";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
+  PACKAGE_ID,
   USER1_ADDRESS,
   USER2_ADDRESS,
 } from "./test-helpers";

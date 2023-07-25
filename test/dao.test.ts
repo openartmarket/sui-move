@@ -3,7 +3,6 @@ import { beforeEach, describe, it } from "mocha";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { PACKAGE_ID } from "../src/config";
 import { endRequestVoting } from "../src/end_request_voting";
 import { Currency } from "../src/types";
 import { vote } from "../src/vote";
@@ -12,6 +11,7 @@ import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
+  PACKAGE_ID,
   USER1_ADDRESS,
   USER1_PHRASE,
   USER2_ADDRESS,
@@ -87,6 +87,7 @@ describe("DAO Voting structure", () => {
     const userVote = await vote({
       artworkId,
       voteRequest,
+      packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
     });
@@ -105,12 +106,19 @@ describe("DAO Voting structure", () => {
     const userVote = await vote({
       artworkId,
       voteRequest,
+      packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
     });
     assert.ok(userVote);
     await assert.rejects(
-      vote({ artworkId, voteRequest, voterAccount: USER1_PHRASE, choice: true })
+      vote({
+        artworkId,
+        voteRequest,
+        packageId: PACKAGE_ID,
+        voterAccount: USER1_PHRASE,
+        choice: true,
+      })
     );
   });
 
@@ -124,7 +132,13 @@ describe("DAO Voting structure", () => {
     });
     assert.ok(voteRequest);
     await assert.rejects(
-      vote({ artworkId, voteRequest, voterAccount: USER3_PHRASE, choice: true })
+      vote({
+        artworkId,
+        voteRequest,
+        voterAccount: USER3_PHRASE,
+        packageId: PACKAGE_ID,
+        choice: true,
+      })
     );
   });
 
@@ -140,6 +154,7 @@ describe("DAO Voting structure", () => {
     const userVote = await vote({
       artworkId,
       voteRequest,
+      packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
     });
@@ -152,7 +167,13 @@ describe("DAO Voting structure", () => {
     });
     assert.ok(endVoteRequest);
     await assert.rejects(
-      vote({ artworkId, voteRequest, voterAccount: USER1_PHRASE, choice: true })
+      vote({
+        artworkId,
+        voteRequest,
+        packageId: PACKAGE_ID,
+        voterAccount: USER1_PHRASE,
+        choice: true,
+      })
     );
   });
 });

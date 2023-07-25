@@ -71,6 +71,7 @@ export type EndVoteRequestParams = BaseArtworkParams & {
 export type BurnArtworkParams = {
   artworkId: string;
   artworkShardId: string;
+  packageId: string;
   signerPhrase: string;
 };
 
@@ -100,6 +101,7 @@ export type VoteRequestParams = BaseArtworkParams & {
 
 export type VoteParams = {
   artworkId: string;
+  packageId: string;
   voteRequest: string;
   voterAccount: string;
   choice: boolean;

@@ -4,7 +4,6 @@ import { beforeEach, describe, it } from "mocha";
 import { OwnedObjectList } from "../src";
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { PACKAGE_ID } from "../src/config";
 import { findObjectIdInOwnedObjectList } from "../src/findObjectIdWithOwnerAddress";
 import { splitArtworkShard } from "../src/split_artwork_shard";
 import { transferArtworkShard } from "../src/transfer_artwork_shard";
@@ -13,6 +12,7 @@ import {
   ADMIN_PHRASE,
   getObject,
   getOwnedObjects,
+  PACKAGE_ID,
   USER1_ADDRESS,
   USER1_PHRASE,
   USER2_ADDRESS,

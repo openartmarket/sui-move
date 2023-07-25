@@ -1,15 +1,20 @@
 import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
 
-import { PACKAGE_ID } from "./config";
 import { getSigner, handleTransactionResponse } from "./helpers";
 import { VoteParams } from "./types";
 
-export async function vote({ artworkId, voteRequest, voterAccount, choice }: VoteParams) {
+export async function vote({
+  artworkId,
+  voteRequest,
+  voterAccount,
+  choice,
+  packageId,
+}: VoteParams) {
   const { signer } = getSigner(voterAccount);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${PACKAGE_ID}::dao::vote`,
+    target: `${packageId}::dao::vote`,
     arguments: [tx.object(artworkId), tx.object(voteRequest), tx.pure(choice)],
   });
   const txRes = await signer.signAndExecuteTransactionBlock({

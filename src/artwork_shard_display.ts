@@ -1,7 +1,6 @@
 import { TransactionBlock } from "@mysten/sui.js";
 
-import { ADMIN_PHRASE, PUBLISHER_ID } from "../test/test-helpers";
-import { ARTWORK_SHARD_TYPE } from "./config";
+import { ADMIN_PHRASE, ARTWORK_SHARD_TYPE,PUBLISHER_ID } from "../test/test-helpers";
 import { getSigner } from "./helpers";
 
 // This is the function you can update to change the display fields

@@ -1,7 +1,6 @@
 export * from "./artwork";
 export * from "./artwork_shard";
 export * from "./burn_artwork_shard";
-export * from "./config";
 export * from "./end_request_voting";
 export * from "./findObjectIdWithOwnerAddress";
 export * from "./helpers";
