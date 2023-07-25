@@ -25,8 +25,8 @@
     "test": "npm run build && mocha --config .mocharc.cjs.cjs dist/cjs/test",
     "create:artwork-display": "tsc && node dist/cjs/src/artwork_display",
     "create:artwork-shard-display": "tsc && node dist/cjs/src/artwork_shard_display",
-    "create:ci-artwork-display": "tsc && node dist/src/artwork_display",
-    "create:ci-artwork-shard-display": "tsc && node dist/src/artwork_shard_display",
+    "create:ci-artwork-display": "tsc && node dist/artwork_display",
+    "create:ci-artwork-shard-display": "tsc && node dist/artwork_shard_display",
     "postinstall": "npm run build",
     "upgrade": "npm-check-updates --upgrade"
   },
