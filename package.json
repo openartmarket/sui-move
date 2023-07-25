@@ -1,5 +1,5 @@
 {
-  "name": "sui-move",
+  "name": "@openartmarket/sui",
   "version": "1.0.0",
   "description": "PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)",
   "main": "dist/cjs/src/index.js",
