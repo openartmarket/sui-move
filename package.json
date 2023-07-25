@@ -47,6 +47,7 @@
     "create:artwork-shard": "tsc && node dist/cjs/src/artwork_shard",
     "split:artwork-shard": "tsc && env-cmd -f .env node dist/cjs/src/split_artwork_shard",
     "create:vote-request": "tsc && node dist/cjs/src/vote_request",
+    "postinstall": "npm run compile",
     "vote": "tsc && node dist/cjs/src/vote",
     "end:vote-request": "tsc && env-cmd -f .env node dist/cjs/src/end_request_voting",
     "upgrade": "npm-check-updates --upgrade"
