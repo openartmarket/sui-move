@@ -4,8 +4,7 @@
   "description": "PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)",
   "main": "dist/cjs/src/index.js",
   "files": [
-    "dist/cjs",
-    "dist/esm"
+    "dist"
   ],
   "exports": {
     ".": {
