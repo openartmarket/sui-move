@@ -1,4 +1,5 @@
 **/build
+**/dist
 .env
 **/.publish.res.json
 output/*.json
