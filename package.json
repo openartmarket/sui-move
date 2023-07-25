@@ -8,10 +8,7 @@
   "description": "PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)",
   "main": "dist/cjs/src/index.js",
   "files": [
-    "dist",
-    "tsconfig.cjs.json",
-    "tsconfig.esm.json",
-    "tsconfig.json"
+    "."  
   ],
   "exports": {
     ".": {
