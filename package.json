@@ -1,10 +1,17 @@
 {
   "name": "@openartmarket/sui",
+  "repository": "git://github.com/openartmarket/sui-move.git",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
   "version": "1.0.0",
   "description": "PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)",
   "main": "dist/cjs/src/index.js",
   "files": [
-    "dist"
+    "dist",
+    "tsconfig.cjs.json",
+    "tsconfig.esm.json",
+    "tsconfig.json"
   ],
   "exports": {
     ".": {
@@ -15,17 +22,6 @@
       "import": "./dist/esm/src/test-helpers/index.js",
       "require": "./dist/cjs/src/test-helpers/index.js"
     }
-  },
-  "types": "dist/esm/src/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "test-helpers": [
-        "./dist/esm/src/test-helpers/index.d.ts"
-      ]
-    }
-  },
-  "directories": {
-    "test": "test"
   },
   "scripts": {
     "clean": "rm -rf ~/.sui",
@@ -41,19 +37,9 @@
     "create:artwork-shard-display": "tsc && node dist/cjs/src/artwork_shard_display",
     "create:ci-artwork-display": "tsc && node dist/src/artwork_display",
     "create:ci-artwork-shard-display": "tsc && node dist/src/artwork_shard_display",
-    "create:artwork": "tsc && node dist/cjs/src/artwork",
-    "update:artwork-outgoing-price": "tsc && env-cmd -f .env node dist/cjs/src/update_artwork_outgoing_price",
-    "create:artwork-shard": "tsc && node dist/cjs/src/artwork_shard",
-    "split:artwork-shard": "tsc && env-cmd -f .env node dist/cjs/src/split_artwork_shard",
-    "create:vote-request": "tsc && node dist/cjs/src/vote_request",
     "postinstall": "npm run build",
-    "vote": "tsc && node dist/cjs/src/vote",
-    "end:vote-request": "tsc && env-cmd -f .env node dist/cjs/src/end_request_voting",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@mysten/bcs": "0.7.2",
     "@mysten/sui.js": "0.36.0",
