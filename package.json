@@ -22,7 +22,7 @@
     "lint": "eslint --ext ts --fix --max-warnings 0 '{src,test}/**/*.{ts,d.ts}'",
     "start": "npm run clean && npm run build && npm run start-node",
     "start-node": "sui start",
-    "test": "npm run build && mocha --config .mocharc.cjs.cjs dist/cjs/test",
+    "test": "mocha test",
     "create:artwork-display": "tsc && node dist/cjs/src/artwork_display",
     "create:artwork-shard-display": "tsc && node dist/cjs/src/artwork_shard_display",
     "create:ci-artwork-display": "tsc && node dist/artwork_display",
