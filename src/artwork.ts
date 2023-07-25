@@ -1,32 +1,27 @@
 import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
 
-import { getSigner } from "./helpers";
-
-export type Currency = "USD" | "EUR" | "GBP" | "NOK" ;
-
-export type MintArtworkParams = {
-  signerPhrase: string;
-  packageId: string;
-  adminCapId: string;
-  totalSupply: number;
-  sharePrice: number;
-  multiplier: number;
-  name: string;
-  artist: string;
-  creationDate: string;
-  description: string;
-  currency: Currency;
-  image: string;
-};
-
+import { getSigner, handleTransactionResponse } from "./helpers";
+import { MintArtworkParams } from "./types";
 /**
  * Mints a new artwork
  * @param params
  * @returns the artwork id
  */
 export async function mintArtwork(params: MintArtworkParams): Promise<string> {
-  const {adminCapId, packageId, signerPhrase, totalSupply, sharePrice, multiplier, name, artist, creationDate, description, currency, image } =
-    params;
+  const {
+    adminCapId,
+    packageId,
+    signerPhrase,
+    totalSupply,
+    sharePrice,
+    multiplier,
+    name,
+    artist,
+    creationDate,
+    description,
+    currency,
+    image,
+  } = params;
 
   // console.log("Mint artwork: %s", name + " by " + artist);
 
@@ -58,9 +53,9 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
     },
   });
 
+  handleTransactionResponse(txRes);
   const artworkId = getCreatedObjects(txRes)?.[0].reference.objectId;
   if (!artworkId) throw new Error("Could not mint artwork");
 
   return artworkId;
 }
-

@@ -1,18 +1,21 @@
 import assert from "assert";
 
-import { Currency, mintArtwork } from "../src/artwork";
+import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import {
-  ADMIN_CAP_ID,
-  ADMIN_PHRASE,
-  PACKAGE_ID,
-  USER1_PHRASE,
-  USER2_PHRASE,
-  USER3_PHRASE,
-} from "../src/config";
+import { PACKAGE_ID } from "../src/config";
 import { endRequestVoting } from "../src/end_request_voting";
+import { Currency } from "../src/types";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
+import {
+  ADMIN_ADDRESS,
+  ADMIN_CAP_ID,
+  ADMIN_PHRASE,
+  USER1_ADDRESS,
+  USER1_PHRASE,
+  USER2_ADDRESS,
+  USER3_PHRASE,
+} from "./test-helpers";
 
 const artworkOptions = {
   signerPhrase: ADMIN_PHRASE,
@@ -37,7 +40,7 @@ describe("DAO Voting structure", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: ADMIN_PHRASE,
+      receiverAddress: ADMIN_ADDRESS,
       shares: 151,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -45,7 +48,7 @@ describe("DAO Voting structure", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 249,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -53,7 +56,7 @@ describe("DAO Voting structure", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER2_PHRASE,
+      receiverAddress: USER2_ADDRESS,
       shares: 100,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -62,7 +65,7 @@ describe("DAO Voting structure", () => {
 
   it("can start a voting session", async () => {
     const voteRequest = await createVoteRequest({
-      artwork_id: artworkId,
+      artworkId,
       request: "Request to sell artwork to Museum",
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
@@ -73,7 +76,7 @@ describe("DAO Voting structure", () => {
 
   it("can vote as a shareholder", async () => {
     const voteRequest = await createVoteRequest({
-      artwork_id: artworkId,
+      artworkId,
       request: "Request to sell artwork to Museum",
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
@@ -81,7 +84,7 @@ describe("DAO Voting structure", () => {
     });
     assert.ok(voteRequest);
     const userVote = await vote({
-      artwork: artworkId,
+      artworkId,
       voteRequest,
       voterAccount: USER1_PHRASE,
       choice: true,
@@ -91,7 +94,7 @@ describe("DAO Voting structure", () => {
 
   it("cannot double vote as a shareholder", async () => {
     const voteRequest = await createVoteRequest({
-      artwork_id: artworkId,
+      artworkId,
       request: "Request to sell artwork to Museum",
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
@@ -99,20 +102,20 @@ describe("DAO Voting structure", () => {
     });
     assert.ok(voteRequest);
     const userVote = await vote({
-      artwork: artworkId,
+      artworkId,
       voteRequest,
       voterAccount: USER1_PHRASE,
       choice: true,
     });
     assert.ok(userVote);
     await assert.rejects(
-      vote({ artwork: artworkId, voteRequest, voterAccount: USER1_PHRASE, choice: true })
+      vote({ artworkId, voteRequest, voterAccount: USER1_PHRASE, choice: true })
     );
   });
 
   it("cannot vote if not a shareholder", async () => {
     const voteRequest = await createVoteRequest({
-      artwork_id: artworkId,
+      artworkId,
       request: "Request to sell artwork to Museum",
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
@@ -120,13 +123,13 @@ describe("DAO Voting structure", () => {
     });
     assert.ok(voteRequest);
     await assert.rejects(
-      vote({ artwork: artworkId, voteRequest, voterAccount: USER3_PHRASE, choice: true })
+      vote({ artworkId, voteRequest, voterAccount: USER3_PHRASE, choice: true })
     );
   });
 
   it("cannot vote if vote is closed", async () => {
     const voteRequest = await createVoteRequest({
-      artwork_id: artworkId,
+      artworkId,
       request: "Request to sell artwork to Museum",
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
@@ -134,7 +137,7 @@ describe("DAO Voting structure", () => {
     });
     assert.ok(voteRequest);
     const userVote = await vote({
-      artwork: artworkId,
+      artworkId,
       voteRequest,
       voterAccount: USER1_PHRASE,
       choice: true,
@@ -148,7 +151,7 @@ describe("DAO Voting structure", () => {
     });
     assert.ok(endVoteRequest);
     await assert.rejects(
-      vote({ artwork: artworkId, voteRequest, voterAccount: USER1_PHRASE, choice: true })
+      vote({ artworkId, voteRequest, voterAccount: USER1_PHRASE, choice: true })
     );
   });
 });

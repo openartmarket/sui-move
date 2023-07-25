@@ -1,20 +1,7 @@
 import { TransactionBlock } from "@mysten/sui.js";
 
-import { getSigner } from "./helpers";
-
-export type TransferArtworkShardParams = {
-    artworkId: string;
-    artworkShardId: string;
-    packageId: string;
-    signerPhrase: string;
-    recieverPhrase: string;
-};
-
-export type TransferArtworkShardResult = {
-  artworkShardId: string;
-  digest: string;
-  address: string;
-};
+import { getSigner, handleTransactionResponse } from "./helpers";
+import { TransferArtworkShardParams, TransferArtworkShardResult } from "./types";
 
 /**
  * Mints an artwork shard
@@ -23,16 +10,14 @@ export type TransferArtworkShardResult = {
 export async function transferArtworkShard(
   params: TransferArtworkShardParams
 ): Promise<TransferArtworkShardResult> {
-  const { artworkId, signerPhrase, recieverPhrase, artworkShardId, packageId } = params;
+  const { artworkId, signerPhrase, receiverAddress, artworkShardId, packageId } = params;
   const { signer } = getSigner(signerPhrase);
-  const { address } = getSigner(recieverPhrase);
-  //console.log('New receiver', address)
-  //console.log("Transfer artwork shard: %s", artworkShardId);
+
   const tx = new TransactionBlock();
 
   tx.moveCall({
     target: `${packageId}::open_art_market::transfer_artwork_shard`,
-    arguments: [tx.object(artworkId), tx.pure(artworkShardId), tx.pure(address)],
+    arguments: [tx.object(artworkId), tx.pure(artworkShardId), tx.pure(receiverAddress)],
   });
 
   const txRes = await signer.signAndExecuteTransactionBlock({
@@ -44,10 +29,7 @@ export async function transferArtworkShard(
     },
   });
 
-  // console.log(txRes);
-//  const artworkShardId = findObjectIdWithOwnerAddress(txRes, address)
+  handleTransactionResponse(txRes);
   const { digest } = txRes;
-  return { artworkShardId, digest, address };
+  return { artworkShardId, digest, owner: receiverAddress };
 }
-
-

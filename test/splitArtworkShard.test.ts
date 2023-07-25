@@ -2,8 +2,9 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "../src/config";
+import { PACKAGE_ID } from "../src/config";
 import { splitArtworkShard } from "../src/split_artwork_shard";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, USER1_ADDRESS, USER1_PHRASE } from "./test-helpers";
 import { getObject } from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
 
@@ -17,7 +18,7 @@ describe("splitArtworkShard", () => {
     const { artworkShardId } = await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -47,7 +48,7 @@ describe("splitArtworkShard", () => {
     const { artworkShardId } = await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 12,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,

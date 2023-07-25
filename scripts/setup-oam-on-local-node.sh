@@ -75,6 +75,9 @@ jq -n --arg package_id "$PACKAGE_ID" \
       --arg user2_phrase "$USER2_PHRASE" \
       --arg user3_phrase "$USER3_PHRASE" \
       --arg admin_address "$ADMIN_ADDRESS" \
+      --arg user1_address "$USER1_ADDRESS" \
+      --arg user2_address "$USER2_ADDRESS" \
+      --arg user3_address "$USER3_ADDRESS" \
       '{
         "PACKAGE_ID": $package_id, 
         "PUBLISHER_ID": $publisher_id, 
@@ -84,7 +87,10 @@ jq -n --arg package_id "$PACKAGE_ID" \
         "ADMIN_ADDRESS": $admin_address, 
         "USER1_PHRASE": $user1_phrase,
         "USER2_PHRASE": $user2_phrase,
-        "USER3_PHRASE": $user3_phrase
+        "USER3_PHRASE": $user3_phrase,
+        "USER1_ADDRESS": $user1_address,
+        "USER2_ADDRESS": $user2_address,
+        "USER3_ADDRESS": $user3_address
       }' > ./output/contract.json
 
 echo "Contract details are saved in output/contract.json"

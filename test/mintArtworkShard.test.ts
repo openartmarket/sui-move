@@ -2,7 +2,14 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE, USER2_PHRASE } from "../src/config";
+import { PACKAGE_ID } from "../src/config";
+import {
+  ADMIN_ADDRESS,
+  ADMIN_CAP_ID,
+  ADMIN_PHRASE,
+  USER1_ADDRESS,
+  USER2_ADDRESS,
+} from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
 
 describe("mintArtworkShard", () => {
@@ -15,7 +22,7 @@ describe("mintArtworkShard", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 2,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -27,7 +34,7 @@ describe("mintArtworkShard", () => {
       mintArtworkShard({
         artworkId,
         signerPhrase: ADMIN_PHRASE,
-        recieverPhrase: USER1_PHRASE,
+        receiverAddress: USER1_ADDRESS,
         shares: 501,
         packageId: PACKAGE_ID,
         adminCapId: ADMIN_CAP_ID,
@@ -39,7 +46,7 @@ describe("mintArtworkShard", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 150,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -47,7 +54,7 @@ describe("mintArtworkShard", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER2_PHRASE,
+      receiverAddress: USER2_ADDRESS,
       shares: 250,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -55,7 +62,7 @@ describe("mintArtworkShard", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 98,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -64,7 +71,7 @@ describe("mintArtworkShard", () => {
       mintArtworkShard({
         artworkId,
         signerPhrase: ADMIN_PHRASE,
-        recieverPhrase: USER2_PHRASE,
+        receiverAddress: USER2_ADDRESS,
         shares: 3,
         packageId: PACKAGE_ID,
         adminCapId: ADMIN_CAP_ID,
@@ -76,7 +83,7 @@ describe("mintArtworkShard", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: ADMIN_PHRASE,
+      receiverAddress: ADMIN_ADDRESS,
       shares: 150,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -84,7 +91,7 @@ describe("mintArtworkShard", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 50,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -92,7 +99,7 @@ describe("mintArtworkShard", () => {
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER2_PHRASE,
+      receiverAddress: USER2_ADDRESS,
       shares: 1,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,

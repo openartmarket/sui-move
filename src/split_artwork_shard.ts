@@ -1,20 +1,12 @@
-import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
 import { findObjectIdWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
-import { getSigner } from "./helpers";
+import { getSigner, handleTransactionResponse } from "./helpers";
+import { ArtworkShardDetails, SplitArtworkShardParams } from "./types";
 
-export type SplitArtworkShardParams = {
-  packageId: string;
-  artworkShardId: string,
-  signerPhrase: string,
-  shares: number
-}
-export type SplitArtworkShardResult = {
-  artworkShardId: string,
-  owner: string
-}
-
-export async function splitArtworkShard( params:SplitArtworkShardParams ): Promise<SplitArtworkShardResult> {
+export async function splitArtworkShard(
+  params: SplitArtworkShardParams
+): Promise<ArtworkShardDetails> {
   const { artworkShardId, signerPhrase, shares, packageId } = params;
   const { signer, address } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
@@ -32,19 +24,10 @@ export async function splitArtworkShard( params:SplitArtworkShardParams ): Promi
     },
   });
 
-  const status = getExecutionStatus(txRes);
-  if(status === undefined) {
-    throw new Error("Failed to get execution status");
-  }
-  if(status.error) {
-    throw new Error(status.error);
-  }
-  if(status.status !== "success") {
-    throw new Error(`Transaction failed with status: ${status.status}`);
-  }
+  handleTransactionResponse(txRes);
   const newArtworkShardId = findObjectIdWithOwnerAddress(txRes, address);
   return {
     artworkShardId: newArtworkShardId,
-    owner: address
+    owner: address,
   };
 }

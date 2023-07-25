@@ -1,26 +1,18 @@
-import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
-import { getSigner } from "./helpers";
+import { getSigner, handleTransactionResponse } from "./helpers";
+import { ArtworkShardDetails, MergeArtworkShardParams } from "./types";
 
-export type MergeArtworkShardParams = {
-  packageId: string;
-  artworkShard1Id: string,
-  artworkShard2Id: string,
-  signerPhrase: string,
-}
-export type MergeArtworkShardResult = {
-  artworkShardId: string,
-  owner: string
-}
-
-export async function mergeArtworkShard( params:MergeArtworkShardParams ): Promise<MergeArtworkShardResult> {
+export async function mergeArtworkShard(
+  params: MergeArtworkShardParams
+): Promise<ArtworkShardDetails> {
   const { artworkShard1Id, artworkShard2Id, signerPhrase, packageId } = params;
   const { signer, address } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
     target: `${packageId}::open_art_market::merge_artwork_shards`,
-    arguments: [tx.object(artworkShard1Id),tx.object(artworkShard2Id)],
+    arguments: [tx.object(artworkShard1Id), tx.object(artworkShard2Id)],
   });
 
   const txRes = await signer.signAndExecuteTransactionBlock({
@@ -31,19 +23,9 @@ export async function mergeArtworkShard( params:MergeArtworkShardParams ): Promi
     },
   });
 
-  const status = getExecutionStatus(txRes);
-  if(status === undefined) {
-    throw new Error("Failed to get execution status");
-  }
-  if(status.error) {
-    throw new Error(status.error);
-  }
-  if(status.status !== "success") {
-    throw new Error(`Transaction failed with status: ${status.status}`);
-  }
+  handleTransactionResponse(txRes);
   return {
     artworkShardId: artworkShard1Id,
-    owner: address
-
+    owner: address,
   };
 }

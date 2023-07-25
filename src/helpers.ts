@@ -1,4 +1,11 @@
-import { Connection, Ed25519Keypair, JsonRpcProvider, RawSigner } from "@mysten/sui.js";
+import {
+  Connection,
+  Ed25519Keypair,
+  getExecutionStatus,
+  JsonRpcProvider,
+  RawSigner,
+  SuiTransactionBlockResponse,
+} from "@mysten/sui.js";
 
 import { SUI_NETWORK } from "./config";
 
@@ -21,4 +28,17 @@ export function getSigner(phrase: string): {
   // console.log("Address = " + address);
 
   return { signer, address };
+}
+
+export function handleTransactionResponse(txRes: SuiTransactionBlockResponse): void {
+  const status = getExecutionStatus(txRes);
+  if (status === undefined) {
+    throw new Error("Failed to get execution status");
+  }
+  if (status.error) {
+    throw new Error(status.error);
+  }
+  if (status.status !== "success") {
+    throw new Error(`Transaction failed with status: ${status.status}`);
+  }
 }

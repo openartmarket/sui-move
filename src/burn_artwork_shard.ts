@@ -1,26 +1,17 @@
-import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
 import { PACKAGE_ID } from "./config";
-import { getSigner } from "./helpers";
+import { getSigner, handleTransactionResponse } from "./helpers";
+import { BurnArtworkParams, BurnArtworkResult } from "./types";
 
-export type BurnArtworkParams = {
-  artworkId: string,
-  artworkShardId: string,
-  signerPhrase: string,
-}
-export type BurnArtworkResult = {
-  success: boolean,
-  owner: string
-}
-
-export async function burnArtworkShard( params:BurnArtworkParams ): Promise<BurnArtworkResult> {
+export async function burnArtworkShard(params: BurnArtworkParams): Promise<BurnArtworkResult> {
   const { artworkShardId, artworkId, signerPhrase } = params;
   const { signer, address } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
     target: `${PACKAGE_ID}::open_art_market::safe_burn_artwork_shard`,
-    arguments: [tx.object(artworkId),tx.object(artworkShardId)],
+    arguments: [tx.object(artworkId), tx.object(artworkShardId)],
   });
 
   const txRes = await signer.signAndExecuteTransactionBlock({
@@ -30,20 +21,10 @@ export async function burnArtworkShard( params:BurnArtworkParams ): Promise<Burn
       showEffects: true,
     },
   });
-
-  const status = getExecutionStatus(txRes);
-  if(status === undefined) {
-    throw new Error("Failed to get execution status");
-  }
-  if(status.error) {
-    throw new Error(status.error);
-  }
-  if(status.status !== "success") {
-    throw new Error(`Transaction failed with status: ${status.status}`);
-  }
+  handleTransactionResponse(txRes);
   return {
+    artworkShardId,
     success: true,
-    owner: address
-
+    owner: address,
   };
 }

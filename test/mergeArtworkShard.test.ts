@@ -2,9 +2,9 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "../src/config";
+import { PACKAGE_ID } from "../src/config";
 import { mergeArtworkShard } from "../src/merge_artwork_shard";
-import { getObject } from "./test-helpers";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, getObject, USER1_ADDRESS, USER1_PHRASE } from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
 
 describe("mergeArtworkShard", () => {
@@ -17,7 +17,7 @@ describe("mergeArtworkShard", () => {
     const { artworkShardId } = await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
@@ -25,7 +25,7 @@ describe("mergeArtworkShard", () => {
     const { artworkShardId: artworkShard2Id } = await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
+      receiverAddress: USER1_ADDRESS,
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
