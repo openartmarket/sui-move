@@ -34,7 +34,9 @@
     },
     "exclude": [
         "dist",
-        "node_modules"
+        "node_modules",
+        "test",
+        "test_scenarios"
     ],
     "ts-node": {
         "transpileOnly": true,

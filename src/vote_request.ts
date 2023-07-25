@@ -9,7 +9,7 @@ export async function createVoteRequest({
   adminCapId,
   packageId,
   signerPhrase,
-}: VoteRequestParams) {
+}: VoteRequestParams):Promise<string> {
   const { signer } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
@@ -27,5 +27,6 @@ export async function createVoteRequest({
   });
   handleTransactionResponse(txRes);
   const vote_request_id = getCreatedObjects(txRes)?.[0].reference.objectId;
+  if(!vote_request_id) throw new Error("Vote request not created");
   return vote_request_id;
 }
