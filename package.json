@@ -6,18 +6,11 @@
   "license": "MIT",
   "version": "1.0.0",
   "description": "PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)",
-  "main": "dist/cjs/src/index.js",
-  "files": [
-    "."  
-  ],
+  "main": "src/index.js",
   "exports": {
     ".": {
       "import": "./dist/esm/src/index.js",
       "require": "./dist/cjs/src/index.js"
-    },
-    "./test-helpers": {
-      "import": "./dist/esm/src/test-helpers/index.js",
-      "require": "./dist/cjs/src/test-helpers/index.js"
     }
   },
   "scripts": {
