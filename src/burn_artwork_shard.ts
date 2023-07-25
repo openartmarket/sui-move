@@ -4,8 +4,8 @@ import { getSigner, handleTransactionResponse } from "./helpers";
 import { BurnArtworkParams, BurnArtworkResult } from "./types";
 
 export async function burnArtworkShard(params: BurnArtworkParams): Promise<BurnArtworkResult> {
-  const { artworkShardId, artworkId, packageId, signerPhrase } = params;
-  const { signer, address } = getSigner(signerPhrase);
+  const { artworkShardId, artworkId, packageId, signerPhrase, network } = params;
+  const { signer, address } = getSigner(signerPhrase, network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

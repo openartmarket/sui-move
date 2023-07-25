@@ -7,18 +7,19 @@ import { mintArtworkShard } from "../src/artwork_shard";
 import { findObjectIdInOwnedObjectList } from "../src/findObjectIdWithOwnerAddress";
 import { splitArtworkShard } from "../src/split_artwork_shard";
 import { transferArtworkShard } from "../src/transfer_artwork_shard";
+import { mintArtworkOptions } from "./test-data";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getObject,
   getOwnedObjects,
   PACKAGE_ID,
+  SUI_NETWORK,
   USER1_ADDRESS,
   USER1_PHRASE,
   USER2_ADDRESS,
   USER2_PHRASE,
 } from "./test-helpers";
-import { mintArtworkOptions } from "./testdata";
 
 describe("transferArtworkShard", () => {
   let artworkId: string;
@@ -34,6 +35,7 @@ describe("transferArtworkShard", () => {
       shares: 12,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
 
     await transferArtworkShard({
@@ -42,6 +44,7 @@ describe("transferArtworkShard", () => {
       signerPhrase: USER1_PHRASE,
       receiverAddress: USER2_ADDRESS,
       packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
     });
 
     const transferredShard = await getObject(artworkShardId);
@@ -58,6 +61,7 @@ describe("transferArtworkShard", () => {
       shares: 12,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
 
     const splitShardId1 = await splitArtworkShard({
@@ -65,6 +69,7 @@ describe("transferArtworkShard", () => {
       signerPhrase: USER2_PHRASE,
       shares: 5,
       packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
     });
 
     const oldShard = await getObject(artworkShardId);
@@ -83,6 +88,7 @@ describe("transferArtworkShard", () => {
       signerPhrase: USER2_PHRASE,
       receiverAddress: USER1_ADDRESS,
       packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
     });
 
     const ownedObjects = await getOwnedObjects(transferArtworkShardResponse.owner);

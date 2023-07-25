@@ -4,40 +4,25 @@ import { beforeEach, describe, it } from "mocha";
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
 import { endRequestVoting } from "../src/end_request_voting";
-import { Currency } from "../src/types";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
+import { mintArtworkOptions } from "./test-data";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   PACKAGE_ID,
+  SUI_NETWORK,
   USER1_ADDRESS,
   USER1_PHRASE,
   USER2_ADDRESS,
   USER3_PHRASE,
 } from "./test-helpers";
 
-const artworkOptions = {
-  signerPhrase: ADMIN_PHRASE,
-  packageId: PACKAGE_ID,
-  adminCapId: ADMIN_CAP_ID,
-  totalSupply: 500,
-  sharePrice: 10,
-  multiplier: 100,
-  name: "Mona Lisa",
-  artist: "Leonardo da Vinci",
-  creationDate: "1685548680595",
-  description: "Choconta painting",
-  currency: "NOK" as Currency,
-  image:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
-};
-
 describe("DAO Voting structure", () => {
   let artworkId: string;
   beforeEach(async () => {
-    artworkId = await mintArtwork(artworkOptions);
+    artworkId = await mintArtwork(mintArtworkOptions);
     await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
@@ -45,6 +30,7 @@ describe("DAO Voting structure", () => {
       shares: 151,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     await mintArtworkShard({
       artworkId,
@@ -53,6 +39,7 @@ describe("DAO Voting structure", () => {
       shares: 249,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     await mintArtworkShard({
       artworkId,
@@ -61,6 +48,7 @@ describe("DAO Voting structure", () => {
       shares: 100,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
   });
 
@@ -71,6 +59,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     assert.ok(voteRequest);
   });
@@ -82,6 +71,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
@@ -90,6 +80,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
+      network: SUI_NETWORK,
     });
     assert.ok(userVote);
   });
@@ -101,6 +92,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
@@ -109,6 +101,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
+      network: SUI_NETWORK,
     });
     assert.ok(userVote);
     await assert.rejects(
@@ -118,6 +111,7 @@ describe("DAO Voting structure", () => {
         packageId: PACKAGE_ID,
         voterAccount: USER1_PHRASE,
         choice: true,
+        network: SUI_NETWORK,
       })
     );
   });
@@ -129,6 +123,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     assert.ok(voteRequest);
     await assert.rejects(
@@ -138,6 +133,7 @@ describe("DAO Voting structure", () => {
         voterAccount: USER3_PHRASE,
         packageId: PACKAGE_ID,
         choice: true,
+        network: SUI_NETWORK,
       })
     );
   });
@@ -149,6 +145,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
@@ -157,6 +154,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
+      network: SUI_NETWORK,
     });
     assert.ok(userVote);
     const endVoteRequest = await endRequestVoting({
@@ -164,6 +162,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     assert.ok(endVoteRequest);
     await assert.rejects(
@@ -173,6 +172,7 @@ describe("DAO Voting structure", () => {
         packageId: PACKAGE_ID,
         voterAccount: USER1_PHRASE,
         choice: true,
+        network: SUI_NETWORK,
       })
     );
   });

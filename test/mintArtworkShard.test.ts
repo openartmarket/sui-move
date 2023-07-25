@@ -3,15 +3,16 @@ import { beforeEach, describe, it } from "mocha";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
+import { mintArtworkOptions } from "./test-data";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   PACKAGE_ID,
+  SUI_NETWORK,
   USER1_ADDRESS,
   USER2_ADDRESS,
 } from "./test-helpers";
-import { mintArtworkOptions } from "./testdata";
 
 describe("mintArtworkShard", () => {
   let artworkId: string;
@@ -27,6 +28,7 @@ describe("mintArtworkShard", () => {
       shares: 2,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
   });
 
@@ -39,6 +41,7 @@ describe("mintArtworkShard", () => {
         shares: 501,
         packageId: PACKAGE_ID,
         adminCapId: ADMIN_CAP_ID,
+        network: SUI_NETWORK,
       })
     );
   });
@@ -51,6 +54,7 @@ describe("mintArtworkShard", () => {
       shares: 150,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     await mintArtworkShard({
       artworkId,
@@ -59,6 +63,7 @@ describe("mintArtworkShard", () => {
       shares: 250,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     await mintArtworkShard({
       artworkId,
@@ -67,6 +72,7 @@ describe("mintArtworkShard", () => {
       shares: 98,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     await assert.rejects(
       mintArtworkShard({
@@ -76,6 +82,7 @@ describe("mintArtworkShard", () => {
         shares: 3,
         packageId: PACKAGE_ID,
         adminCapId: ADMIN_CAP_ID,
+        network: SUI_NETWORK,
       })
     );
   });
@@ -88,6 +95,7 @@ describe("mintArtworkShard", () => {
       shares: 150,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     await mintArtworkShard({
       artworkId,
@@ -96,6 +104,7 @@ describe("mintArtworkShard", () => {
       shares: 50,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     await mintArtworkShard({
       artworkId,
@@ -104,6 +113,7 @@ describe("mintArtworkShard", () => {
       shares: 1,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
   });
 

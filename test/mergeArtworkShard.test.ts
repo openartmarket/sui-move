@@ -3,15 +3,16 @@ import assert from "assert";
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
 import { mergeArtworkShard } from "../src/merge_artwork_shard";
+import { mintArtworkOptions } from "./test-data";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getObject,
   PACKAGE_ID,
+  SUI_NETWORK,
   USER1_ADDRESS,
   USER1_PHRASE,
 } from "./test-helpers";
-import { mintArtworkOptions } from "./testdata";
 
 describe("mergeArtworkShard", () => {
   let artworkId: string;
@@ -27,6 +28,7 @@ describe("mergeArtworkShard", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
     const { artworkShardId: artworkShard2Id } = await mintArtworkShard({
       artworkId,
@@ -35,6 +37,7 @@ describe("mergeArtworkShard", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
 
     const mergeArtworkShards = await mergeArtworkShard({
@@ -42,6 +45,7 @@ describe("mergeArtworkShard", () => {
       artworkShard2Id,
       signerPhrase: USER1_PHRASE,
       packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
     });
     const burnedShard = await getObject(artworkShard2Id);
     const newShard = await getObject(mergeArtworkShards.artworkShardId);

@@ -10,6 +10,7 @@ export type Currency = "USD" | "EUR" | "GBP" | "NOK";
 // Common interface for packages and artwork shards
 export type BaseArtworkParams = {
   packageId: string;
+  network: string;
   signerPhrase: string;
 };
 
@@ -73,6 +74,7 @@ export type BurnArtworkParams = {
   artworkShardId: string;
   packageId: string;
   signerPhrase: string;
+  network: string;
 };
 
 export type BurnArtworkResult = ArtworkShardDetails & {
@@ -105,6 +107,7 @@ export type VoteParams = {
   voteRequest: string;
   voterAccount: string;
   choice: boolean;
+  network: string;
 };
 
 export type OwnedObjectList = {
@@ -121,4 +124,17 @@ export type Data = {
   objectId: string;
   version: string;
   digest: string;
+};
+
+type BaseDisplayParams = {
+  PUBLISHER_ID: string;
+  ADMIN_PHRASE: string;
+  SUI_NETWORK: string;
+};
+
+export type CreateArtworkDisplayParams = BaseDisplayParams & {
+  ARTWORK_TYPE: string;
+};
+export type CreateArtworkShardDisplayParams = BaseDisplayParams & {
+  ARTWORK_SHARD_TYPE: string;
 };

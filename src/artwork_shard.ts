@@ -11,8 +11,9 @@ import { MintArtworkShardParams, MintArtworkShardResult } from "./types";
 export async function mintArtworkShard(
   params: MintArtworkShardParams
 ): Promise<MintArtworkShardResult> {
-  const { artworkId, signerPhrase, receiverAddress, packageId, adminCapId, shares } = params;
-  const { signer } = getSigner(signerPhrase);
+  const { artworkId, signerPhrase, receiverAddress, packageId, adminCapId, shares, network } =
+    params;
+  const { signer } = getSigner(signerPhrase, network);
 
   const tx = new TransactionBlock();
 

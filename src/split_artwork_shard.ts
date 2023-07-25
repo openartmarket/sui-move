@@ -7,8 +7,8 @@ import { ArtworkShardDetails, SplitArtworkShardParams } from "./types";
 export async function splitArtworkShard(
   params: SplitArtworkShardParams
 ): Promise<ArtworkShardDetails> {
-  const { artworkShardId, signerPhrase, shares, packageId } = params;
-  const { signer, address } = getSigner(signerPhrase);
+  const { artworkShardId, signerPhrase, shares, packageId, network } = params;
+  const { signer, address } = getSigner(signerPhrase, network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

@@ -6,8 +6,8 @@ import { ArtworkShardDetails, MergeArtworkShardParams } from "./types";
 export async function mergeArtworkShard(
   params: MergeArtworkShardParams
 ): Promise<ArtworkShardDetails> {
-  const { artworkShard1Id, artworkShard2Id, signerPhrase, packageId } = params;
-  const { signer, address } = getSigner(signerPhrase);
+  const { artworkShard1Id, artworkShard2Id, signerPhrase, packageId, network } = params;
+  const { signer, address } = getSigner(signerPhrase, network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

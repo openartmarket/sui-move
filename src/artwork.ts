@@ -21,11 +21,12 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
     description,
     currency,
     image,
+    network,
   } = params;
 
   // console.log("Mint artwork: %s", name + " by " + artist);
 
-  const { signer } = getSigner(signerPhrase);
+  const { signer } = getSigner(signerPhrase, network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

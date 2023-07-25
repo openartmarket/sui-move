@@ -10,8 +10,8 @@ import { TransferArtworkShardParams, TransferArtworkShardResult } from "./types"
 export async function transferArtworkShard(
   params: TransferArtworkShardParams
 ): Promise<TransferArtworkShardResult> {
-  const { artworkId, signerPhrase, receiverAddress, artworkShardId, packageId } = params;
-  const { signer } = getSigner(signerPhrase);
+  const { artworkId, signerPhrase, receiverAddress, artworkShardId, packageId, network } = params;
+  const { signer } = getSigner(signerPhrase, network);
 
   const tx = new TransactionBlock();
 

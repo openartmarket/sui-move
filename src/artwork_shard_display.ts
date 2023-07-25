@@ -1,7 +1,7 @@
 import { TransactionBlock } from "@mysten/sui.js";
 
-import { ADMIN_PHRASE, ARTWORK_SHARD_TYPE,PUBLISHER_ID } from "../test/test-helpers";
 import { getSigner } from "./helpers";
+import { CreateArtworkShardDisplayParams } from "./types";
 
 // This is the function you can update to change the display fields
 function getArtworkShardDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
@@ -17,11 +17,16 @@ function getArtworkShardDisplayFields(imageProviderUrlPrefix = "", imageProvider
   };
 }
 
-async function createArtworkShardDisplay() {
+export async function createArtworkShardDisplay({
+  ADMIN_PHRASE,
+  ARTWORK_SHARD_TYPE,
+  PUBLISHER_ID,
+  SUI_NETWORK,
+}: CreateArtworkShardDisplayParams) {
   const artworkShardDisplayFields = getArtworkShardDisplayFields();
 
   const tx = new TransactionBlock();
-  const { signer, address } = getSigner(ADMIN_PHRASE);
+  const { signer, address } = getSigner(ADMIN_PHRASE, SUI_NETWORK);
   const artworkShardDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
     arguments: [
@@ -48,5 +53,3 @@ async function createArtworkShardDisplay() {
     },
   });
 }
-
-createArtworkShardDisplay();

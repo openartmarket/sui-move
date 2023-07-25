@@ -7,19 +7,22 @@ import {
   SuiTransactionBlockResponse,
 } from "@mysten/sui.js";
 
-import { SUI_NETWORK } from "../test/test-helpers";
+export function getProvider(SUI_NETWORK: string) {
+  const connOptions = new Connection({
+    fullnode: SUI_NETWORK,
+  });
+  return new JsonRpcProvider(connOptions);
+}
 
-// console.log("Connecting to ", SUI_NETWORK);
-const connOptions = new Connection({
-  fullnode: SUI_NETWORK,
-});
-export const provider = new JsonRpcProvider(connOptions);
-
-export function getSigner(phrase: string): {
+export function getSigner(
+  phrase: string,
+  network: string
+): {
   signer: RawSigner;
   address: string;
 } {
   if (!phrase) throw new Error("No phrase provided");
+  const provider = getProvider(network);
 
   const keypair = Ed25519Keypair.deriveKeypair(phrase);
   const signer = new RawSigner(keypair, provider);

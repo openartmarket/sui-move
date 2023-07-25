@@ -4,15 +4,16 @@ import { beforeEach, describe, it } from "mocha";
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
 import { splitArtworkShard } from "../src/split_artwork_shard";
+import { mintArtworkOptions } from "./test-data";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   PACKAGE_ID,
+  SUI_NETWORK,
   USER1_ADDRESS,
   USER1_PHRASE,
 } from "./test-helpers";
 import { getObject } from "./test-helpers";
-import { mintArtworkOptions } from "./testdata";
 
 describe("splitArtworkShard", () => {
   let artworkId: string;
@@ -28,6 +29,7 @@ describe("splitArtworkShard", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
 
     const splitShardId = await splitArtworkShard({
@@ -35,6 +37,7 @@ describe("splitArtworkShard", () => {
       signerPhrase: USER1_PHRASE,
       shares: 2,
       packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
     });
 
     // Get the shard and check that it has 2 shares
@@ -58,6 +61,7 @@ describe("splitArtworkShard", () => {
       shares: 12,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
+      network: SUI_NETWORK,
     });
 
     const splitShardId = await splitArtworkShard({
@@ -65,12 +69,14 @@ describe("splitArtworkShard", () => {
       signerPhrase: USER1_PHRASE,
       shares: 5,
       packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
     });
     const splitAgainShardId = await splitArtworkShard({
       artworkShardId: splitShardId.artworkShardId,
       signerPhrase: USER1_PHRASE,
       shares: 3,
       packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
     });
 
     const oldShard = await getObject(artworkShardId);
