@@ -2,26 +2,26 @@ import { TransactionBlock } from "@mysten/sui.js";
 
 import { findObjectIdWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
 import { getSigner, handleTransactionResponse } from "./helpers";
-import { MintArtworkShardParams, MintArtworkShardResult } from "./types";
+import { MintContractStockParams, MintContractStockResult } from "./types";
 
 /**
- * Mints an artwork shard
- * @returns artwork shard id
+ * Mints an contract stock
+ * @returns contract stock id
  */
-export async function mintArtworkShard(
-  params: MintArtworkShardParams
-): Promise<MintArtworkShardResult> {
-  const { artworkId, signerPhrase, receiverAddress, packageId, adminCapId, shares, network } =
+export async function mintContractStock(
+  params: MintContractStockParams
+): Promise<MintContractStockResult> {
+  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, shares, network } =
     params;
   const { signer } = getSigner(signerPhrase, network);
 
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::open_art_market::mint_artwork_shard`,
+    target: `${packageId}::open_art_market::mint_contract_stock`,
     arguments: [
       tx.object(adminCapId),
-      tx.object(artworkId),
+      tx.object(contractId),
       tx.pure(shares),
       tx.pure(receiverAddress),
     ],
@@ -36,7 +36,7 @@ export async function mintArtworkShard(
     },
   });
   handleTransactionResponse(txRes);
-  const artworkShardId = findObjectIdWithOwnerAddress(txRes, receiverAddress);
+  const contractStockId = findObjectIdWithOwnerAddress(txRes, receiverAddress);
   const { digest } = txRes;
-  return { artworkShardId, digest, owner: receiverAddress };
+  return { contractStockId, digest, owner: receiverAddress };
 }

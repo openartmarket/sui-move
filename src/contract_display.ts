@@ -1,10 +1,10 @@
 import { TransactionBlock } from "@mysten/sui.js";
 
 import { getSigner } from "./helpers";
-import { CreateArtworkDisplayParams } from "./types";
+import { CreateContractDisplayParams } from "./types";
 
 // This is the function you can update to change the display fields
-function getArtworkDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
+function getContractDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
   return {
     keys: ["name", "description", "currency", "image_url", "project_url"],
     values: [
@@ -17,34 +17,34 @@ function getArtworkDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPo
   };
 }
 
-export async function createArtworkDisplay({
-  ARTWORK_TYPE,
+export async function createContractDisplay({
+  CONTRACT_TYPE,
   PUBLISHER_ID,
   ADMIN_PHRASE,
   SUI_NETWORK,
-}: CreateArtworkDisplayParams) {
-  const artworkDisplayFields = getArtworkDisplayFields();
+}: CreateContractDisplayParams) {
+  const contractDisplayFields = getContractDisplayFields();
 
   const tx = new TransactionBlock();
   const { signer, address } = getSigner(ADMIN_PHRASE, SUI_NETWORK);
 
-  const artworkDisplay = tx.moveCall({
+  const contractDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
     arguments: [
       tx.object(PUBLISHER_ID),
-      tx.pure(artworkDisplayFields.keys),
-      tx.pure(artworkDisplayFields.values),
+      tx.pure(contractDisplayFields.keys),
+      tx.pure(contractDisplayFields.values),
     ],
-    typeArguments: [ARTWORK_TYPE],
+    typeArguments: [CONTRACT_TYPE],
   });
 
   tx.moveCall({
     target: "0x2::display::update_version",
-    arguments: [artworkDisplay],
-    typeArguments: [ARTWORK_TYPE],
+    arguments: [contractDisplay],
+    typeArguments: [CONTRACT_TYPE],
   });
 
-  tx.transferObjects([artworkDisplay], tx.pure(address));
+  tx.transferObjects([contractDisplay], tx.pure(address));
   await signer.signAndExecuteTransactionBlock({
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",

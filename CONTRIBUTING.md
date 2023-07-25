@@ -31,8 +31,8 @@ sui start
 ./scripts/setup-oam-on-local-node.sh
 ./scripts/json-to-env.sh
 direnv allow
-npm run create:artwork-display
-npm run create:artwork-shard-display
+npm run create:contract-display
+npm run create:contract-stock-display
 
 ```
 
@@ -48,8 +48,8 @@ docker compose up
 ./scripts/json-to-env.sh
 direnv allow
 cd setup
-npm run create:artwork-display
-npm run create:artwork-shard-display
+npm run create:contract-display
+npm run create:contract-stock-display
 ```
 
 ## Testing the contracts

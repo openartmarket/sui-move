@@ -60,14 +60,14 @@ echo "Installing dependencies..."
 
 npm install
 
-echo "Creating Artwork Display..."
+echo "Creating Contract Display..."
 
-npm run create:artwork-display
+npm run create:contract-display
 sleep 5
 
-npm run create:artwork-shard-display
+npm run create:contract-stock-display
 sleep 5
 
-echo "Creating Mona Lisa Artwork..."
+echo "Creating Mona Lisa Contract..."
 
-npm run create:artwork
+npm run create:contract

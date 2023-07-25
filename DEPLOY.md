@@ -46,10 +46,10 @@ Next, deploy the contracts.
 ## Create the displays
 
     cd setup
-    npm run create:artwork-display
-    npm run create:artwork-shard-display
+    npm run create:contract-display
+    npm run create:contract-stock-display
 
-## Create an artwork
+## Create an contract
 
 Now we need to define the PACKAGE_ID and ADMIN_CAP_ID. These values are in `publish-output.json` created above.
 Extract them:

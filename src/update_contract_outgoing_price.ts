@@ -4,7 +4,7 @@ import { getSigner, handleTransactionResponse } from "./helpers";
 import { UpdateOutgoingPriceParams } from "./types";
 
 export async function updateOutgoingPrice({
-  artworkId,
+  contractId,
   newOutgoingPrice,
   packageId,
   adminCapId,
@@ -16,7 +16,7 @@ export async function updateOutgoingPrice({
 
   tx.moveCall({
     target: `${packageId}::open_art_market::update_outgoing_price`,
-    arguments: [tx.object(adminCapId), tx.object(artworkId), tx.pure(newOutgoingPrice)],
+    arguments: [tx.object(adminCapId), tx.object(contractId), tx.pure(newOutgoingPrice)],
   });
 
   const txRes = await signer.signAndExecuteTransactionBlock({

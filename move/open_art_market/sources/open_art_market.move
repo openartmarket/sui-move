@@ -12,8 +12,8 @@ module open_art_market::open_art_market {
 
     // Error codes
     const EInsufficientShares: u64 = 0;
-    const EIncompatibleShardTypes: u64 = 1;
-    const EInvalidArtwork: u64 = 2;
+    const EIncompatibleStockTypes: u64 = 1;
+    const EInvalidContract: u64 = 2;
     const EITONotFinished: u64 = 3;
     const EInvalidSupply: u64 = 4;
     const EInvalidSharePrice: u64 = 5;
@@ -22,14 +22,14 @@ module open_art_market::open_art_market {
     const ECallerNotAShareHolder: u64 = 8;
 
     // Structs
-    // An ArtworkShard NFT
-    // Represents shares of an Artwork NFT and it is owned by a shareholder
-    struct ArtworkShard has key {
+    // An ContractStock NFT
+    // Represents shares of an Contract NFT and it is owned by a shareholder
+    struct ContractStock has key {
         id: UID,
-        artwork_id: ID,
+        contract_id: ID,
         shares: u64,
         share_price: u64,
-        artwork_name: String,
+        contract_name: String,
         artist: String,
         creation_date: u64,
         description: String,
@@ -37,12 +37,12 @@ module open_art_market::open_art_market {
         image_url: String,
     }
 
-    // The Artwork NFT struct
+    // The Contract NFT struct
     // This object is only created by the admin and should be shared
-    // @todo: make the artwork an NFT that is wrapped around another
+    // @todo: make the contract an NFT that is wrapped around another
     // struct so we can eventually transfer it outside of the Wrapper once sold
     // to the buyer (not a requirement right now but seems optimal)
-    struct Artwork has key, store{
+    struct Contract has key, store{
         id: UID,
         total_supply: u64,
         shares: u64,
@@ -78,8 +78,8 @@ module open_art_market::open_art_market {
         transfer::public_transfer(admin_cap, tx_context::sender(ctx));
     }
     
-    // Create a new Artwork NFT shared object
-    public fun mint_artwork_and_share(
+    // Create a new Contract NFT shared object
+    public fun mint_contract_and_share(
         _: &mut AdminCap, total_supply: u64, share_price: u64, multiplier: u64, name: String, artist: String,
         creation_date: u64, description: String, currency: String,
         image_url: String, ctx: &mut TxContext
@@ -92,7 +92,7 @@ module open_art_market::open_art_market {
 
         let outgoing_price = (share_price * total_supply) * multiplier;
 
-        let artwork = Artwork {
+        let contract = Contract {
             id: object::new(ctx),
             total_supply,
             shares: total_supply,
@@ -106,156 +106,156 @@ module open_art_market::open_art_market {
             currency,
             image_url
         };
-        transfer::public_share_object<Artwork>(artwork);
+        transfer::public_share_object<Contract>(contract);
     }
 
-    // Create an ArtworkShard NFT
-    public fun mint_artwork_shard(_: &mut AdminCap, artwork: &mut Artwork, shares: u64, receiver: address, ctx: &mut TxContext) {
-        let remaining_shares = artwork.shares;
+    // Create an ContractStock NFT
+    public fun mint_contract_stock(_: &mut AdminCap, contract: &mut Contract, shares: u64, receiver: address, ctx: &mut TxContext) {
+        let remaining_shares = contract.shares;
 
-        // Ensure that artwork has sufficient shares available to create the shard
+        // Ensure that contract has sufficient shares available to create the stock
         assert!(shares <= remaining_shares, EInsufficientShares);
 
         let new_shares_balance = remaining_shares - shares;
-        artwork.shares = new_shares_balance;
+        contract.shares = new_shares_balance;
 
-        let is_receiver_shareholder = df::exists_(&artwork.id, receiver);
+        let is_receiver_shareholder = df::exists_(&contract.id, receiver);
 
         if(is_receiver_shareholder){
-            let df_shares = df::borrow_mut<address, Shares>(&mut artwork.id, receiver);
+            let df_shares = df::borrow_mut<address, Shares>(&mut contract.id, receiver);
             df_shares.value = df_shares.value + shares;
         }else {
-            df::add(&mut artwork.id, receiver, Shares {value: shares} );
+            df::add(&mut contract.id, receiver, Shares {value: shares} );
         };
 
-        let artwork_shard = ArtworkShard {
+        let contract_stock = ContractStock {
             id: object::new(ctx),
-            artwork_id: object::uid_to_inner(&artwork.id),
+            contract_id: object::uid_to_inner(&contract.id),
             shares,
-            share_price: artwork.share_price,
-            artwork_name: artwork.name,
-            artist: artwork.artist,
-            creation_date: artwork.creation_date,
-            description: artwork.description,
-            currency: artwork.currency,
-            image_url: artwork.image_url,
+            share_price: contract.share_price,
+            contract_name: contract.name,
+            artist: contract.artist,
+            creation_date: contract.creation_date,
+            description: contract.description,
+            currency: contract.currency,
+            image_url: contract.image_url,
         };
 
-        transfer::transfer(artwork_shard, receiver);
+        transfer::transfer(contract_stock, receiver);
     }
 
-    public fun transfer_artwork_shard(artwork: &mut Artwork, artwork_shard: ArtworkShard, new_owner: address, ctx: &mut TxContext) {
+    public fun transfer_contract_stock(contract: &mut Contract, contract_stock: ContractStock, new_owner: address, ctx: &mut TxContext) {
         // @todo: what checks need to be made here?
-        let is_receiver_shareholder = df::exists_(&artwork.id, new_owner);
+        let is_receiver_shareholder = df::exists_(&contract.id, new_owner);
 
-        // Make sure the df share balances of receiver under artwork are kept up to date
+        // Make sure the df share balances of receiver under contract are kept up to date
         if(is_receiver_shareholder) {
-            let df_receiver_shares = df::borrow_mut<address, Shares>(&mut artwork.id, new_owner);
-            df_receiver_shares.value = df_receiver_shares.value + artwork_shard.shares;
+            let df_receiver_shares = df::borrow_mut<address, Shares>(&mut contract.id, new_owner);
+            df_receiver_shares.value = df_receiver_shares.value + contract_stock.shares;
         } else {
-            df::add(&mut artwork.id, new_owner, Shares {value: artwork_shard.shares});
+            df::add(&mut contract.id, new_owner, Shares {value: contract_stock.shares});
         };
 
-        // Make sure the df share balances of sender under artwork are kept up to date
-        let df_sender_shares = df::borrow_mut<address, Shares>(&mut artwork.id, tx_context::sender(ctx));
-        df_sender_shares.value = df_sender_shares.value - artwork_shard.shares;
+        // Make sure the df share balances of sender under contract are kept up to date
+        let df_sender_shares = df::borrow_mut<address, Shares>(&mut contract.id, tx_context::sender(ctx));
+        df_sender_shares.value = df_sender_shares.value - contract_stock.shares;
 
-        transfer::transfer(artwork_shard, new_owner);
+        transfer::transfer(contract_stock, new_owner);
     }
 
-    // CAUTION: Internal helper method, this can burn shards with shares in them
-    fun burn_artwork_shard(artwork_shard: ArtworkShard): u64 {
-        let ArtworkShard {
+    // CAUTION: Internal helper method, this can burn stocks with shares in them
+    fun burn_contract_stock(contract_stock: ContractStock): u64 {
+        let ContractStock {
             id,
-            artwork_id: _,
+            contract_id: _,
             shares,
             share_price: _,
-            artwork_name: _,
+            contract_name: _,
             artist: _,
             creation_date: _,
             description: _,
             currency: _,
             image_url: _,
-        } = artwork_shard;
+        } = contract_stock;
 
         object::delete(id);
         shares
     }
 
-    // Burns a shard after checking the ITO has finished and returns the number of shares it contained
-    public fun safe_burn_artwork_shard(artwork: &Artwork, artwork_shard: ArtworkShard): u64 {
+    // Burns a stock after checking the ITO has finished and returns the number of shares it contained
+    public fun safe_burn_contract_stock(contract: &Contract, contract_stock: ContractStock): u64 {
 
-        // Ensure that the shard belongs to the artwork
-        assert!(object::uid_to_inner(&artwork.id) == artwork_shard.artwork_id, EInvalidArtwork);
+        // Ensure that the stock belongs to the contract
+        assert!(object::uid_to_inner(&contract.id) == contract_stock.contract_id, EInvalidContract);
 
         // Ensure that the ITO has finished
-        assert!(artwork.shares == 0, EITONotFinished);  
+        assert!(contract.shares == 0, EITONotFinished);  
 
-        burn_artwork_shard(artwork_shard)
+        burn_contract_stock(contract_stock)
 
     }
 
-    // Function to merge two shards owned by the same user
-    public fun merge_artwork_shards(artwork_shard1: &mut ArtworkShard, artwork_shard2: ArtworkShard) {
+    // Function to merge two stocks owned by the same user
+    public fun merge_contract_stocks(contract_stock1: &mut ContractStock, contract_stock2: ContractStock) {
 
-        // Ensure that both shards belong to the same artwork
-        assert!(artwork_shard1.artwork_id == artwork_shard2.artwork_id, EIncompatibleShardTypes);
+        // Ensure that both stocks belong to the same contract
+        assert!(contract_stock1.contract_id == contract_stock2.contract_id, EIncompatibleStockTypes);
 
-        let artwork_shard2_shares = burn_artwork_shard(artwork_shard2);
+        let contract_stock2_shares = burn_contract_stock(contract_stock2);
 
-        artwork_shard1.shares = artwork_shard1.shares + artwork_shard2_shares;
+        contract_stock1.shares = contract_stock1.shares + contract_stock2_shares;
         
     }
 
 
     // @todo: method for setting the currency type (can be done at minting time)
 
-    // Open Art Market & Artwork Owner (person coming with the artwork to the market) has shares allocated for sale. 
-    // We will create those Artwork Shards as the first action after minting the Artwork
-    // Function to split a shard into two shards
-    public fun split_artwork_shard(artwork_shard: &mut ArtworkShard, shares: u64, ctx: &mut TxContext) {
-        // Ensure that the original shard has sufficient shares to split
-        assert!(artwork_shard.shares > shares, EInsufficientShares);
+    // Open Art Market & Contract Owner (person coming with the contract to the market) has shares allocated for sale. 
+    // We will create those Contract Stocks as the first action after minting the Contract
+    // Function to split a stock into two stocks
+    public fun split_contract_stock(contract_stock: &mut ContractStock, shares: u64, ctx: &mut TxContext) {
+        // Ensure that the original stock has sufficient shares to split
+        assert!(contract_stock.shares > shares, EInsufficientShares);
         
-        // Create new shard with remaining shares
-        let artwork_shard2 = ArtworkShard {
+        // Create new stock with remaining shares
+        let contract_stock2 = ContractStock {
             id: object::new(ctx),
-            artwork_id: artwork_shard.artwork_id,
+            contract_id: contract_stock.contract_id,
             shares,
-            share_price: artwork_shard.share_price,
-            artwork_name: artwork_shard.artwork_name,
-            artist: artwork_shard.artist,
-            creation_date: artwork_shard.creation_date,
-            description: artwork_shard.description,
-            currency: artwork_shard.currency,
-            image_url: artwork_shard.image_url,
+            share_price: contract_stock.share_price,
+            contract_name: contract_stock.contract_name,
+            artist: contract_stock.artist,
+            creation_date: contract_stock.creation_date,
+            description: contract_stock.description,
+            currency: contract_stock.currency,
+            image_url: contract_stock.image_url,
         };
 
-        // Update shares of original shard
-        let remaining_shares = artwork_shard.shares - shares;
-        artwork_shard.shares = remaining_shares;
+        // Update shares of original stock
+        let remaining_shares = contract_stock.shares - shares;
+        contract_stock.shares = remaining_shares;
 
-        // Transfer new shard to sender
-        transfer::transfer(artwork_shard2, tx_context::sender(ctx));
+        // Transfer new stock to sender
+        transfer::transfer(contract_stock2, tx_context::sender(ctx));
     }
 
-    // Function to update the outgoing price of an Artwork
-    public fun update_outgoing_price(_: &AdminCap, artwork: &mut Artwork, new_outgoing_price: u64) {
-        artwork.outgoing_price = new_outgoing_price;
+    // Function to update the outgoing price of an Contract
+    public fun update_outgoing_price(_: &AdminCap, contract: &mut Contract, new_outgoing_price: u64) {
+        contract.outgoing_price = new_outgoing_price;
     }
 
     // Accessors
 
-    public fun get_shard_artwork_id(artwork_shard: &ArtworkShard): ID {
-        artwork_shard.artwork_id
+    public fun get_stock_contract_id(contract_stock: &ContractStock): ID {
+        contract_stock.contract_id
     }
 
-    public fun get_shard_shares(artwork_shard: &ArtworkShard): u64 {
-        artwork_shard.shares
+    public fun get_stock_shares(contract_stock: &ContractStock): u64 {
+        contract_stock.shares
     }
 
-    public fun get_artwork_id(artwork: &Artwork): &UID {
-        &artwork.id
+    public fun get_contract_id(contract: &Contract): &UID {
+        &contract.id
     }
 
     public fun get_user_shares(shares: &Shares): u64 {
@@ -263,8 +263,8 @@ module open_art_market::open_art_market {
     }
 
     // Function for getting available shares for sale
-    public fun get_available_shares_for_sale(artwork: &Artwork): u64 {
-        artwork.shares
+    public fun get_available_shares_for_sale(contract: &Contract): u64 {
+        contract.shares
     }
 
 }

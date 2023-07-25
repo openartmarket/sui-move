@@ -19,14 +19,14 @@ PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)
 - Export your USER_PHRASE as an environment variable: `export USER_PHRASE=lost soul ...`
 - Make sure you have switched to the admin address before moving forward
 - Publish the contracts: `npm run publish <network>` If you don't specify a network, it will default to `local` 
-- The publish script will deploy the contracts, set the .env variables, create the displays and create an artwork
+- The publish script will deploy the contracts, set the .env variables, create the displays and create an contract
 
 ## Runnig scripts individually
-- To create the display run `npm run create:artwork-display`
-- To create an artwork run `npm run create:artwork`
+- To create the display run `npm run create:contract-display`
+- To create an contract run `npm run create:contract`
 
 ## Sample flow
-1. Run publish script which creates the Artwork & ArtworkShard displays and an artwork
-1. Run artwork_shard to create an ArtworkShard
+1. Run publish script which creates the Contract & ContractStock displays and an contract
+1. Run contract_stock to create an ContractStock
 1. Run vote_request to create a vote request
 1. Run vote to vote on the vote request

@@ -2,18 +2,18 @@ import { TransactionBlock } from "@mysten/sui.js";
 
 import { findObjectIdWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
 import { getSigner, handleTransactionResponse } from "./helpers";
-import { ArtworkShardDetails, SplitArtworkShardParams } from "./types";
+import { ContractStockDetails, SplitContractStockParams } from "./types";
 
-export async function splitArtworkShard(
-  params: SplitArtworkShardParams
-): Promise<ArtworkShardDetails> {
-  const { artworkShardId, signerPhrase, shares, packageId, network } = params;
+export async function splitContractStock(
+  params: SplitContractStockParams
+): Promise<ContractStockDetails> {
+  const { contractStockId, signerPhrase, shares, packageId, network } = params;
   const { signer, address } = getSigner(signerPhrase, network);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::open_art_market::split_artwork_shard`,
-    arguments: [tx.object(artworkShardId), tx.pure(shares)],
+    target: `${packageId}::open_art_market::split_contract_stock`,
+    arguments: [tx.object(contractStockId), tx.pure(shares)],
   });
 
   const txRes = await signer.signAndExecuteTransactionBlock({
@@ -25,9 +25,9 @@ export async function splitArtworkShard(
   });
 
   handleTransactionResponse(txRes);
-  const newArtworkShardId = findObjectIdWithOwnerAddress(txRes, address);
+  const newContractStockId = findObjectIdWithOwnerAddress(txRes, address);
   return {
-    artworkShardId: newArtworkShardId,
+    contractStockId: newContractStockId,
     owner: address,
   };
 }

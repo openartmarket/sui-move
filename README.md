@@ -40,9 +40,9 @@ We would love for the community to review and improve our code. If you are inter
 
 # Smart Contracts
 
-PoC contracts modeling Open Art Market use case, where only the admin can create an Artwork and ArtworkShards for this artwork. 
+PoC contracts modeling Open Art Market use case, where only the admin can create an Contract and ContractStocks for this contract. 
 
-The users can own shares of an artwork. 
+The users can own shares of an contract. 
 
 The admin can create new voting requests for DAO operations. 
 
@@ -53,12 +53,12 @@ Multiple shareholders can vote whether they agree or not to vote requests.
 
 <b>Structs of the module:</b>
 
-* Artwork - The Artwork NFT is a shared object and it is created only by the admin.
-* ArtworkShard - Represents shares of an Artwork NFT and it is owned by a shareholder.
+* Contract - The Contract NFT is a shared object and it is created only by the admin.
+* ContractStock - Represents shares of an Contract NFT and it is owned by a shareholder.
 * AdminCap - Admin capability to guard access restricted methods.
-* Shares - Represents the number of the shares owned by an address for an Artwork.
+* Shares - Represents the number of the shares owned by an address for an Contract.
 
-In this module the admin can create a new Artwork and ArtworkShards. There are also the methods to transfer ownership of the ArtworkShard, to merge multiple shards that are owned by the same address or even burn an ArtworkShard.
+In this module the admin can create a new Contract and ContractStocks. There are also the methods to transfer ownership of the ContractStock, to merge multiple stocks that are owned by the same address or even burn an ContractStock.
 
 ### dao module
 
@@ -67,11 +67,11 @@ In this module the admin can create a new Artwork and ArtworkShards. There are a
 * VoteRequest - This struct represents a question that can be voted on by shareholders.
 * Vote
 
-In this module the admin can create a new voting request for the shareholders of an Artwork. Then the shareholders can vote as long as the vote request is active.
+In this module the admin can create a new voting request for the shareholders of an Contract. Then the shareholders can vote as long as the vote request is active.
 
 # Setup
 
-We have implemented programmable transactions to test the flow start to end. By running `npm run test:s2e` an Artwork, and then an ArtworkShard will be created, along with a new voting request.
+We have implemented programmable transactions to test the flow start to end. By running `npm run test:s2e` an Contract, and then an ContractStock will be created, along with a new voting request.
 
 
 # Installing

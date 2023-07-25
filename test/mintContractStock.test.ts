@@ -1,9 +1,9 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "mocha";
 
-import { mintArtwork } from "../src/artwork";
-import { mintArtworkShard } from "../src/artwork_shard";
-import { mintArtworkOptions } from "./test-data";
+import { mintContract } from "../src/contract";
+import { mintContractStock } from "../src/contract_stock";
+import { mintContractOptions } from "./test-data";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
@@ -14,15 +14,15 @@ import {
   USER2_ADDRESS,
 } from "./test-helpers";
 
-describe("mintArtworkShard", () => {
-  let artworkId: string;
+describe("mintContractStock", () => {
+  let contractId: string;
   beforeEach(async () => {
-    artworkId = await mintArtwork(mintArtworkOptions);
+    contractId = await mintContract(mintContractOptions);
   });
 
   it("should issue new shares", async () => {
-    await mintArtworkShard({
-      artworkId,
+    await mintContractStock({
+      contractId,
       signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER1_ADDRESS,
       shares: 2,
@@ -34,8 +34,8 @@ describe("mintArtworkShard", () => {
 
   it("should not issue new shares, when asking for too much", async () => {
     await assert.rejects(
-      mintArtworkShard({
-        artworkId,
+      mintContractStock({
+        contractId,
         signerPhrase: ADMIN_PHRASE,
         receiverAddress: USER1_ADDRESS,
         shares: 501,
@@ -47,8 +47,8 @@ describe("mintArtworkShard", () => {
   });
 
   it("should not issue new shares, when sold out", async () => {
-    await mintArtworkShard({
-      artworkId,
+    await mintContractStock({
+      contractId,
       signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER1_ADDRESS,
       shares: 150,
@@ -56,8 +56,8 @@ describe("mintArtworkShard", () => {
       adminCapId: ADMIN_CAP_ID,
       network: SUI_NETWORK,
     });
-    await mintArtworkShard({
-      artworkId,
+    await mintContractStock({
+      contractId,
       signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER2_ADDRESS,
       shares: 250,
@@ -65,8 +65,8 @@ describe("mintArtworkShard", () => {
       adminCapId: ADMIN_CAP_ID,
       network: SUI_NETWORK,
     });
-    await mintArtworkShard({
-      artworkId,
+    await mintContractStock({
+      contractId,
       signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER1_ADDRESS,
       shares: 98,
@@ -75,8 +75,8 @@ describe("mintArtworkShard", () => {
       network: SUI_NETWORK,
     });
     await assert.rejects(
-      mintArtworkShard({
-        artworkId,
+      mintContractStock({
+        contractId,
         signerPhrase: ADMIN_PHRASE,
         receiverAddress: USER2_ADDRESS,
         shares: 3,
@@ -88,8 +88,8 @@ describe("mintArtworkShard", () => {
   });
 
   it("can give shares to OAM and owner", async () => {
-    await mintArtworkShard({
-      artworkId,
+    await mintContractStock({
+      contractId,
       signerPhrase: ADMIN_PHRASE,
       receiverAddress: ADMIN_ADDRESS,
       shares: 150,
@@ -97,8 +97,8 @@ describe("mintArtworkShard", () => {
       adminCapId: ADMIN_CAP_ID,
       network: SUI_NETWORK,
     });
-    await mintArtworkShard({
-      artworkId,
+    await mintContractStock({
+      contractId,
       signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER1_ADDRESS,
       shares: 50,
@@ -106,8 +106,8 @@ describe("mintArtworkShard", () => {
       adminCapId: ADMIN_CAP_ID,
       network: SUI_NETWORK,
     });
-    await mintArtworkShard({
-      artworkId,
+    await mintContractStock({
+      contractId,
       signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER2_ADDRESS,
       shares: 1,
@@ -117,10 +117,10 @@ describe("mintArtworkShard", () => {
     });
   });
 
-  it.skip("can set the outgoing sale price of the artwork", async () => {
+  it.skip("can set the outgoing sale price of the contract", async () => {
     assert.ok(false);
   });
-  it.skip("can burn the shares after artwork is sold", async () => {
+  it.skip("can burn the shares after contract is sold", async () => {
     assert.ok(false);
   });
 });

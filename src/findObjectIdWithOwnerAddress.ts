@@ -4,7 +4,7 @@ import { Daum, OwnedObjectList } from "./types";
 
 export function findObjectIdWithOwnerAddress(txRes: SuiTransactionBlockResponse, address: string) {
   const objects = getCreatedObjects(txRes);
-  if (!objects) throw new Error("Failed to mint artwork shard");
+  if (!objects) throw new Error("Failed to mint contract stock");
   const objectWithOwnerAddress = objects.find((obj) => {
     if (typeof obj.owner === "string") return false;
     if ("AddressOwner" in obj.owner) {

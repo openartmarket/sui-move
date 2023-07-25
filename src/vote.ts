@@ -4,7 +4,7 @@ import { getSigner, handleTransactionResponse } from "./helpers";
 import { VoteParams } from "./types";
 
 export async function vote({
-  artworkId,
+  contractId,
   voteRequest,
   voterAccount,
   choice,
@@ -16,7 +16,7 @@ export async function vote({
 
   tx.moveCall({
     target: `${packageId}::dao::vote`,
-    arguments: [tx.object(artworkId), tx.object(voteRequest), tx.pure(choice)],
+    arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)],
   });
   const txRes = await signer.signAndExecuteTransactionBlock({
     transactionBlock: tx,

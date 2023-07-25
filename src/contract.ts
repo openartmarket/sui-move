@@ -1,13 +1,13 @@
 import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
 
 import { getSigner, handleTransactionResponse } from "./helpers";
-import { MintArtworkParams } from "./types";
+import { MintContractParams } from "./types";
 /**
- * Mints a new artwork
+ * Mints a new contract
  * @param params
- * @returns the artwork id
+ * @returns the contract id
  */
-export async function mintArtwork(params: MintArtworkParams): Promise<string> {
+export async function mintContract(params: MintContractParams): Promise<string> {
   const {
     adminCapId,
     packageId,
@@ -24,13 +24,13 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
     network,
   } = params;
 
-  // console.log("Mint artwork: %s", name + " by " + artist);
+  // console.log("Mint contract: %s", name + " by " + artist);
 
   const { signer } = getSigner(signerPhrase, network);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::open_art_market::mint_artwork_and_share`,
+    target: `${packageId}::open_art_market::mint_contract_and_share`,
     arguments: [
       tx.object(adminCapId),
       tx.pure(totalSupply),
@@ -55,8 +55,8 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
   });
 
   handleTransactionResponse(txRes);
-  const artworkId = getCreatedObjects(txRes)?.[0].reference.objectId;
-  if (!artworkId) throw new Error("Could not mint artwork");
+  const contractId = getCreatedObjects(txRes)?.[0].reference.objectId;
+  if (!contractId) throw new Error("Could not mint contract");
 
-  return artworkId;
+  return contractId;
 }

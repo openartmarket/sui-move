@@ -106,4 +106,9 @@ for key in $keys; do
   # Export the environment variable
   echo "export $key=\"$value\"" >> .envrc
 done
-# tail -f /dev/null
+
+echo "Environment variables are exported to .envrc file"
+direnv allow
+
+npx ts-node scripts/publish-displays.ts
+echo "Displays are published successfully"

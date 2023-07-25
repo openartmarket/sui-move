@@ -1,4 +1,4 @@
-import { MintArtworkParams } from "../src/types";
+import { MintContractParams } from "../src/types";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
@@ -13,8 +13,8 @@ export const USER3_ADDRESS = getEnv("USER3_ADDRESS");
 
 export const SUI_NETWORK = getEnv("SUI_NETWORK");
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
-export const ARTWORK_TYPE = `${PACKAGE_ID}::open_art_market::Artwork`;
-export const ARTWORK_SHARD_TYPE = `${PACKAGE_ID}::open_art_market::ArtworkShard`;
+export const CONTRACT_TYPE = `${PACKAGE_ID}::open_art_market::Contract`;
+export const CONTRACT_STOCK_TYPE = `${PACKAGE_ID}::open_art_market::ContractStock`;
 
 export function getEnv(name: string): string {
   const value = process.env[name];
@@ -22,7 +22,7 @@ export function getEnv(name: string): string {
   return value;
 }
 
-export const mintArtworkOptions: MintArtworkParams = {
+export const mintContractOptions: MintContractParams = {
   signerPhrase: ADMIN_PHRASE,
   packageId: PACKAGE_ID,
   adminCapId: ADMIN_CAP_ID,

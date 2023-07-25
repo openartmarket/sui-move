@@ -1,10 +1,10 @@
 import { TransactionBlock } from "@mysten/sui.js";
 
 import { getSigner } from "./helpers";
-import { CreateArtworkShardDisplayParams } from "./types";
+import { CreateContractStockDisplayParams } from "./types";
 
 // This is the function you can update to change the display fields
-function getArtworkShardDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
+function getContractStockDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
   return {
     keys: ["name", "description", "currency", "image_url", "project_url"],
     values: [
@@ -17,33 +17,33 @@ function getArtworkShardDisplayFields(imageProviderUrlPrefix = "", imageProvider
   };
 }
 
-export async function createArtworkShardDisplay({
+export async function createContractStockDisplay({
   ADMIN_PHRASE,
-  ARTWORK_SHARD_TYPE,
+  CONTRACT_STOCK_TYPE,
   PUBLISHER_ID,
   SUI_NETWORK,
-}: CreateArtworkShardDisplayParams) {
-  const artworkShardDisplayFields = getArtworkShardDisplayFields();
+}: CreateContractStockDisplayParams) {
+  const contractStockDisplayFields = getContractStockDisplayFields();
 
   const tx = new TransactionBlock();
   const { signer, address } = getSigner(ADMIN_PHRASE, SUI_NETWORK);
-  const artworkShardDisplay = tx.moveCall({
+  const contractStockDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
     arguments: [
       tx.object(PUBLISHER_ID),
-      tx.pure(artworkShardDisplayFields.keys),
-      tx.pure(artworkShardDisplayFields.values),
+      tx.pure(contractStockDisplayFields.keys),
+      tx.pure(contractStockDisplayFields.values),
     ],
-    typeArguments: [ARTWORK_SHARD_TYPE],
+    typeArguments: [CONTRACT_STOCK_TYPE],
   });
 
   tx.moveCall({
     target: "0x2::display::update_version",
-    arguments: [artworkShardDisplay],
-    typeArguments: [ARTWORK_SHARD_TYPE],
+    arguments: [contractStockDisplay],
+    typeArguments: [CONTRACT_STOCK_TYPE],
   });
 
-  tx.transferObjects([artworkShardDisplay], tx.pure(address));
+  tx.transferObjects([contractStockDisplay], tx.pure(address));
 
   await signer.signAndExecuteTransactionBlock({
     transactionBlock: tx,

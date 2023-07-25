@@ -1,32 +1,32 @@
 export type ContractMethod =
   | "vote"
-  | "merge_artwork_shards"
-  | "mint_artwork_shard"
-  | "split_artwork_shard"
-  | "safe_burn_artwork_shard";
+  | "merge_contract_stocks"
+  | "mint_contract_stock"
+  | "split_contract_stock"
+  | "safe_burn_contract_stock";
 
 export type Currency = "USD" | "EUR" | "GBP" | "NOK";
 
-// Common interface for packages and artwork shards
-export type BaseArtworkParams = {
+// Common interface for packages and contract stocks
+export type BaseContractParams = {
   packageId: string;
   network: string;
   signerPhrase: string;
 };
 
-// Common interface for artwork shard details
-export type ArtworkShardDetails = {
-  artworkShardId: string;
+// Common interface for contract stock details
+export type ContractStockDetails = {
+  contractStockId: string;
   owner: string;
 };
 
-// Common interface for minted artwork shard details
-export type MintArtworkShardResult = ArtworkShardDetails & {
+// Common interface for minted contract stock details
+export type MintContractStockResult = ContractStockDetails & {
   digest: string;
 };
 
-// Mint Artwork
-export type MintArtworkParams = BaseArtworkParams & {
+// Mint Contract
+export type MintContractParams = BaseContractParams & {
   adminCapId: string;
   totalSupply: number;
   sharePrice: number;
@@ -39,70 +39,70 @@ export type MintArtworkParams = BaseArtworkParams & {
   image: string;
 };
 
-// Merge Artwork Shard
-export type MergeArtworkShardParams = BaseArtworkParams & {
-  artworkShard1Id: string;
-  artworkShard2Id: string;
+// Merge Contract Stock
+export type MergeContractStockParams = BaseContractParams & {
+  contractStock1Id: string;
+  contractStock2Id: string;
 };
 
-// Transfer Artwork Shard
-export type TransferArtworkShardParams = BaseArtworkParams & {
-  artworkId: string;
-  artworkShardId: string;
+// Transfer Contract Stock
+export type TransferContractStockParams = BaseContractParams & {
+  contractId: string;
+  contractStockId: string;
   receiverAddress: string;
 };
 
-export type TransferArtworkShardResult = ArtworkShardDetails & {
+export type TransferContractStockResult = ContractStockDetails & {
   digest: string;
 };
 
-// Split Artwork Shard
-export type SplitArtworkShardParams = BaseArtworkParams & {
-  artworkShardId: string;
+// Split Contract Stock
+export type SplitContractStockParams = BaseContractParams & {
+  contractStockId: string;
   shares: number;
 };
 
 // End Vote Request
-export type EndVoteRequestParams = BaseArtworkParams & {
+export type EndVoteRequestParams = BaseContractParams & {
   adminCapId: string;
   voteRequest: string;
 };
 
-// Burn Artwork
-export type BurnArtworkParams = {
-  artworkId: string;
-  artworkShardId: string;
+// Burn Contract
+export type BurnContractParams = {
+  contractId: string;
+  contractStockId: string;
   packageId: string;
   signerPhrase: string;
   network: string;
 };
 
-export type BurnArtworkResult = ArtworkShardDetails & {
+export type BurnContractResult = ContractStockDetails & {
   success: boolean;
 };
 
-// Mint Artwork Shard
-export type MintArtworkShardParams = BaseArtworkParams & {
+// Mint Contract Stock
+export type MintContractStockParams = BaseContractParams & {
   adminCapId: string;
-  artworkId: string;
+  contractId: string;
   receiverAddress: string;
   shares: number;
 };
 
-export type UpdateOutgoingPriceParams = BaseArtworkParams & {
+export type UpdateOutgoingPriceParams = BaseContractParams & {
   adminCapId: string;
-  artworkId: string;
+  contractId: string;
   newOutgoingPrice: number;
 };
 
-export type VoteRequestParams = BaseArtworkParams & {
-  artworkId: string;
+export type VoteRequestParams = BaseContractParams & {
+  contractId: string;
   request: string;
   adminCapId: string;
 };
 
 export type VoteParams = {
-  artworkId: string;
+  contractId: string;
   packageId: string;
   voteRequest: string;
   voterAccount: string;
@@ -132,9 +132,9 @@ type BaseDisplayParams = {
   SUI_NETWORK: string;
 };
 
-export type CreateArtworkDisplayParams = BaseDisplayParams & {
-  ARTWORK_TYPE: string;
+export type CreateContractDisplayParams = BaseDisplayParams & {
+  CONTRACT_TYPE: string;
 };
-export type CreateArtworkShardDisplayParams = BaseDisplayParams & {
-  ARTWORK_SHARD_TYPE: string;
+export type CreateContractStockDisplayParams = BaseDisplayParams & {
+  CONTRACT_STOCK_TYPE: string;
 };

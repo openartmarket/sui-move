@@ -27,8 +27,8 @@ jobs:
     - run: npm ci
     - run: ./scripts/json-to-env.sh
     - run: direnv allow
-    - run: direnv exec . npm run create:ci-artwork-display
-    - run: direnv exec . npm run create:ci-artwork-shard-display
+    - run: direnv exec . npm run create:ci-contract-display
+    - run: direnv exec . npm run create:ci-contract-stock-display
     - run: direnv exec . npm test
     - run: npm run format
     - run: npm run lint

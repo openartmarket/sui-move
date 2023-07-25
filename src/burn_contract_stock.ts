@@ -1,18 +1,16 @@
 import { TransactionBlock } from "@mysten/sui.js";
 
 import { getSigner, handleTransactionResponse } from "./helpers";
-import { ArtworkShardDetails, MergeArtworkShardParams } from "./types";
+import { BurnContractParams, BurnContractResult } from "./types";
 
-export async function mergeArtworkShard(
-  params: MergeArtworkShardParams
-): Promise<ArtworkShardDetails> {
-  const { artworkShard1Id, artworkShard2Id, signerPhrase, packageId, network } = params;
+export async function burnContractStock(params: BurnContractParams): Promise<BurnContractResult> {
+  const { contractStockId, contractId, packageId, signerPhrase, network } = params;
   const { signer, address } = getSigner(signerPhrase, network);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::open_art_market::merge_artwork_shards`,
-    arguments: [tx.object(artworkShard1Id), tx.object(artworkShard2Id)],
+    target: `${packageId}::open_art_market::safe_burn_contract_stock`,
+    arguments: [tx.object(contractId), tx.object(contractStockId)],
   });
 
   const txRes = await signer.signAndExecuteTransactionBlock({
@@ -22,10 +20,10 @@ export async function mergeArtworkShard(
       showEffects: true,
     },
   });
-
   handleTransactionResponse(txRes);
   return {
-    artworkShardId: artworkShard1Id,
+    contractStockId,
+    success: true,
     owner: address,
   };
 }
