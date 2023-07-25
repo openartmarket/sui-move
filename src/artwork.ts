@@ -1,11 +1,13 @@
 import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
 
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID } from "./config";
 import { getSigner } from "./helpers";
 
 export type Currency = "USD" | "EUR" | "GBP" | "NOK" ;
 
 export type MintArtworkParams = {
+  signerPhrase: string;
+  packageId: string;
+  adminCapId: string;
   totalSupply: number;
   sharePrice: number;
   multiplier: number;
@@ -23,18 +25,18 @@ export type MintArtworkParams = {
  * @returns the artwork id
  */
 export async function mintArtwork(params: MintArtworkParams): Promise<string> {
-  const { totalSupply, sharePrice, multiplier, name, artist, creationDate, description, currency, image } =
+  const {adminCapId, packageId, signerPhrase, totalSupply, sharePrice, multiplier, name, artist, creationDate, description, currency, image } =
     params;
 
   // console.log("Mint artwork: %s", name + " by " + artist);
 
-  const { signer } = getSigner(ADMIN_PHRASE);
+  const { signer } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${PACKAGE_ID}::open_art_market::mint_artwork_and_share`,
+    target: `${packageId}::open_art_market::mint_artwork_and_share`,
     arguments: [
-      tx.object(ADMIN_CAP_ID),
+      tx.object(adminCapId),
       tx.pure(totalSupply),
       tx.pure(sharePrice),
       tx.pure(multiplier),
@@ -62,17 +64,3 @@ export async function mintArtwork(params: MintArtworkParams): Promise<string> {
   return artworkId;
 }
 
-if (process.argv.length === 3 && process.argv[2] === "atomic-run") {
-  mintArtwork({
-    totalSupply: 500,
-    sharePrice: 10,
-    multiplier: 2,
-    name: "Mona Lisa",
-    artist: "Leonardo da Vinci",
-    creationDate: "1685548680595",
-    description: "Choconta painting",
-    currency: "USD",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
-  });
-}

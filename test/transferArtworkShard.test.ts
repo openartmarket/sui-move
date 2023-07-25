@@ -2,48 +2,23 @@ import assert from "assert";
 
 import { mintArtwork } from "../src/artwork";
 import { mintArtworkShard } from "../src/artwork_shard";
-import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE } from "../src/config";
+import { ADMIN_CAP_ID, ADMIN_PHRASE, PACKAGE_ID, USER1_PHRASE, USER2_PHRASE } from "../src/config";
+import {
+  findObjectIdInOwnedObjectList,
+  OwnedObjectList,
+} from "../src/findObjectIdWithOwnerAddress";
 import { splitArtworkShard } from "../src/split_artwork_shard";
-import { getObject } from "./test-helpers";
+import { transferArtworkShard } from "../src/transfer_artwork_shard";
+import { getObject, getOwnedObjects } from "./test-helpers";
 import { mintArtworkOptions } from "./testdata";
 
-describe("splitArtworkShard", () => {
+describe("transferArtworkShard", () => {
   let artworkId: string;
   beforeEach(async () => {
     artworkId = await mintArtwork(mintArtworkOptions);
   });
 
-  it("should split an artwork shard", async () => {
-    const { artworkShardId } = await mintArtworkShard({
-      artworkId,
-      signerPhrase: ADMIN_PHRASE,
-      recieverPhrase: USER1_PHRASE,
-      shares: 10,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
-    });
-
-    const splitShardId = await splitArtworkShard({
-      artworkShardId,
-      signerPhrase: USER1_PHRASE,
-      shares: 2,
-      packageId: PACKAGE_ID,
-    });
-
-    // Get the shard and check that it has 2 shares
-    const splitShard = await getObject(splitShardId.artworkShardId);
-    const oldShard = await getObject(artworkShardId);
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(splitShard.data.content.fields.shares, "2");
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(oldShard.data.content.fields.shares, "8");
-  }).timeout(10_000);
-
-  it("should split a split shard", async () => {
+  it("should mint a shard and then transfer it", async () => {
     const { artworkShardId } = await mintArtworkShard({
       artworkId,
       signerPhrase: ADMIN_PHRASE,
@@ -53,33 +28,62 @@ describe("splitArtworkShard", () => {
       adminCapId: ADMIN_CAP_ID,
     });
 
-    const splitShardId = await splitArtworkShard({
+    await transferArtworkShard({
+      artworkId,
+      artworkShardId,
+      signerPhrase: USER1_PHRASE,
+      recieverPhrase: USER2_PHRASE,
+      packageId: PACKAGE_ID,
+    });
+
+    const transferredShard = await getObject(artworkShardId);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    assert.strictEqual(transferredShard.data.content.fields.shares, "12");
+  }).timeout(10_000);
+
+  it("should split a split shard and transfer it to new owner", async () => {
+    const { artworkShardId } = await mintArtworkShard({
+      artworkId,
+      signerPhrase: ADMIN_PHRASE,
+      recieverPhrase: USER1_PHRASE,
+      shares: 12,
+      packageId: PACKAGE_ID,
+      adminCapId: ADMIN_CAP_ID,
+    });
+
+    const splitShardId1 = await splitArtworkShard({
       artworkShardId,
       signerPhrase: USER1_PHRASE,
       shares: 5,
       packageId: PACKAGE_ID,
     });
-    const splitAgainShardId = await splitArtworkShard({
-      artworkShardId: splitShardId.artworkShardId,
-      signerPhrase: USER1_PHRASE,
-      shares: 3,
-      packageId: PACKAGE_ID,
-    });
 
     const oldShard = await getObject(artworkShardId);
-    const splitShard = await getObject(splitShardId.artworkShardId);
-    const splitAgainShard = await getObject(splitAgainShardId.artworkShardId);
-
+    const splitShard = await getObject(splitShardId1.artworkShardId);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(oldShard.data.content.fields.shares, "7");
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    assert.strictEqual(splitShard.data.content.fields.shares, "2");
+    assert.strictEqual(splitShard.data.content.fields.shares, "5");
 
+    const transferArtworkShardResponse = await transferArtworkShard({
+      artworkId,
+      artworkShardId: splitShardId1.artworkShardId,
+      signerPhrase: USER1_PHRASE,
+      recieverPhrase: USER2_PHRASE,
+      packageId: PACKAGE_ID,
+    });
+
+    const ownedObjects = await getOwnedObjects(transferArtworkShardResponse.address);
+    const transferredShard = findObjectIdInOwnedObjectList(
+      ownedObjects as OwnedObjectList,
+      splitShardId1.artworkShardId
+    );
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    assert.strictEqual(splitAgainShard.data.content.fields.shares, "3");
+    assert.strictEqual(transferredShard.data.objectId, splitShardId1.artworkShardId);
   }).timeout(10_000);
 });

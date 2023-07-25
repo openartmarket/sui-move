@@ -33,10 +33,10 @@ export USER3_ADDRESS=$(echo "$buyer3" | jq -r '.[0]')
 gas=$(sui client gas --json)
 gas_object=$(echo $gas | jq -r '.[0].id.id')
 
-sui client transfer-sui --amount 200000000000000 --to "$ADMIN_ADDRESS" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
-sui client transfer-sui --amount 200000000000000 --to "$USER1_ADDRESS" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
-sui client transfer-sui --amount 200000000000000 --to "$USER2_ADDRESS" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
-sui client transfer-sui --amount 200000000000000 --to "$USER3_ADDRESS" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
+sui client transfer-sui --amount 20000000000000 --to "$ADMIN_ADDRESS" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
+sui client transfer-sui --amount 20000000000000 --to "$USER1_ADDRESS" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
+sui client transfer-sui --amount 20000000000000 --to "$USER2_ADDRESS" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
+sui client transfer-sui --amount 20000000000000 --to "$USER3_ADDRESS" --gas-budget 200000000 --sui-coin-object-id "$gas_object"
 
 sui client switch --address $ADMIN_ADDRESS
 
@@ -74,16 +74,30 @@ jq -n --arg package_id "$PACKAGE_ID" \
       --arg user1_phrase "$USER1_PHRASE" \
       --arg user2_phrase "$USER2_PHRASE" \
       --arg user3_phrase "$USER3_PHRASE" \
+      --arg admin_address "$ADMIN_ADDRESS" \
       '{
         "PACKAGE_ID": $package_id, 
-        "ADMIN_CAP_ID": $admin_cap_id, 
         "PUBLISHER_ID": $publisher_id, 
         "SUI_NETWORK": $sui_network, 
+        "ADMIN_CAP_ID": $admin_cap_id, 
         "ADMIN_PHRASE": $admin_phrase, 
+        "ADMIN_ADDRESS": $admin_address, 
         "USER1_PHRASE": $user1_phrase,
         "USER2_PHRASE": $user2_phrase,
         "USER3_PHRASE": $user3_phrase
       }' > ./output/contract.json
 
 echo "Contract details are saved in output/contract.json"
+
+json=$(cat ./output/contract.json)
+rm -f .envrc
+# Iterate over the keys
+keys=$(echo "$json" | jq -r 'keys[]')
+for key in $keys; do
+  # Get the value for the current key
+  value=$(echo "$json" | jq -r ".$key")
+
+  # Export the environment variable
+  echo "export $key=\"$value\"" >> .envrc
+done
 # tail -f /dev/null

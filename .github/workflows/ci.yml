@@ -11,26 +11,37 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: oam-runners
     steps:
     - uses: actions/checkout@v3
     - uses: HatsuneMiku3939/direnv-action@v1
-    - run: docker compose up -d
-    - run: ./scripts/wait-for-file ./output/contract.json 300
+    - run: cat ./.tool-versions | cut -d' ' -f1 | xargs -n 1 asdf plugin add || echo "asdf plugins installed"
+    - run: asdf install
+    # - run: cargo install --locked --git https://github.com/MystenLabs/sui.git --tag testnet-v1.5.0 sui
+    # - run: cargo install --git https://github.com/move-language/move move-analyzer --branch sui-move --features "address32"
+    # - run: asdf reshim
+    - run: rm -rf ~/.sui
+    - run: sui start > sui.log 2>&1 &
+    - run: sleep 5
+    - run: ./scripts/setup-oam-on-local-node.sh
     - run: npm ci
     - run: ./scripts/json-to-env.sh
     - run: direnv allow
-    - run: direnv exec . npm run create:artwork-display
-    - run: direnv exec . npm run create:artwork-shard-display
+    - run: direnv exec . npm run create:ci-artwork-display
+    - run: direnv exec . npm run create:ci-artwork-shard-display
     - run: direnv exec . npm test
     - run: npm run format
     - run: npm run lint
     - run: npm run compile
     - run: ./scripts/fail-if-dirty
-    - name: Print docker logs
+    - name: Print sui log
       run: |
-        docker compose logs > docker.log
-        cat docker.log
+        cat sui.log
       if: ${{ always() }}
+    - name: Kill sui
+      run: |
+        sudo kill -9 $(ps aux | grep sui | grep -v grep | awk '{print $2}')
+      if: ${{ always() }}
+    
 
     
