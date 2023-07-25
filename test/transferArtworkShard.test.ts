@@ -47,7 +47,7 @@ describe("transferArtworkShard", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(transferredShard.data.content.fields.shares, "12");
-  }).timeout(10_000);
+  });
 
   it("should split a split shard and transfer it to new owner", async () => {
     const { artworkShardId } = await mintArtworkShard({
@@ -92,5 +92,5 @@ describe("transferArtworkShard", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(transferredShard.data.objectId, splitShardId1.artworkShardId);
-  }).timeout(10_000);
+  });
 });

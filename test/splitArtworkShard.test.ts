@@ -42,7 +42,7 @@ describe("splitArtworkShard", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(oldShard.data.content.fields.shares, "8");
-  }).timeout(10_000);
+  });
 
   it("should split a split shard", async () => {
     const { artworkShardId } = await mintArtworkShard({
@@ -82,5 +82,5 @@ describe("splitArtworkShard", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(splitAgainShard.data.content.fields.shares, "3");
-  }).timeout(10_000);
+  });
 });

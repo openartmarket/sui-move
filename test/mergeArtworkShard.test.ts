@@ -45,5 +45,5 @@ describe("mergeArtworkShard", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(burnedShard.error.code, "deleted");
-  }).timeout(10_000);
+  });
 });
