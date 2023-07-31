@@ -35,6 +35,8 @@
   "exclude": [
     "dist",
     "node_modules",
+    "scripts",
+    "src/*_display.ts",
     "test/*.ts",
     "test/test-helpers.ts",
     "test_scenarios"
