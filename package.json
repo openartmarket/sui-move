@@ -17,8 +17,8 @@
   "scripts": {
     "clean": "rm -rf ~/.sui",
     "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc --build tsconfig.cjs.json",
-    "build:esm": "tsc --build tsconfig.esm.json",
+    "build:cjs": "npx tsc --build tsconfig.cjs.json",
+    "build:esm": "npx tsc --build tsconfig.esm.json",
     "format": "prettier-eslint --write '{src,test}/**/*.{ts,d.ts}'",
     "lint": "eslint --ext ts --fix --max-warnings 0 '{src,test}/**/*.{ts,d.ts}'",
     "start": "npm run clean && npm run build && npm run start-node",
