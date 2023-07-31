@@ -9,9 +9,9 @@ export async function vote({
   voterAccount,
   choice,
   packageId,
-  network,
+  provider,
 }: VoteParams) {
-  const { signer } = getSigner(voterAccount, network);
+  const { signer } = getSigner(voterAccount, provider);
   const tx = new TransactionBlock();
 
   tx.moveCall({

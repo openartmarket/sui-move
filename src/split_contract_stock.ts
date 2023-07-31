@@ -7,8 +7,8 @@ import { ContractStockDetails, SplitContractStockParams } from "./types";
 export async function splitContractStock(
   params: SplitContractStockParams
 ): Promise<ContractStockDetails> {
-  const { contractStockId, signerPhrase, shares, packageId, network } = params;
-  const { signer, address } = getSigner(signerPhrase, network);
+  const { contractStockId, signerPhrase, shares, packageId, provider } = params;
+  const { signer, address } = getSigner(signerPhrase, provider);
   const tx = new TransactionBlock();
 
   tx.moveCall({

@@ -6,13 +6,13 @@ import { mintContractStock } from "../src/contract_stock";
 import { endRequestVoting } from "../src/end_request_voting";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
-import { mintContractOptions } from "./test-data";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
+  mintContractOptions,
   PACKAGE_ID,
-  SUI_NETWORK,
+  provider,
   USER1_ADDRESS,
   USER1_PHRASE,
   USER2_ADDRESS,
@@ -30,7 +30,7 @@ describe("DAO Voting structure", () => {
       shares: 151,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     await mintContractStock({
       contractId,
@@ -39,7 +39,7 @@ describe("DAO Voting structure", () => {
       shares: 249,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     await mintContractStock({
       contractId,
@@ -48,7 +48,7 @@ describe("DAO Voting structure", () => {
       shares: 100,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
   });
 
@@ -59,7 +59,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(voteRequest);
   });
@@ -71,7 +71,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
@@ -80,7 +80,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(userVote);
   });
@@ -92,7 +92,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
@@ -101,7 +101,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(userVote);
     await assert.rejects(
@@ -111,7 +111,7 @@ describe("DAO Voting structure", () => {
         packageId: PACKAGE_ID,
         voterAccount: USER1_PHRASE,
         choice: true,
-        network: SUI_NETWORK,
+        provider,
       })
     );
   });
@@ -123,7 +123,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(voteRequest);
     await assert.rejects(
@@ -133,7 +133,7 @@ describe("DAO Voting structure", () => {
         voterAccount: USER3_PHRASE,
         packageId: PACKAGE_ID,
         choice: true,
-        network: SUI_NETWORK,
+        provider,
       })
     );
   });
@@ -145,7 +145,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
@@ -154,7 +154,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(userVote);
     const endVoteRequest = await endRequestVoting({
@@ -162,7 +162,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       signerPhrase: ADMIN_PHRASE,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     assert.ok(endVoteRequest);
     await assert.rejects(
@@ -172,7 +172,7 @@ describe("DAO Voting structure", () => {
         packageId: PACKAGE_ID,
         voterAccount: USER1_PHRASE,
         choice: true,
-        network: SUI_NETWORK,
+        provider,
       })
     );
   });

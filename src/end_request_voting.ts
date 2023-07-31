@@ -8,9 +8,9 @@ export async function endRequestVoting({
   packageId,
   signerPhrase,
   adminCapId,
-  network,
+  provider,
 }: EndVoteRequestParams) {
-  const { signer } = getSigner(signerPhrase, network);
+  const { signer } = getSigner(signerPhrase, provider);
   const tx = new TransactionBlock();
 
   tx.moveCall({

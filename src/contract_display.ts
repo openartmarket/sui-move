@@ -1,5 +1,6 @@
 import { TransactionBlock } from "@mysten/sui.js";
 
+import { getProvider } from "../test/test-helpers";
 import { getSigner } from "./helpers";
 import { CreateContractDisplayParams } from "./types";
 
@@ -26,7 +27,7 @@ export async function createContractDisplay({
   const contractDisplayFields = getContractDisplayFields();
 
   const tx = new TransactionBlock();
-  const { signer, address } = getSigner(ADMIN_PHRASE, SUI_NETWORK);
+  const { signer, address } = getSigner(ADMIN_PHRASE, getProvider(SUI_NETWORK));
 
   const contractDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",

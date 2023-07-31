@@ -3,13 +3,13 @@ import assert from "assert";
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/contract_stock";
 import { mergeContractStock } from "../src/merge_contract_stock";
-import { mintContractOptions } from "./test-data";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getObject,
+  mintContractOptions,
   PACKAGE_ID,
-  SUI_NETWORK,
+  provider,
   USER1_ADDRESS,
   USER1_PHRASE,
 } from "./test-helpers";
@@ -28,7 +28,7 @@ describe("mergeContractStock", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     const { contractStockId: contractStock2Id } = await mintContractStock({
       contractId,
@@ -37,7 +37,7 @@ describe("mergeContractStock", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     const mergeContractStocks = await mergeContractStock({
@@ -45,7 +45,7 @@ describe("mergeContractStock", () => {
       contractStock2Id,
       signerPhrase: USER1_PHRASE,
       packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     const burnedStock = await getObject(contractStock2Id);
     const newStock = await getObject(mergeContractStocks.contractStockId);

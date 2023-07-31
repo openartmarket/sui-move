@@ -4,8 +4,8 @@ import { getSigner, handleTransactionResponse } from "./helpers";
 import { BurnContractParams, BurnContractResult } from "./types";
 
 export async function burnContractStock(params: BurnContractParams): Promise<BurnContractResult> {
-  const { contractStockId, contractId, packageId, signerPhrase, network } = params;
-  const { signer, address } = getSigner(signerPhrase, network);
+  const { contractStockId, contractId, packageId, signerPhrase, provider } = params;
+  const { signer, address } = getSigner(signerPhrase, provider);
   const tx = new TransactionBlock();
 
   tx.moveCall({

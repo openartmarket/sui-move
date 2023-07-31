@@ -3,13 +3,13 @@ import { beforeEach, describe, it } from "mocha";
 
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/contract_stock";
-import { mintContractOptions } from "./test-data";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
+  mintContractOptions,
   PACKAGE_ID,
-  SUI_NETWORK,
+  provider,
   USER1_ADDRESS,
   USER2_ADDRESS,
 } from "./test-helpers";
@@ -28,7 +28,7 @@ describe("mintContractStock", () => {
       shares: 2,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
   });
 
@@ -41,7 +41,7 @@ describe("mintContractStock", () => {
         shares: 501,
         packageId: PACKAGE_ID,
         adminCapId: ADMIN_CAP_ID,
-        network: SUI_NETWORK,
+        provider,
       })
     );
   });
@@ -54,7 +54,7 @@ describe("mintContractStock", () => {
       shares: 150,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     await mintContractStock({
       contractId,
@@ -63,7 +63,7 @@ describe("mintContractStock", () => {
       shares: 250,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     await mintContractStock({
       contractId,
@@ -72,7 +72,7 @@ describe("mintContractStock", () => {
       shares: 98,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     await assert.rejects(
       mintContractStock({
@@ -82,7 +82,7 @@ describe("mintContractStock", () => {
         shares: 3,
         packageId: PACKAGE_ID,
         adminCapId: ADMIN_CAP_ID,
-        network: SUI_NETWORK,
+        provider,
       })
     );
   });
@@ -95,7 +95,7 @@ describe("mintContractStock", () => {
       shares: 150,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     await mintContractStock({
       contractId,
@@ -104,7 +104,7 @@ describe("mintContractStock", () => {
       shares: 50,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     await mintContractStock({
       contractId,
@@ -113,7 +113,7 @@ describe("mintContractStock", () => {
       shares: 1,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
   });
 

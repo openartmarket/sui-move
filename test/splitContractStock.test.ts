@@ -4,12 +4,12 @@ import { beforeEach, describe, it } from "mocha";
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/contract_stock";
 import { splitContractStock } from "../src/split_contract_stock";
-import { mintContractOptions } from "./test-data";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
+  mintContractOptions,
   PACKAGE_ID,
-  SUI_NETWORK,
+  provider,
   USER1_ADDRESS,
   USER1_PHRASE,
 } from "./test-helpers";
@@ -29,7 +29,7 @@ describe("splitContractStock", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     const splitStockId = await splitContractStock({
@@ -37,7 +37,7 @@ describe("splitContractStock", () => {
       signerPhrase: USER1_PHRASE,
       shares: 2,
       packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     // Get the stock and check that it has 2 shares
@@ -61,7 +61,7 @@ describe("splitContractStock", () => {
       shares: 12,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     const splitStockId = await splitContractStock({
@@ -69,14 +69,14 @@ describe("splitContractStock", () => {
       signerPhrase: USER1_PHRASE,
       shares: 5,
       packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
+      provider,
     });
     const splitAgainStockId = await splitContractStock({
       contractStockId: splitStockId.contractStockId,
       signerPhrase: USER1_PHRASE,
       shares: 3,
       packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     const oldStock = await getObject(contractStockId);

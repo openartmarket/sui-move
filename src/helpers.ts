@@ -1,5 +1,4 @@
 import {
-  Connection,
   Ed25519Keypair,
   getExecutionStatus,
   JsonRpcProvider,
@@ -7,22 +6,14 @@ import {
   SuiTransactionBlockResponse,
 } from "@mysten/sui.js";
 
-export function getProvider(SUI_NETWORK: string) {
-  const connOptions = new Connection({
-    fullnode: SUI_NETWORK,
-  });
-  return new JsonRpcProvider(connOptions);
-}
-
 export function getSigner(
   phrase: string,
-  network: string
+  provider: JsonRpcProvider
 ): {
   signer: RawSigner;
   address: string;
 } {
   if (!phrase) throw new Error("No phrase provided");
-  const provider = getProvider(network);
 
   const keypair = Ed25519Keypair.deriveKeypair(phrase);
   const signer = new RawSigner(keypair, provider);

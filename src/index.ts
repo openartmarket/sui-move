@@ -1,6 +1,6 @@
+export * from "./burn_contract_stock";
 export * from "./contract";
 export * from "./contract_stock";
-export * from "./burn_contract_stock";
 export * from "./end_request_voting";
 export * from "./findObjectIdWithOwnerAddress";
 export * from "./helpers";

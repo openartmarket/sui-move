@@ -9,9 +9,9 @@ export async function updateOutgoingPrice({
   packageId,
   adminCapId,
   signerPhrase,
-  network,
+  provider,
 }: UpdateOutgoingPriceParams) {
-  const { signer } = getSigner(signerPhrase, network);
+  const { signer } = getSigner(signerPhrase, provider);
   const tx = new TransactionBlock();
 
   tx.moveCall({

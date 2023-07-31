@@ -1,3 +1,5 @@
+import { JsonRpcProvider } from "@mysten/sui.js";
+
 export type ContractMethod =
   | "vote"
   | "merge_contract_stocks"
@@ -10,7 +12,7 @@ export type Currency = "USD" | "EUR" | "GBP" | "NOK";
 // Common interface for packages and contract stocks
 export type BaseContractParams = {
   packageId: string;
-  network: string;
+  provider: JsonRpcProvider;
   signerPhrase: string;
 };
 
@@ -74,7 +76,7 @@ export type BurnContractParams = {
   contractStockId: string;
   packageId: string;
   signerPhrase: string;
-  network: string;
+  provider: JsonRpcProvider;
 };
 
 export type BurnContractResult = ContractStockDetails & {
@@ -107,7 +109,7 @@ export type VoteParams = {
   voteRequest: string;
   voterAccount: string;
   choice: boolean;
-  network: string;
+  provider: JsonRpcProvider;
 };
 
 export type OwnedObjectList = {

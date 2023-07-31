@@ -7,14 +7,14 @@ import { mintContractStock } from "../src/contract_stock";
 import { findObjectIdInOwnedObjectList } from "../src/findObjectIdWithOwnerAddress";
 import { splitContractStock } from "../src/split_contract_stock";
 import { transferContractStock } from "../src/transfer_contract_stock";
-import { mintContractOptions } from "./test-data";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getObject,
   getOwnedObjects,
+  mintContractOptions,
   PACKAGE_ID,
-  SUI_NETWORK,
+  provider,
   USER1_ADDRESS,
   USER1_PHRASE,
   USER2_ADDRESS,
@@ -35,7 +35,7 @@ describe("transferContractStock", () => {
       shares: 12,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     await transferContractStock({
@@ -44,7 +44,7 @@ describe("transferContractStock", () => {
       signerPhrase: USER1_PHRASE,
       receiverAddress: USER2_ADDRESS,
       packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     const transferredStock = await getObject(contractStockId);
@@ -61,7 +61,7 @@ describe("transferContractStock", () => {
       shares: 12,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     const splitStockId1 = await splitContractStock({
@@ -69,7 +69,7 @@ describe("transferContractStock", () => {
       signerPhrase: USER2_PHRASE,
       shares: 5,
       packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     const oldStock = await getObject(contractStockId);
@@ -88,7 +88,7 @@ describe("transferContractStock", () => {
       signerPhrase: USER2_PHRASE,
       receiverAddress: USER1_ADDRESS,
       packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
+      provider,
     });
 
     const ownedObjects = await getOwnedObjects(transferContractStockResponse.owner);
