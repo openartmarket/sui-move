@@ -1,8 +1,8 @@
 {
-    "compilerOptions": {
+  "compilerOptions": {
     "rootDirs": [
-			".",
-		],
+      ".",
+    ],
     "outDir": "dist",
     "target": "ESNext",
     "module": "commonjs",
@@ -31,16 +31,18 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true
-    },
-    "exclude": [
-        "dist",
-        "node_modules",
-        "test",
-        "test_scenarios"
-    ],
-    "ts-node": {
-        "transpileOnly": true,
-        "files": true,
-        "esm": true
-    }
+  },
+  "exclude": [
+    "dist",
+    "node_modules",
+    "test",
+    "test_scenarios"
+  ],
+  "include": ["src/**/*"],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "esm": true,
+    
+  }
 }
