@@ -23,7 +23,7 @@ jobs:
     - run: rm -rf ~/.sui
     - run: sui start > sui.log 2>&1 &
     - run: sleep 5
-    - run: ./scripts/setup-oam-on-local-node.sh
+    - run: ./scripts/setup-local-node.sh
     - run: npm ci
     - run: ./scripts/json-to-env.sh
     - run: direnv allow
