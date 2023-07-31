@@ -10,8 +10,8 @@
   
   "exports": {
     ".": {
-      "import": "./dist/esm/src/index.js",
-      "require": "./dist/cjs/src/index.js"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     }
   },
   "scripts": {
@@ -24,8 +24,8 @@
     "start": "npm run clean && npm run build && npm run start-node",
     "start-node": "sui start",
     "test": "mocha test",
-    "create:contract-display": "tsc && node dist/cjs/src/contract_display",
-    "create:contract-stock-display": "tsc && node dist/cjs/src/contract_stock_display",
+    "create:contract-display": "tsc && node dist/cjs/contract_display",
+    "create:contract-stock-display": "tsc && node dist/cjs/contract_stock_display",
     "create:ci-contract-display": "tsc && node dist/contract_display",
     "create:ci-contract-stock-display": "tsc && node dist/contract_stock_display",
     "postinstall": "npm run build",
