@@ -25,6 +25,7 @@ export type ContractStockDetails = {
 // Common interface for minted contract stock details
 export type MintContractStockResult = ContractStockDetails & {
   digest: string;
+  filledQuantity: number;
 };
 
 // Mint Contract

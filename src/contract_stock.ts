@@ -38,5 +38,5 @@ export async function mintContractStock(
   handleTransactionResponse(txRes);
   const contractStockId = findObjectIdWithOwnerAddress(txRes, receiverAddress);
   const { digest } = txRes;
-  return { contractStockId, digest, owner: receiverAddress };
+  return { contractStockId, digest, owner: receiverAddress, filledQuantity: shares };
 }
