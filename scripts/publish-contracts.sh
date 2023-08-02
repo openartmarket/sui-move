@@ -2,18 +2,12 @@
 set -e
 
 # This script publishes the contracts
-# Requires environment variables ADMIN_PHRASE and ADMIN_ADDRESS to be set
-
-# Add a wallet to the system, so that we can publish the contracts
-# This wallet needs to have SUI coins on it to pay for gas
-sui keytool import "$ADMIN_PHRASE" ed25519
-sui client switch --address "$ADMIN_ADDRESS"
 
 network=${SUI_NETWORK_NAME:-localnet}
 
 SUI_URL="https://fullnode.$network.sui.io:443"
 
-# Add the devnet environment if it doesn't exist
+# Add the environment if it doesn't exist
 list=$(sui client envs)
 if echo "$list" | grep -qz "$network"; then
   echo "$network already present"
@@ -21,7 +15,7 @@ else
   sui client new-env --alias "$network" --rpc "$SUI_URL"
 fi
 
-# Switch to devnet if not active
+# Switch to enviroment if not active
 envs=$(sui client active-env)
 if [[ $envs != *"$network"* ]]; then
   sui client switch --env "$network"
