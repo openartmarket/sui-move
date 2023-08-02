@@ -2,6 +2,9 @@
 set -e
 
 # This script publishes the contracts
+# Requires environment variables ADMIN_PHRASE and ADMIN_ADDRESS to be set
+
+sui client switch --address "$ADMIN_ADDRESS"
 
 network=${SUI_NETWORK_NAME:-localnet}
 
