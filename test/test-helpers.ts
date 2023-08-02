@@ -6,7 +6,7 @@ import {
 } from "@mysten/sui.js";
 
 import { getClient } from "../src/helpers";
-import { MintContractParams } from "../src/types";
+import { MintContractParams, NetworkName } from "../src/types";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
@@ -24,8 +24,10 @@ export const PACKAGE_ID = getEnv("PACKAGE_ID");
 export const CONTRACT_TYPE = `${PACKAGE_ID}::open_art_market::Contract`;
 export const CONTRACT_STOCK_TYPE = `${PACKAGE_ID}::open_art_market::ContractStock`;
 
+const network = SUI_NETWORK as NetworkName;
+
 export async function getObject(objectId: string): Promise<SuiObjectResponse> {
-  return await provider.getObject({
+  return await getClient(network).getObject({
     id: objectId,
     options: { showContent: true },
   });

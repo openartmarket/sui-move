@@ -86,12 +86,11 @@ describe("transferContractStock", () => {
     });
 
     const ownedObjects = await getOwnedObjects(transferContractStockResponse.owner);
-    console.log({ ownedObjects });
+
     const transferredStock = findObjectIdInOwnedObjectList(
       ownedObjects as OwnedObjectList,
       splitStockId1.contractStockId
     );
-    console.log({ transferredStock });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(transferredStock.data.objectId, splitStockId1.contractStockId);
