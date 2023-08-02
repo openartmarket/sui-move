@@ -9,7 +9,6 @@ import {
   ADMIN_PHRASE,
   mintContractOptions,
   PACKAGE_ID,
-  provider,
   USER1_ADDRESS,
   USER1_PHRASE,
 } from "./test-helpers";
@@ -29,7 +28,6 @@ describe("splitContractStock", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
 
     const splitStockId = await splitContractStock({
@@ -37,7 +35,6 @@ describe("splitContractStock", () => {
       signerPhrase: USER1_PHRASE,
       shares: 2,
       packageId: PACKAGE_ID,
-      provider,
     });
 
     // Get the stock and check that it has 2 shares
@@ -61,7 +58,6 @@ describe("splitContractStock", () => {
       shares: 12,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
 
     const splitStockId = await splitContractStock({
@@ -69,14 +65,12 @@ describe("splitContractStock", () => {
       signerPhrase: USER1_PHRASE,
       shares: 5,
       packageId: PACKAGE_ID,
-      provider,
     });
     const splitAgainStockId = await splitContractStock({
       contractStockId: splitStockId.contractStockId,
       signerPhrase: USER1_PHRASE,
       shares: 3,
       packageId: PACKAGE_ID,
-      provider,
     });
 
     const oldStock = await getObject(contractStockId);

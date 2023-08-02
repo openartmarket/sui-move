@@ -6,9 +6,9 @@ import { ContractStockDetails, MergeContractStockParams } from "./types";
 export async function mergeContractStock(
   params: MergeContractStockParams
 ): Promise<ContractStockDetails> {
-  const { contractStock1Id, contractStock2Id, signerPhrase, packageId } = params;
+  const { contractStock1Id, contractStock2Id, signerPhrase, packageId, network } = params;
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient();
+  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

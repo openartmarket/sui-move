@@ -7,10 +7,10 @@ import { ContractStockDetails, SplitContractStockParams } from "./types";
 export async function splitContractStock(
   params: SplitContractStockParams
 ): Promise<ContractStockDetails> {
-  const { contractStockId, signerPhrase, shares, packageId } = params;
+  const { contractStockId, signerPhrase, shares, packageId, network } = params;
   const { keypair } = getSigner(signerPhrase);
   const address = keypair.getPublicKey().toSuiAddress();
-  const client = getClient();
+  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

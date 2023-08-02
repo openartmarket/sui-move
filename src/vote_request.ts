@@ -9,9 +9,10 @@ export async function createVoteRequest({
   adminCapId,
   packageId,
   signerPhrase,
+  network,
 }: VoteRequestParams): Promise<string> {
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient();
+  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

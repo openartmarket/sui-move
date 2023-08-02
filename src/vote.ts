@@ -9,9 +9,10 @@ export async function vote({
   voterAccount,
   choice,
   packageId,
+  network,
 }: VoteParams) {
   const { keypair } = getSigner(voterAccount);
-  const client = getClient();
+  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

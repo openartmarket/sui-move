@@ -11,9 +11,10 @@ import { MintContractStockParams, MintContractStockResult } from "./types";
 export async function mintContractStock(
   params: MintContractStockParams
 ): Promise<MintContractStockResult> {
-  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, shares } = params;
+  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, shares, network } =
+    params;
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient();
+  const client = getClient(network);
 
   const tx = new TransactionBlock();
 

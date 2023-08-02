@@ -21,12 +21,13 @@ export async function mintContract(params: MintContractParams): Promise<string> 
     description,
     currency,
     image,
+    network,
   } = params;
 
   // console.log("Mint contract: %s", name + " by " + artist);
 
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient();
+  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

@@ -21,12 +21,13 @@ export async function createContractDisplay({
   CONTRACT_TYPE,
   PUBLISHER_ID,
   ADMIN_PHRASE,
+  SUI_NETWORK,
 }: CreateContractDisplayParams) {
   const contractDisplayFields = getContractDisplayFields();
 
   const { keypair } = getSigner(ADMIN_PHRASE);
   const address = keypair.getPublicKey().toSuiAddress();
-  const client = getClient();
+  const client = getClient(SUI_NETWORK);
   const tx = new TransactionBlock();
 
   const contractDisplay = tx.moveCall({

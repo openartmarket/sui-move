@@ -6,6 +6,8 @@ import {
 } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 
+import { NetworkName } from "./types";
+
 export function getSigner(phrase: string): {
   keypair: Ed25519Keypair;
   address: string;
@@ -42,8 +44,8 @@ export function getCreatedObjects(
   ) as SuiObjectChangeCreated[];
 }
 
-export function getClient() {
+export function getClient(network: NetworkName = "localnet") {
   return new SuiClient({
-    url: getFullnodeUrl("localnet"),
+    url: getFullnodeUrl(network),
   });
 }

@@ -1,3 +1,5 @@
+export type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
+
 export type ContractMethod =
   | "vote"
   | "merge_contract_stocks"
@@ -11,6 +13,7 @@ export type Currency = "USD" | "EUR" | "GBP" | "NOK";
 export type BaseContractParams = {
   packageId: string;
   signerPhrase: string;
+  network?: NetworkName;
 };
 
 // Common interface for contract stock details
@@ -27,6 +30,7 @@ export type MintContractStockResult = ContractStockDetails & {
 
 export type AvailableStockParams = {
   contractId: string;
+  network?: NetworkName;
 };
 
 // Mint Contract
@@ -78,6 +82,7 @@ export type BurnContractParams = {
   contractStockId: string;
   packageId: string;
   signerPhrase: string;
+  network?: NetworkName;
 };
 
 export type BurnContractResult = ContractStockDetails & {
@@ -110,6 +115,7 @@ export type VoteParams = {
   voteRequest: string;
   voterAccount: string;
   choice: boolean;
+  network?: NetworkName;
 };
 
 export type OwnedObjectList = {
@@ -131,7 +137,7 @@ export type Data = {
 type BaseDisplayParams = {
   PUBLISHER_ID: string;
   ADMIN_PHRASE: string;
-  SUI_NETWORK: string;
+  SUI_NETWORK: NetworkName;
 };
 
 export type CreateContractDisplayParams = BaseDisplayParams & {

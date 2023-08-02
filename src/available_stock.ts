@@ -1,15 +1,16 @@
-import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
-
-const client = new SuiClient({
-  url: getFullnodeUrl("localnet"),
-});
+import { getClient } from "./helpers";
 import { AvailableStockParams } from "./types";
 /**
  * Mints a new contract
  * @param params
  * @returns the contract id
  */
-export async function availableStock({ contractId }: AvailableStockParams): Promise<number> {
+export async function availableStock({
+  contractId,
+  network,
+}: AvailableStockParams): Promise<number> {
+  const client = getClient(network);
+
   const txn = await client.getObject({
     id: contractId,
     options: { showContent: true },

@@ -10,9 +10,9 @@ import { TransferContractStockParams, TransferContractStockResult } from "./type
 export async function transferContractStock(
   params: TransferContractStockParams
 ): Promise<TransferContractStockResult> {
-  const { contractId, signerPhrase, receiverAddress, contractStockId, packageId } = params;
+  const { contractId, signerPhrase, receiverAddress, contractStockId, packageId, network } = params;
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient();
+  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

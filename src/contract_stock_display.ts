@@ -21,13 +21,14 @@ export async function createContractStockDisplay({
   ADMIN_PHRASE,
   CONTRACT_STOCK_TYPE,
   PUBLISHER_ID,
+  SUI_NETWORK,
 }: CreateContractStockDisplayParams) {
   const contractStockDisplayFields = getContractStockDisplayFields();
 
   const tx = new TransactionBlock();
   const { keypair } = getSigner(ADMIN_PHRASE);
   const address = keypair.getPublicKey().toSuiAddress();
-  const client = getClient();
+  const client = getClient(SUI_NETWORK);
 
   const contractStockDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",

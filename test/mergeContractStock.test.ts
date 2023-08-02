@@ -9,7 +9,6 @@ import {
   getObject,
   mintContractOptions,
   PACKAGE_ID,
-  provider,
   USER1_ADDRESS,
   USER1_PHRASE,
 } from "./test-helpers";
@@ -28,7 +27,6 @@ describe("mergeContractStock", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
     const { contractStockId: contractStock2Id } = await mintContractStock({
       contractId,
@@ -37,7 +35,6 @@ describe("mergeContractStock", () => {
       shares: 10,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
 
     const mergeContractStocks = await mergeContractStock({
@@ -45,7 +42,6 @@ describe("mergeContractStock", () => {
       contractStock2Id,
       signerPhrase: USER1_PHRASE,
       packageId: PACKAGE_ID,
-      provider,
     });
     const burnedStock = await getObject(contractStock2Id);
     const newStock = await getObject(mergeContractStocks.contractStockId);

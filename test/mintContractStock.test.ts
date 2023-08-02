@@ -10,7 +10,6 @@ import {
   ADMIN_PHRASE,
   mintContractOptions,
   PACKAGE_ID,
-  provider,
   USER1_ADDRESS,
   USER2_ADDRESS,
 } from "./test-helpers";
@@ -29,7 +28,6 @@ describe("mintContractStock", () => {
       signerPhrase: ADMIN_PHRASE,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
     const sharesLeft = await availableStock({
       contractId,
@@ -46,7 +44,6 @@ describe("mintContractStock", () => {
         shares: 501,
         packageId: PACKAGE_ID,
         adminCapId: ADMIN_CAP_ID,
-        provider,
       })
     );
   });
@@ -59,7 +56,6 @@ describe("mintContractStock", () => {
       shares: 150,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
     await mintContractStock({
       contractId,
@@ -68,7 +64,6 @@ describe("mintContractStock", () => {
       shares: 250,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
     await mintContractStock({
       contractId,
@@ -77,7 +72,6 @@ describe("mintContractStock", () => {
       shares: 98,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
     const sharesLeft = await availableStock({
       contractId,
@@ -92,7 +86,6 @@ describe("mintContractStock", () => {
         shares: 3,
         packageId: PACKAGE_ID,
         adminCapId: ADMIN_CAP_ID,
-        provider,
       })
     );
   });
@@ -105,7 +98,6 @@ describe("mintContractStock", () => {
       shares: 150,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
     await mintContractStock({
       contractId,
@@ -114,7 +106,6 @@ describe("mintContractStock", () => {
       shares: 50,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
     await mintContractStock({
       contractId,
@@ -123,7 +114,6 @@ describe("mintContractStock", () => {
       shares: 1,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
-      provider,
     });
   });
 
