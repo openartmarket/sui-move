@@ -8,7 +8,6 @@ original_address=$(sui client active-address)
 envs=$(sui client active-env)
 
 if [[ $envs != *"localnet"* ]]; then
-  
   sui client switch --env localnet
 fi
 
@@ -43,31 +42,10 @@ sui client active-env
 
 mkdir -p output
 
-# This is the publish command
-publish_res=$(sui client publish --gas-budget 200000000 --json ./move/open_art_market)
-echo ${publish_res} >./output/publish.res.json
-
-if [[ "$publish_res" =~ "error" ]]; then
-  # If yes, print the error message and exit the script
-  echo "Error during move contract publishing.  Details : $publish_res"
-  exit 1
-fi
-echo "Contract published successfully"
-# switch back to original address
 sui client switch --address $original_address
 
-
-PACKAGE_ID=$(echo "${publish_res}" | jq -r '.effects.created[] | select(.owner == "Immutable").reference.objectId')
-newObjs=$(echo "$publish_res" | jq -r '.objectChanges[] | select(.type == "created")')
-ADMIN_CAP_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::open_art_market::AdminCap")).objectId')
-PUBLISHER_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::Publisher")).objectId')
-UPGRADE_CAP_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::package::UpgradeCap")).objectId')
-
 # TODO: Write an .envrc file instead
-jq -n --arg package_id "$PACKAGE_ID" \
-      --arg admin_cap_id "$ADMIN_CAP_ID" \
-      --arg publisher_id "$PUBLISHER_ID" \
-      --arg sui_network "localnet" \
+jq -n --arg sui_network "$SUI_NETWORK" \
       --arg admin_phrase "$ADMIN_PHRASE" \
       --arg user1_phrase "$USER1_PHRASE" \
       --arg user2_phrase "$USER2_PHRASE" \
@@ -77,10 +55,7 @@ jq -n --arg package_id "$PACKAGE_ID" \
       --arg user2_address "$USER2_ADDRESS" \
       --arg user3_address "$USER3_ADDRESS" \
       '{
-        "PACKAGE_ID": $package_id, 
-        "PUBLISHER_ID": $publisher_id, 
         "SUI_NETWORK": $sui_network, 
-        "ADMIN_CAP_ID": $admin_cap_id, 
         "ADMIN_PHRASE": $admin_phrase, 
         "ADMIN_ADDRESS": $admin_address, 
         "USER1_PHRASE": $user1_phrase,
@@ -107,6 +82,3 @@ done
 
 echo "Environment variables are exported to .envrc file"
 direnv allow
-
-npx ts-node scripts/publish-displays.ts
-echo "Displays are published successfully"

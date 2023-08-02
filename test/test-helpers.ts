@@ -34,7 +34,7 @@ export async function getObject(objectId: string): Promise<SuiObjectResponse> {
 }
 
 export async function getOwnedObjects(address: string): Promise<PaginatedObjectsResponse> {
-  return await getClient().getOwnedObjects({
+  return await getClient(network).getOwnedObjects({
     owner: address,
   });
 }
@@ -57,7 +57,6 @@ export const mintContractOptions: MintContractParams = {
   signerPhrase: ADMIN_PHRASE,
   packageId: PACKAGE_ID,
   adminCapId: ADMIN_CAP_ID,
-  provider,
   totalSupply: 500,
   sharePrice: 10,
   multiplier: 100,

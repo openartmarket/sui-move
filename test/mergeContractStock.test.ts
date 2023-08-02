@@ -9,6 +9,7 @@ import {
   getObject,
   mintContractOptions,
   PACKAGE_ID,
+  SUI_NETWORK,
   USER1_ADDRESS,
   USER1_PHRASE,
 } from "./test-helpers";
@@ -16,6 +17,7 @@ import {
 describe("mergeContractStock", () => {
   let contractId: string;
   beforeEach(async () => {
+    console.log(SUI_NETWORK, PACKAGE_ID);
     contractId = await mintContract(mintContractOptions);
   });
 

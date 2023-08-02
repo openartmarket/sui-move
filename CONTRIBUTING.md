@@ -22,34 +22,15 @@ Run the test suite, two shells are required:
 
 `shell 1` - run the SUI node
 ```sh
-rm -rf ~/.sui
+npm run clean
 sui start
 ```
 
 `shell 2` - deploy the contracts, and write environment variables for tests
 ```sh
-./scripts/setup-oam-on-local-node.sh
-./scripts/json-to-env.sh
-direnv allow
-npm run create:contract-display
-npm run create:contract-stock-display
+./scripts/setup-local-node.sh
+./scripts/publish-contracts.sh
 
-```
-
-### Option 2: Run tests against a docker container
-Run it as we do in CI, in a Docker container, two shells are required:
-
-`shell 1` - run the SUI node
-```sh
-docker compose up
-```
-`shell 2` - deploy the contracts, and write environment variables for tests
-```sh
-./scripts/json-to-env.sh
-direnv allow
-cd setup
-npm run create:contract-display
-npm run create:contract-stock-display
 ```
 
 ## Testing the contracts
