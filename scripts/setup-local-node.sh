@@ -7,8 +7,6 @@ set -e
 original_address=$(sui client active-address)
 envs=$(sui client active-env)
 
-SUI_NETWORK="http://127.0.0.1:9000"
-
 if [[ $envs != *"localnet"* ]]; then
   
   sui client switch --env localnet
@@ -69,7 +67,7 @@ UPGRADE_CAP_ID=$(echo "$newObjs" | jq -r 'select (.objectType | contains("::pack
 jq -n --arg package_id "$PACKAGE_ID" \
       --arg admin_cap_id "$ADMIN_CAP_ID" \
       --arg publisher_id "$PUBLISHER_ID" \
-      --arg sui_network "$SUI_NETWORK" \
+      --arg sui_network "localnet" \
       --arg admin_phrase "$ADMIN_PHRASE" \
       --arg user1_phrase "$USER1_PHRASE" \
       --arg user2_phrase "$USER2_PHRASE" \

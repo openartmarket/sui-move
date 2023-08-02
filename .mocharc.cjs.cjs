@@ -1,4 +1,4 @@
-process.env.SUI_NETWORK = 'http://127.0.0.1:9000'
+process.env.SUI_NETWORK = 'localnet'
 
 module.exports = {
   "recursive": true,
