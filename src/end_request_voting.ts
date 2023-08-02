@@ -1,6 +1,6 @@
-import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getExecutionStatus, getSigner, handleTransactionResponse } from "./helpers";
 import { EndVoteRequestParams } from "./types";
 
 export async function endRequestVoting({
@@ -8,9 +8,9 @@ export async function endRequestVoting({
   packageId,
   signerPhrase,
   adminCapId,
-  provider,
 }: EndVoteRequestParams) {
-  const { signer } = getSigner(signerPhrase, provider);
+  const { keypair } = getSigner(signerPhrase);
+  const client = getClient();
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -18,7 +18,8 @@ export async function endRequestVoting({
     arguments: [tx.object(adminCapId), tx.object(voteRequest)],
   });
 
-  const txRes = await signer.signAndExecuteTransactionBlock({
+  const txRes = await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {

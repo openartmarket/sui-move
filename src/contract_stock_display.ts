@@ -1,7 +1,6 @@
-import { TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getProvider } from "../test/test-helpers";
-import { getSigner } from "./helpers";
+import { getClient, getSigner } from "./helpers";
 import { CreateContractStockDisplayParams } from "./types";
 
 // This is the function you can update to change the display fields
@@ -22,12 +21,14 @@ export async function createContractStockDisplay({
   ADMIN_PHRASE,
   CONTRACT_STOCK_TYPE,
   PUBLISHER_ID,
-  SUI_NETWORK,
 }: CreateContractStockDisplayParams) {
   const contractStockDisplayFields = getContractStockDisplayFields();
 
   const tx = new TransactionBlock();
-  const { signer, address } = getSigner(ADMIN_PHRASE, getProvider(SUI_NETWORK));
+  const { keypair } = getSigner(ADMIN_PHRASE);
+  const address = keypair.getPublicKey().toSuiAddress();
+  const client = getClient();
+
   const contractStockDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
     arguments: [
@@ -46,7 +47,8 @@ export async function createContractStockDisplay({
 
   tx.transferObjects([contractStockDisplay], tx.pure(address));
 
-  await signer.signAndExecuteTransactionBlock({
+  await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {

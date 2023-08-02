@@ -1,5 +1,6 @@
-import { getCreatedObjects, SuiTransactionBlockResponse } from "@mysten/sui.js";
+import { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 
+import { getCreatedObjects } from "./helpers";
 import { Daum, OwnedObjectList } from "./types";
 
 export function findObjectIdWithOwnerAddress(txRes: SuiTransactionBlockResponse, address: string) {
@@ -21,7 +22,7 @@ export function findObjectIdWithOwnerAddress(txRes: SuiTransactionBlockResponse,
         2
       )}`
     );
-  const objectId = objectWithOwnerAddress.reference.objectId;
+  const objectId = objectWithOwnerAddress.objectId;
   return objectId;
 }
 

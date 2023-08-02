@@ -5,6 +5,7 @@ import {
   SuiObjectResponse,
 } from "@mysten/sui.js";
 
+import { getClient } from "../src/helpers";
 import { MintContractParams } from "../src/types";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
@@ -31,7 +32,7 @@ export async function getObject(objectId: string): Promise<SuiObjectResponse> {
 }
 
 export async function getOwnedObjects(address: string): Promise<PaginatedObjectsResponse> {
-  return await provider.getOwnedObjects({
+  return await getClient().getOwnedObjects({
     owner: address,
   });
 }

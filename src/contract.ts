@@ -1,6 +1,6 @@
-import { getCreatedObjects, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getCreatedObjects, getSigner, handleTransactionResponse } from "./helpers";
 import { MintContractParams } from "./types";
 /**
  * Mints a new contract
@@ -21,12 +21,12 @@ export async function mintContract(params: MintContractParams): Promise<string> 
     description,
     currency,
     image,
-    provider,
   } = params;
 
   // console.log("Mint contract: %s", name + " by " + artist);
 
-  const { signer } = getSigner(signerPhrase, provider);
+  const { keypair } = getSigner(signerPhrase);
+  const client = getClient();
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -45,7 +45,8 @@ export async function mintContract(params: MintContractParams): Promise<string> 
     ],
   });
 
-  const txRes = await signer.signAndExecuteTransactionBlock({
+  const txRes = await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {
@@ -55,7 +56,7 @@ export async function mintContract(params: MintContractParams): Promise<string> 
   });
 
   handleTransactionResponse(txRes);
-  const contractId = getCreatedObjects(txRes)?.[0].reference.objectId;
+  const contractId = getCreatedObjects(txRes)?.[0].objectId;
   if (!contractId) throw new Error("Could not mint contract");
 
   return contractId;

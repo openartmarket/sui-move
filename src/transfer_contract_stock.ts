@@ -1,6 +1,6 @@
-import { TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getSigner, handleTransactionResponse } from "./helpers";
 import { TransferContractStockParams, TransferContractStockResult } from "./types";
 
 /**
@@ -10,10 +10,9 @@ import { TransferContractStockParams, TransferContractStockResult } from "./type
 export async function transferContractStock(
   params: TransferContractStockParams
 ): Promise<TransferContractStockResult> {
-  const { contractId, signerPhrase, receiverAddress, contractStockId, packageId, provider } =
-    params;
-  const { signer } = getSigner(signerPhrase, provider);
-
+  const { contractId, signerPhrase, receiverAddress, contractStockId, packageId } = params;
+  const { keypair } = getSigner(signerPhrase);
+  const client = getClient();
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -21,7 +20,8 @@ export async function transferContractStock(
     arguments: [tx.object(contractId), tx.pure(contractStockId), tx.pure(receiverAddress)],
   });
 
-  const txRes = await signer.signAndExecuteTransactionBlock({
+  const txRes = await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {

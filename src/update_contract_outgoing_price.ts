@@ -1,6 +1,6 @@
-import { TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getSigner, handleTransactionResponse } from "./helpers";
 import { UpdateOutgoingPriceParams } from "./types";
 
 export async function updateOutgoingPrice({
@@ -9,9 +9,9 @@ export async function updateOutgoingPrice({
   packageId,
   adminCapId,
   signerPhrase,
-  provider,
 }: UpdateOutgoingPriceParams) {
-  const { signer } = getSigner(signerPhrase, provider);
+  const { keypair } = getSigner(signerPhrase);
+  const client = getClient();
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -19,7 +19,8 @@ export async function updateOutgoingPrice({
     arguments: [tx.object(adminCapId), tx.object(contractId), tx.pure(newOutgoingPrice)],
   });
 
-  const txRes = await signer.signAndExecuteTransactionBlock({
+  const txRes = await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {

@@ -1,13 +1,14 @@
-import { TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getSigner, handleTransactionResponse } from "./helpers";
 import { ContractStockDetails, MergeContractStockParams } from "./types";
 
 export async function mergeContractStock(
   params: MergeContractStockParams
 ): Promise<ContractStockDetails> {
-  const { contractStock1Id, contractStock2Id, signerPhrase, packageId, provider } = params;
-  const { signer, address } = getSigner(signerPhrase, provider);
+  const { contractStock1Id, contractStock2Id, signerPhrase, packageId } = params;
+  const { keypair } = getSigner(signerPhrase);
+  const client = getClient();
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -15,17 +16,19 @@ export async function mergeContractStock(
     arguments: [tx.object(contractStock1Id), tx.object(contractStock2Id)],
   });
 
-  const txRes = await signer.signAndExecuteTransactionBlock({
+  const txRes = await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {
       showEffects: true,
+      showObjectChanges: true,
     },
   });
 
   handleTransactionResponse(txRes);
   return {
     contractStockId: contractStock1Id,
-    owner: address,
+    owner: keypair.getPublicKey().toSuiAddress(),
   };
 }

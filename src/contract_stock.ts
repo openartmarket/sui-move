@@ -1,7 +1,7 @@
-import { TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { findObjectIdWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
-import { getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getSigner, handleTransactionResponse } from "./helpers";
 import { MintContractStockParams, MintContractStockResult } from "./types";
 
 /**
@@ -11,9 +11,9 @@ import { MintContractStockParams, MintContractStockResult } from "./types";
 export async function mintContractStock(
   params: MintContractStockParams
 ): Promise<MintContractStockResult> {
-  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, shares, provider } =
-    params;
-  const { signer } = getSigner(signerPhrase, provider);
+  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, shares } = params;
+  const { keypair } = getSigner(signerPhrase);
+  const client = getClient();
 
   const tx = new TransactionBlock();
 
@@ -27,7 +27,8 @@ export async function mintContractStock(
     ],
   });
 
-  const txRes = await signer.signAndExecuteTransactionBlock({
+  const txRes = await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {

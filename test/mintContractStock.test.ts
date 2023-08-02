@@ -1,6 +1,7 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "mocha";
 
+import { availableStock } from "../src/available_stock";
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/contract_stock";
 import {
@@ -23,13 +24,17 @@ describe("mintContractStock", () => {
   it("should issue new shares", async () => {
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER1_ADDRESS,
       shares: 2,
+      signerPhrase: ADMIN_PHRASE,
       packageId: PACKAGE_ID,
       adminCapId: ADMIN_CAP_ID,
       provider,
     });
+    const sharesLeft = await availableStock({
+      contractId,
+    });
+    assert.equal(sharesLeft, 498);
   });
 
   it("should not issue new shares, when asking for too much", async () => {
@@ -74,6 +79,11 @@ describe("mintContractStock", () => {
       adminCapId: ADMIN_CAP_ID,
       provider,
     });
+    const sharesLeft = await availableStock({
+      contractId,
+    });
+    assert.equal(sharesLeft, 2);
+
     await assert.rejects(
       mintContractStock({
         contractId,

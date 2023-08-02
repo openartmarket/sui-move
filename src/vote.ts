@@ -1,6 +1,6 @@
-import { getExecutionStatus, TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getExecutionStatus, getSigner, handleTransactionResponse } from "./helpers";
 import { VoteParams } from "./types";
 
 export async function vote({
@@ -9,16 +9,17 @@ export async function vote({
   voterAccount,
   choice,
   packageId,
-  provider,
 }: VoteParams) {
-  const { signer } = getSigner(voterAccount, provider);
+  const { keypair } = getSigner(voterAccount);
+  const client = getClient();
   const tx = new TransactionBlock();
 
   tx.moveCall({
     target: `${packageId}::dao::vote`,
     arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)],
   });
-  const txRes = await signer.signAndExecuteTransactionBlock({
+  const txRes = await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {

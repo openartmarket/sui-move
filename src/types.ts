@@ -28,6 +28,10 @@ export type MintContractStockResult = ContractStockDetails & {
   filledQuantity: number;
 };
 
+export type AvailableStockParams = {
+  contractId: string;
+};
+
 // Mint Contract
 export type MintContractParams = BaseContractParams & {
   adminCapId: string;

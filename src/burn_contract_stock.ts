@@ -1,11 +1,12 @@
-import { TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getSigner, handleTransactionResponse } from "./helpers";
 import { BurnContractParams, BurnContractResult } from "./types";
 
 export async function burnContractStock(params: BurnContractParams): Promise<BurnContractResult> {
-  const { contractStockId, contractId, packageId, signerPhrase, provider } = params;
-  const { signer, address } = getSigner(signerPhrase, provider);
+  const { contractStockId, contractId, packageId, signerPhrase } = params;
+  const { keypair } = getSigner(signerPhrase);
+  const client = getClient();
   const tx = new TransactionBlock();
 
   tx.moveCall({
@@ -13,7 +14,8 @@ export async function burnContractStock(params: BurnContractParams): Promise<Bur
     arguments: [tx.object(contractId), tx.object(contractStockId)],
   });
 
-  const txRes = await signer.signAndExecuteTransactionBlock({
+  const txRes = await client.signAndExecuteTransactionBlock({
+    signer: keypair,
     transactionBlock: tx,
     requestType: "WaitForLocalExecution",
     options: {
@@ -24,6 +26,6 @@ export async function burnContractStock(params: BurnContractParams): Promise<Bur
   return {
     contractStockId,
     success: true,
-    owner: address,
+    owner: keypair.getPublicKey().toSuiAddress(),
   };
 }
