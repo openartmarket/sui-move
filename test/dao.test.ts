@@ -1,54 +1,49 @@
 import assert from "assert";
-import { beforeEach, describe, it } from "mocha";
+import { before, describe, it } from "mocha";
 
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/contract_stock";
 import { endRequestVoting } from "../src/end_request_voting";
+import { NetworkName } from "../src/types";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
 import {
   ADMIN_ADDRESS,
-  ADMIN_CAP_ID,
-  ADMIN_PHRASE,
+  baseOptions,
   mintContractOptions,
   PACKAGE_ID,
-  provider,
+  SUI_NETWORK,
   USER1_ADDRESS,
   USER1_PHRASE,
   USER2_ADDRESS,
   USER3_PHRASE,
 } from "./test-helpers";
 
+const network = SUI_NETWORK as NetworkName;
+console.log({ network });
+
 describe("DAO Voting structure", () => {
   let contractId: string;
-  beforeEach(async () => {
+  before(async function () {
+    this.timeout(30_000);
     contractId = await mintContract(mintContractOptions);
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: ADMIN_ADDRESS,
       shares: 151,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER1_ADDRESS,
       shares: 249,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER2_ADDRESS,
       shares: 100,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
   });
 
@@ -56,22 +51,16 @@ describe("DAO Voting structure", () => {
     const voteRequest = await createVoteRequest({
       contractId,
       request: "Request to sell contract to Museum",
-      packageId: PACKAGE_ID,
-      signerPhrase: ADMIN_PHRASE,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
     assert.ok(voteRequest);
-  });
+  }).timeout(30_000);
 
   it("can vote as a shareholder", async () => {
     const voteRequest = await createVoteRequest({
       contractId,
       request: "Request to sell contract to Museum",
-      packageId: PACKAGE_ID,
-      signerPhrase: ADMIN_PHRASE,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
@@ -80,7 +69,7 @@ describe("DAO Voting structure", () => {
       packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
-      provider,
+      network,
     });
     assert.ok(userVote);
   });
@@ -89,41 +78,33 @@ describe("DAO Voting structure", () => {
     const voteRequest = await createVoteRequest({
       contractId,
       request: "Request to sell contract to Museum",
-      packageId: PACKAGE_ID,
-      signerPhrase: ADMIN_PHRASE,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
       contractId,
       voteRequest,
-      packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
-      provider,
+      ...baseOptions,
     });
     assert.ok(userVote);
     await assert.rejects(
       vote({
         contractId,
         voteRequest,
-        packageId: PACKAGE_ID,
         voterAccount: USER1_PHRASE,
         choice: true,
-        provider,
+        ...baseOptions,
       })
     );
-  });
+  }).timeout(30_000);
 
   it("cannot vote if not a shareholder", async () => {
     const voteRequest = await createVoteRequest({
       contractId,
       request: "Request to sell contract to Museum",
-      packageId: PACKAGE_ID,
-      signerPhrase: ADMIN_PHRASE,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
     assert.ok(voteRequest);
     await assert.rejects(
@@ -133,7 +114,7 @@ describe("DAO Voting structure", () => {
         voterAccount: USER3_PHRASE,
         packageId: PACKAGE_ID,
         choice: true,
-        provider,
+        network,
       })
     );
   });
@@ -142,38 +123,30 @@ describe("DAO Voting structure", () => {
     const voteRequest = await createVoteRequest({
       contractId,
       request: "Request to sell contract to Museum",
-      packageId: PACKAGE_ID,
-      signerPhrase: ADMIN_PHRASE,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
     assert.ok(voteRequest);
     const userVote = await vote({
       contractId,
       voteRequest,
-      packageId: PACKAGE_ID,
       voterAccount: USER1_PHRASE,
       choice: true,
-      provider,
+      ...baseOptions,
     });
     assert.ok(userVote);
     const endVoteRequest = await endRequestVoting({
       voteRequest,
-      packageId: PACKAGE_ID,
-      signerPhrase: ADMIN_PHRASE,
-      adminCapId: ADMIN_CAP_ID,
-      provider,
+      ...baseOptions,
     });
     assert.ok(endVoteRequest);
     await assert.rejects(
       vote({
         contractId,
         voteRequest,
-        packageId: PACKAGE_ID,
         voterAccount: USER1_PHRASE,
         choice: true,
-        provider,
+        ...baseOptions,
       })
     );
-  });
+  }).timeout(30_000);
 });

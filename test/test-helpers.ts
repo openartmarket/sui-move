@@ -24,7 +24,7 @@ export const PACKAGE_ID = getEnv("PACKAGE_ID");
 export const CONTRACT_TYPE = `${PACKAGE_ID}::open_art_market::Contract`;
 export const CONTRACT_STOCK_TYPE = `${PACKAGE_ID}::open_art_market::ContractStock`;
 
-const network = SUI_NETWORK as NetworkName;
+export const network = SUI_NETWORK as NetworkName;
 
 export async function getObject(objectId: string): Promise<SuiObjectResponse> {
   return await getClient(network).getObject({
@@ -53,10 +53,15 @@ export function getEnv(name: string): string {
 }
 export const provider = getProvider(SUI_NETWORK);
 
-export const mintContractOptions: MintContractParams = {
+export const baseOptions = {
   signerPhrase: ADMIN_PHRASE,
   packageId: PACKAGE_ID,
   adminCapId: ADMIN_CAP_ID,
+  network,
+};
+
+export const mintContractOptions: MintContractParams = {
+  ...baseOptions,
   totalSupply: 500,
   sharePrice: 10,
   multiplier: 100,

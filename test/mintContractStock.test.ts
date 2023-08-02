@@ -6,10 +6,9 @@ import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/contract_stock";
 import {
   ADMIN_ADDRESS,
-  ADMIN_CAP_ID,
-  ADMIN_PHRASE,
+  baseOptions,
   mintContractOptions,
-  PACKAGE_ID,
+  network,
   USER1_ADDRESS,
   USER2_ADDRESS,
 } from "./test-helpers";
@@ -22,15 +21,14 @@ describe("mintContractStock", () => {
 
   it("should issue new shares", async () => {
     await mintContractStock({
+      ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 2,
-      signerPhrase: ADMIN_PHRASE,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
     });
     const sharesLeft = await availableStock({
       contractId,
+      network,
     });
     assert.equal(sharesLeft, 498);
   });
@@ -39,11 +37,9 @@ describe("mintContractStock", () => {
     await assert.rejects(
       mintContractStock({
         contractId,
-        signerPhrase: ADMIN_PHRASE,
-        receiverAddress: USER1_ADDRESS,
         shares: 501,
-        packageId: PACKAGE_ID,
-        adminCapId: ADMIN_CAP_ID,
+        receiverAddress: USER1_ADDRESS,
+        ...baseOptions,
       })
     );
   });
@@ -51,71 +47,58 @@ describe("mintContractStock", () => {
   it("should not issue new shares, when sold out", async () => {
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
-      receiverAddress: USER1_ADDRESS,
       shares: 150,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
+      receiverAddress: USER1_ADDRESS,
+      ...baseOptions,
     });
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER2_ADDRESS,
       shares: 250,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
+      ...baseOptions,
     });
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER1_ADDRESS,
       shares: 98,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
+      ...baseOptions,
     });
     const sharesLeft = await availableStock({
       contractId,
+      network,
     });
     assert.equal(sharesLeft, 2);
 
     await assert.rejects(
       mintContractStock({
         contractId,
-        signerPhrase: ADMIN_PHRASE,
         receiverAddress: USER2_ADDRESS,
         shares: 3,
-        packageId: PACKAGE_ID,
-        adminCapId: ADMIN_CAP_ID,
+        ...baseOptions,
       })
     );
-  });
+  }).timeout(30_000);
 
   it("can give shares to OAM and owner", async () => {
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: ADMIN_ADDRESS,
       shares: 150,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
+      ...baseOptions,
     });
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER1_ADDRESS,
       shares: 50,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
+      ...baseOptions,
     });
     await mintContractStock({
       contractId,
-      signerPhrase: ADMIN_PHRASE,
       receiverAddress: USER2_ADDRESS,
       shares: 1,
-      packageId: PACKAGE_ID,
-      adminCapId: ADMIN_CAP_ID,
+      ...baseOptions,
     });
-  });
+  }).timeout(30_000);
 
   it.skip("can set the outgoing sale price of the contract", async () => {
     assert.ok(false);
