@@ -5,7 +5,7 @@
   "author": "",
   "license": "MIT",
   "version": "1.0.0",
-  "description": "PoC contracts modeling Open Art Market use case (https://www.openartmarket.com/)",
+  "description": "Contracts for Open Art Market (https://www.openartmarket.com/)",
   "main": "src/index.js",
   "exports": {
     ".": {
@@ -14,20 +14,18 @@
     }
   },
   "scripts": {
-    "clean": "rm -rf ~/.sui",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc --build tsconfig.cjs.json",
     "build:esm": "tsc --build tsconfig.esm.json",
+    "clean": "rm -rf ~/.sui",
+    "deploy-contracts": "./scripts/publish-contracts.sh",
     "format": "prettier-eslint --write '{src,test}/**/*.{ts,d.ts}'",
     "lint": "eslint --ext ts --fix --max-warnings 0 '{src,test}/**/*.{ts,d.ts}'",
+    "postinstall": "npm run build",
+    "setup-local": "./scripts/setup-local-node.sh",
     "start": "npm run clean && npm run build && npm run start-node",
     "start-node": "sui start",
     "test": "mocha test",
-    "create:contract-display": "tsc && node dist/cjs/contract_display",
-    "create:contract-stock-display": "tsc && node dist/cjs/contract_stock_display",
-    "create:ci-contract-display": "tsc && node dist/contract_display",
-    "create:ci-contract-stock-display": "tsc && node dist/contract_stock_display",
-    "postinstall": "npm run build",
     "upgrade": "npm-check-updates --upgrade"
   },
   "devDependencies": {
@@ -37,7 +35,6 @@
     "@types/mocha": "10.0.1",
     "@types/node": "20.4.5",
     "@typescript-eslint/eslint-plugin": "5.59.11",
-    "dotenv": "16.3.1",
     "eslint": "8.46.0",
     "eslint-config-prettier": "8.9.0",
     "eslint-plugin-import": "2.28.0",

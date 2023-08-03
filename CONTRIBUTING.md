@@ -52,7 +52,6 @@ Change `it('...')` to `it.only('...')`, and `npm test` will *only* run that test
 Go to [SUI Explorer](https://suiexplorer.com/?network=local)
 
 
-
 ## Coding practices
 1. We use tests to verify the code works as expected.
 2. We use prettier to format the code.
@@ -84,7 +83,7 @@ The code is compiled when running this command
 We compile the code for both cjs and esm modules
 
 ```sh
-npm run compile
+npm run build
 ```
 
 ## To contribute code changes to this code
