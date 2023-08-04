@@ -19,7 +19,7 @@ describe("mintContractStock", () => {
     contractId = await mintContract(mintContractOptions);
   });
 
-  it.only("should issue new shares", async () => {
+  it("should issue new shares", async () => {
     await mintContractStock({
       ...baseOptions,
       contractId,
