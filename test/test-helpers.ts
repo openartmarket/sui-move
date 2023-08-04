@@ -65,7 +65,7 @@ export const mintContractOptions: MintContractParams = {
   ...baseOptions,
   totalSupply: 500,
   sharePrice: 10,
-  multiplier: 100,
+  outgoingPrice: 100,
   creationDate: "1685548680595",
   name: "Mona Lisa",
   artist: "Leonardo da Vinci",

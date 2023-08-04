@@ -38,7 +38,7 @@ export type MintContractParams = BaseContractParams & {
   adminCapId: string;
   totalSupply: number;
   sharePrice: number;
-  multiplier: number;
+  outgoingPrice: number;
   name: string;
   artist: string;
   creationDate: string;

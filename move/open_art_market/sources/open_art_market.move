@@ -17,7 +17,7 @@ module open_art_market::open_art_market {
     const EITONotFinished: u64 = 3;
     const EInvalidSupply: u64 = 4;
     const EInvalidSharePrice: u64 = 5;
-    const EInvalidMultiplier: u64 = 6;
+    const EInvalidOutgoingPrice: u64 = 6;
     const EInvalidShares: u64 = 7;
     const ECallerNotAShareHolder: u64 = 8;
 
@@ -48,7 +48,6 @@ module open_art_market::open_art_market {
         shares: u64,
         share_price: u64,
         outgoing_price: u64,
-        multiplier: u64,
         name: String,
         artist: String,
         creation_date: u64,
@@ -80,7 +79,7 @@ module open_art_market::open_art_market {
     
     // Create a new Contract NFT shared object
     public fun mint_contract(
-        _: &mut AdminCap, total_supply: u64, share_price: u64, multiplier: u64, name: String, artist: String,
+        _: &mut AdminCap, total_supply: u64, share_price: u64, outgoing_price: u64, name: String, artist: String,
         creation_date: u64, description: String, currency: String,
         reference: String, ctx: &mut TxContext
     ) {
@@ -88,9 +87,8 @@ module open_art_market::open_art_market {
         // Ensure that numeric values are larger than 0
         assert!(total_supply > 0, EInvalidSupply);
         assert!(share_price > 0, EInvalidSharePrice);
-        assert!(multiplier > 0, EInvalidMultiplier);
+        assert!(outgoing_price > 0, EInvalidOutgoingPrice);
 
-        let outgoing_price = (share_price * total_supply) * multiplier;
 
         let contract = Contract {
             id: object::new(ctx),
@@ -98,7 +96,6 @@ module open_art_market::open_art_market {
             shares: total_supply,
             share_price,
             outgoing_price,
-            multiplier,
             name,
             artist,
             creation_date,
