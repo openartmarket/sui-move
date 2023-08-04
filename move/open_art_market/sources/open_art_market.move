@@ -34,7 +34,7 @@ module open_art_market::open_art_market {
         creation_date: u64,
         description: String,
         currency: String,
-        image_url: String,
+        reference: String,
     }
 
     // The Contract NFT struct
@@ -54,7 +54,7 @@ module open_art_market::open_art_market {
         creation_date: u64,
         description: String,
         currency: String,
-        image_url: String,
+        reference: String,
     }
 
     // Admin capability to guard access restricted methods
@@ -79,10 +79,10 @@ module open_art_market::open_art_market {
     }
     
     // Create a new Contract NFT shared object
-    public fun mint_contract_and_share(
+    public fun mint_contract(
         _: &mut AdminCap, total_supply: u64, share_price: u64, multiplier: u64, name: String, artist: String,
         creation_date: u64, description: String, currency: String,
-        image_url: String, ctx: &mut TxContext
+        reference: String, ctx: &mut TxContext
     ) {
 
         // Ensure that numeric values are larger than 0
@@ -104,7 +104,7 @@ module open_art_market::open_art_market {
             creation_date,
             description,
             currency,
-            image_url
+            reference
         };
         transfer::public_share_object<Contract>(contract);
     }
@@ -138,7 +138,7 @@ module open_art_market::open_art_market {
             creation_date: contract.creation_date,
             description: contract.description,
             currency: contract.currency,
-            image_url: contract.image_url,
+            reference: contract.reference,
         };
 
         transfer::transfer(contract_stock, receiver);
@@ -175,7 +175,7 @@ module open_art_market::open_art_market {
             creation_date: _,
             description: _,
             currency: _,
-            image_url: _,
+            reference: _,
         } = contract_stock;
 
         object::delete(id);
@@ -228,7 +228,7 @@ module open_art_market::open_art_market {
             creation_date: contract_stock.creation_date,
             description: contract_stock.description,
             currency: contract_stock.currency,
-            image_url: contract_stock.image_url,
+            reference: contract_stock.reference,
         };
 
         // Update shares of original stock

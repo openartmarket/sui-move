@@ -31,7 +31,7 @@ export async function mintContract(params: MintContractParams): Promise<string> 
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::open_art_market::mint_contract_and_share`,
+    target: `${packageId}::open_art_market::mint_contract`,
     arguments: [
       tx.object(adminCapId),
       tx.pure(totalSupply),

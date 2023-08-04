@@ -48,6 +48,7 @@ export function getProvider(SUI_NETWORK: string) {
 
 export function getEnv(name: string): string {
   const value = process.env[name];
+  if (!value && name.match(/^USER/)) return '';
   if (!value) throw new Error(`Missing env variable ${name}`);
   return value;
 }
@@ -65,11 +66,10 @@ export const mintContractOptions: MintContractParams = {
   totalSupply: 500,
   sharePrice: 10,
   multiplier: 100,
+  creationDate: "1685548680595",
   name: "Mona Lisa",
   artist: "Leonardo da Vinci",
-  creationDate: "1685548680595",
   description: "Choconta painting",
   currency: "USD",
-  image:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+  image:"reference-id-for-contract",
 };

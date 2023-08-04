@@ -37,7 +37,7 @@ module open_art_market::dao {
     // Functions
 
     /// This function creates a new vote request
-    public fun create_vote_request(_: &mut AdminCap, contract_id: ID, request: String, ctx: &mut TxContext) {
+    public fun start_vote(_: &mut AdminCap, contract_id: ID, request: String, ctx: &mut TxContext) {
 
         let vote_request = VoteRequest {
             id: object::new(ctx),
@@ -79,7 +79,7 @@ module open_art_market::dao {
     }
 
     // Function to end the voting period
-    public fun end_request_voting(_: &AdminCap, vote_request: &mut VoteRequest) {
+    public fun end_vote(_: &AdminCap, vote_request: &mut VoteRequest) {
         vote_request.is_active = false;
     }
         

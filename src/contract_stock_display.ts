@@ -4,15 +4,17 @@ import { getClient, getSigner } from "./helpers";
 import { CreateContractStockDisplayParams } from "./types";
 
 // This is the function you can update to change the display fields
-function getContractStockDisplayFields(imageProviderUrlPrefix = "", imageProviderUrlPostfix = "") {
+function getContractStockDisplayFields() {
   return {
-    keys: ["name", "description", "currency", "image_url", "project_url"],
+    keys: ["name", "artist", "description", "currency", "image_url", "thumbnail_url", "project_url"],
     values: [
       "{name}",
+      "{artist}",
       "{description}",
       "{currency}",
-      `${imageProviderUrlPrefix}{image_url}${imageProviderUrlPostfix}`,
-      "https://www.openartmarket.com/",
+      "https://openartmarket.com/image/{reference}",
+      "https://openartmarket.com/image/{reference}?thumb=1",
+      "https://openartmarket.com/perma/{reference}",
     ],
   };
 }

@@ -13,7 +13,7 @@ import {
 const SUI_NETWORK_NAME = getEnv('SUI_NETWORK');
 
 async function main (){
-    console.log('Creating contract display and contract stock display...', SUI_NETWORK_NAME)
+    console.log('👉 Creating contract and stock display on', SUI_NETWORK_NAME)
 
     await createContractDisplay({
         ADMIN_PHRASE,
@@ -27,6 +27,8 @@ async function main (){
         PUBLISHER_ID,
         SUI_NETWORK: (SUI_NETWORK_NAME as NetworkName),
     });
+
+    console.log('✅ Displays created successfully!')
 }
 
 main();

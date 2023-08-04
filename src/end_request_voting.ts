@@ -15,7 +15,7 @@ export async function endRequestVoting({
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::dao::end_request_voting`,
+    target: `${packageId}::dao::end_vote`,
     arguments: [tx.object(adminCapId), tx.object(voteRequest)],
   });
 

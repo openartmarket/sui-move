@@ -16,7 +16,7 @@ export async function createVoteRequest({
   const tx = new TransactionBlock();
 
   tx.moveCall({
-    target: `${packageId}::dao::create_vote_request`,
+    target: `${packageId}::dao::start_vote`,
     arguments: [tx.object(adminCapId), tx.pure(contractId), tx.pure(request)],
   });
   const txRes = await client.signAndExecuteTransactionBlock({
