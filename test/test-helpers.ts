@@ -48,7 +48,7 @@ export function getProvider(SUI_NETWORK: string) {
 
 export function getEnv(name: string): string {
   const value = process.env[name];
-  if (!value && name.match(/^USER/)) return '';
+  if (!value && name.match(/^USER/)) return "";
   if (!value) throw new Error(`Missing env variable ${name}`);
   return value;
 }
@@ -71,5 +71,5 @@ export const mintContractOptions: MintContractParams = {
   artist: "Leonardo da Vinci",
   description: "Choconta painting",
   currency: "USD",
-  image:"reference-id-for-contract",
+  image: "reference-id-for-contract",
 };

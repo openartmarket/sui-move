@@ -6,7 +6,15 @@ import { CreateContractStockDisplayParams } from "./types";
 // This is the function you can update to change the display fields
 function getContractStockDisplayFields() {
   return {
-    keys: ["name", "artist", "description", "currency", "image_url", "thumbnail_url", "project_url"],
+    keys: [
+      "name",
+      "artist",
+      "description",
+      "currency",
+      "image_url",
+      "thumbnail_url",
+      "project_url",
+    ],
     values: [
       "{name}",
       "{artist}",
