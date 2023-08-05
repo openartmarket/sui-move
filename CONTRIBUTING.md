@@ -1,45 +1,54 @@
 # Contributing
 
-We would love for the community to review and improve our code. If you are interested in contributing, please read our [contributing guidelines]
+This document describes how to contribute to the Open Art Market SUI Move contracts.
 
-## Development
-To get started with development, run the following commands:
+## Install dependencies
 
+We use [asdf](https://github.com/asdf-vm/asdf) to install various command line tools.
+Follow the [asdf installation instructions](https://asdf-vm.com/guide/getting-started.html#_3-install-asdf) to install the `asdf` command.
 
-## Local environment
+Most of the required tools are defined in `.tool-versions`. To install them all, run this command:
 
-### Option 1: Run a local sui node
+    ./scripts/asdf-install.sh
 
-#### Install dependencies of the project
-Install dependencies of the project and run sui locally
+The `sui` command line is not available in `asdf`. To install it, run this command:
 
-```sh
-./scripts/bootstrap.sh
-```
-This command will install the dependencies of this project.
+    ./scripts/sui-install.sh
 
-Run the test suite, two shells are required:
+## Define environment variables with `direnv`
 
-`shell 1` - run the SUI node
-```sh
-npm run clean
-sui start
-```
+Follow the [direnv setup instructions](https://direnv.net/docs/hook.html) to make sure `direnv` is loaded in your shell.
+Check that `direnv` is working by running `echo $SUI_NETWORK` in your shell.
+It should print `local`.
 
-`shell 2` - deploy the contracts, and write environment variables for tests
-```sh
-./scripts/setup-local-node.sh
-./scripts/publish-contracts.sh
+## Start a local sui node
 
-```
+    npm run clean
+    sui start
 
-## Testing the contracts
+This will start a local sui node.
+Start a new shell for the following commands.
 
-When you have setup local environment, you are ready to run the tests, in the shell 2 run:
+## Create sui addresses (accounts)
 
-```sh
-npm test
-```
+We'll create an admin address (for contract deployment) and three regular addresses (for testing).
+
+    ./scripts/sui-new-addresses.sh
+
+This should create a new (`.gitignore`d) file called `.sui.env` which will be used by tests.
+
+## Deploy the contracts
+
+    ./scripts/publish-contracts.sh
+
+This will append more environment variables to `.sui.env` which will be used by tests.
+
+## Test the contracts
+
+Now that the contracts are deployed, run the tests:
+
+    npm test
+
 You can rerun tests without redeploying the contracts. Just run `npm test` again.
 
 ### Running a single test
@@ -49,15 +58,14 @@ While you're developing, you may want to run only the single test you're working
 Change `it('...')` to `it.only('...')`, and `npm test` will *only* run that test.
 
 ### Viewing on local blockchain explorer
+
 Go to [SUI Explorer](https://suiexplorer.com/?network=local)
 
-
 ## Coding practices
+
 1. We use tests to verify the code works as expected.
 2. We use prettier to format the code.
 3. We use eslint to check for common errors.
-4. We need to get a test-coverage tool, so we know that we have test all the permutations of the code.
-
 
 ### Formatting
 
@@ -79,12 +87,12 @@ npm run lint
 
 ### Compile
 
-The code is compiled when running this command
-We compile the code for both cjs and esm modules
+The TypeScript code is compiled to JavaScript (esm and cjs) with the following command:
 
 ```sh
 npm run build
 ```
 
-## To contribute code changes to this code
-Please create a pull request with your changes and we will review it as soon as possible.
+## Contributing changes
+
+Please open a pull request with your changes and we will review it as soon as possible.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 # This script publishes the contracts to the network SUI_NETWORK_NAME
 # Requires environment variables SUI_NETWORK_NAME, ADMIN_PHRASE and ADMIN_ADDRESSto be set
@@ -9,25 +9,26 @@ set -e
 sui client switch --address "$ADMIN_ADDRESS"
 ./scripts/utils/switch-environment.sh
 
-# Write out gas
-sui client gas
+# sui client gas
+
+rm -rf tmp
+mkdir -p tmp
 # Publish the contracts
-sui client publish --gas-budget 200000000 --json ./move/open_art_market > publish.res.json
+sui client publish --gas-budget 200000000 --json ./move/open_art_market > tmp/publish.res.json
 
 # Collect the relevant data from the response
-cat publish.res.json | jq -r '.objectChanges[] | select(.type == "created")' > changes.res.json
+cat tmp/publish.res.json | jq -r '.objectChanges[] | select(.type == "created")' > tmp/changes.res.json
 
-PACKAGE_ID=$(cat publish.res.json | jq -r '.effects.created[] | select(.owner == "Immutable").reference.objectId')
-ADMIN_CAP_ID=$(cat changes.res.json | jq -r 'select (.objectType | contains("::open_art_market::AdminCap")).objectId')
-PUBLISHER_ID=$(cat changes.res.json | jq -r 'select (.objectType | contains("::Publisher")).objectId')
-UPGRADE_CAP_ID=$(cat changes.res.json | jq -r 'select (.objectType | contains("::package::UpgradeCap")).objectId')
-
+PACKAGE_ID=$(cat tmp/publish.res.json | jq -r '.effects.created[] | select(.owner == "Immutable").reference.objectId')
+ADMIN_CAP_ID=$(cat tmp/changes.res.json | jq -r 'select (.objectType | contains("::open_art_market::AdminCap")).objectId')
+PUBLISHER_ID=$(cat tmp/changes.res.json | jq -r 'select (.objectType | contains("::Publisher")).objectId')
+UPGRADE_CAP_ID=$(cat tmp/changes.res.json | jq -r 'select (.objectType | contains("::package::UpgradeCap")).objectId')
 
 echo "Contracts published successfully"
-echo "export PACKAGE_ID=$PACKAGE_ID" >> .envrc
-echo "export ADMIN_CAP_ID=$ADMIN_CAP_ID" >> .envrc
-echo "export PUBLISHER_ID=$PUBLISHER_ID" >> .envrc
-echo "export UPGRADE_CAP_ID=$UPGRADE_CAP_ID" >> .envrc
+echo "export PACKAGE_ID=$PACKAGE_ID" >> .sui.env
+echo "export ADMIN_CAP_ID=$ADMIN_CAP_ID" >> .sui.env
+echo "export PUBLISHER_ID=$PUBLISHER_ID" >> .sui.env
+echo "export UPGRADE_CAP_ID=$UPGRADE_CAP_ID" >> .sui.env
 
 direnv allow
 

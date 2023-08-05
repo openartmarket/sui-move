@@ -1,39 +1,21 @@
 # Open Art Market SUI Move contracts
-This repository contains the smart contracts for the Open Art Market project.
+
+[Open Art Market](https://openartmarket.com) uses blockchain technology to provide a public, transparent and decentralized way to manage unique artwork assets and their shares.
+
+These contracts are deployed publicly on the [SUI blockchain](https://sui.io/) where anyone can verify the code. 
+All assets, asset shares and votes are represented on the blockchain, allowing anyone to verify the state of the system.
+
+This repository contains the smart contracts for Open Art Market.
 
 ## Contracts
-1. Open Art Market
-    Manages the unique asset and the sale of shares in them.
-2. DAO voting 
-    Manages vote proposals and votes for each of the options.
 
-## Transparency
-We use blockchain to document the our and our users actions in a transparent way. 
-These contracts are deployed publicly on the [SUI blockchain] and can be verified to contain the same code. 
-All assets, asset shares and votes are represented in the Objects on chain in an easy to read manner, allowing anyone to verify the state of the system.
+* [Open Art Market](./move/sources/open_art_market.move) manages unique artwork assets their shares.
+* [DAO voting](./move/sources/dao.move) manages vote proposals and votes.
 
-## Further development
-We would love for the community to review and improve our code. If you are interested in contributing, please read our [contributing guidelines](CONTRIBUTING.md)
+## Contributing
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">Smart Contracts</a>
-      <ul>
-        <li><a href="#open-art-market">open_art_market module</a></li>
-      </ul>
-      <ul>
-        <li><a href="#dao">dao module</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#setup">Setup</a>
-    </li>
-  </ol>
-</details>
-
+Open Art Market invites anyone to review and improve the code for the smart contracts. 
+If you are interested in contributing, please read our [contributing guidelines](CONTRIBUTING.md).
 
 # Smart Contracts
 
@@ -41,6 +23,7 @@ PoC contracts modeling Open Art Market use case, where only the admin can create
 The users can own shares of an contract. 
 The admin can create new voting requests for DAO operations. 
 Multiple shareholders can vote whether they agree or not to vote requests.
+
 ### open-art-market module
 
 <b>Structs of the module:</b>
