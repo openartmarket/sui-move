@@ -19,7 +19,7 @@ jobs:
     - run: rm -rf ~/.sui
     - run: sui start > sui.log 2>&1 &
     - run: sleep 5
-    - run: ./scripts/new-addresses.sh
+    - run: ./scripts/sui-new-addresses.sh
     - run: npm ci
     - run: direnv exec . ./scripts/publish-contracts.sh
     - run: direnv exec . npm test
