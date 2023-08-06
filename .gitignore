@@ -1,7 +1,5 @@
-**/build
-**/dist
-.env
-output/*.json
-node_modules
+node_modules/
+tmp/
+dist/
 sui.log.*
-**/*.res.json
+.sui.env
