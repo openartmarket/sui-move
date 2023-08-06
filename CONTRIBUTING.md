@@ -15,11 +15,20 @@ The `sui` command line is not available in `asdf`. To install it, run this comma
 
     ./scripts/sui-install.sh
 
-## Define environment variables with `direnv`
+Finally, install the npm dependencies:
 
+    npm install
+
+## Configure `direnv`
+
+We use `direnv` to manage environment variables.
 Follow the [direnv setup instructions](https://direnv.net/docs/hook.html) to make sure `direnv` is loaded in your shell.
-Check that `direnv` is working by running `echo $SUI_NETWORK` in your shell.
-It should print `local`.
+
+Check that `direnv` is working:
+
+    echo $SUI_NETWORK
+
+It should print `localnet`.
 
 ## Start a local sui node
 
@@ -72,26 +81,20 @@ Go to [SUI Explorer](https://suiexplorer.com/?network=local)
 The code is autoformatted when running this command
 Configuration for the formatter is in the `.prettierrc` file
 
-```sh
-npm run format
-```
+    npm run format
 
 ### Linting
 
 The code is linted for warnings and errors when running this command
 Configuration for the linter is in the `.eslintrc.json` file
 
-```sh
-npm run lint
-```
+    npm run lint
 
 ### Compile
 
 The TypeScript code is compiled to JavaScript (esm and cjs) with the following command:
 
-```sh
-npm run build
-```
+    npm run build
 
 ## Contributing changes
 

@@ -25,10 +25,10 @@ PUBLISHER_ID=$(cat tmp/changes.res.json | jq -r 'select (.objectType | contains(
 UPGRADE_CAP_ID=$(cat tmp/changes.res.json | jq -r 'select (.objectType | contains("::package::UpgradeCap")).objectId')
 
 echo "Contracts published successfully"
-echo "export PACKAGE_ID=$PACKAGE_ID" >> .sui.env
-echo "export ADMIN_CAP_ID=$ADMIN_CAP_ID" >> .sui.env
-echo "export PUBLISHER_ID=$PUBLISHER_ID" >> .sui.env
-echo "export UPGRADE_CAP_ID=$UPGRADE_CAP_ID" >> .sui.env
+echo "export PACKAGE_ID=\"$PACKAGE_ID\"" >> .sui.env
+echo "export ADMIN_CAP_ID=\"$ADMIN_CAP_ID\"" >> .sui.env
+echo "export PUBLISHER_ID=\"$PUBLISHER_ID\"" >> .sui.env
+echo "export UPGRADE_CAP_ID=\"$UPGRADE_CAP_ID\"" >> .sui.env
 
 direnv allow
 
