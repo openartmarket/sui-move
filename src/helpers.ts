@@ -6,7 +6,13 @@ import {
 } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 
-import { NetworkName } from "./types";
+import {
+  MergeStockMoveTransactionParams,
+  NetworkName,
+  SplitStockMoveTransactionParams,
+  TransferStockMoveTransactionParams,
+  VoteMoveTransactionParams,
+} from "./types";
 
 export function getSigner(phrase: string): {
   keypair: Ed25519Keypair;
@@ -47,5 +53,52 @@ export function getCreatedObjects(
 export function getClient(network: NetworkName = "localnet") {
   return new SuiClient({
     url: getFullnodeUrl(network),
+  });
+}
+
+export function transferMoveCall({
+  tx,
+  packageId,
+  contractId,
+  contractStockId,
+  receiverAddress,
+}: TransferStockMoveTransactionParams): void {
+  tx.moveCall({
+    target: `${packageId}::open_art_market::transfer_contract_stock`,
+    arguments: [tx.object(contractId), tx.pure(contractStockId), tx.pure(receiverAddress)],
+  });
+}
+export function mergeMoveCall({
+  tx,
+  packageId,
+  contractStock1Id,
+  contractStock2Id,
+}: MergeStockMoveTransactionParams): void {
+  tx.moveCall({
+    target: `${packageId}::open_art_market::merge_contract_stocks`,
+    arguments: [tx.object(contractStock1Id), tx.object(contractStock2Id)],
+  });
+}
+export function splitMoveCall({
+  tx,
+  packageId,
+  contractStockId,
+  shares,
+}: SplitStockMoveTransactionParams): void {
+  tx.moveCall({
+    target: `${packageId}::open_art_market::split_contract_stock`,
+    arguments: [tx.object(contractStockId), tx.pure(shares)],
+  });
+}
+export function voteMoveCall({
+  tx,
+  packageId,
+  contractId,
+  voteRequest,
+  choice,
+}: VoteMoveTransactionParams): void {
+  tx.moveCall({
+    target: `${packageId}::dao::vote`,
+    arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)],
   });
 }

@@ -1,3 +1,5 @@
+import { TransactionBlock } from "@mysten/sui.js/transactions";
+
 export type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
 
 export type ContractMethod =
@@ -145,4 +147,29 @@ export type CreateContractDisplayParams = BaseDisplayParams & {
 };
 export type CreateContractStockDisplayParams = BaseDisplayParams & {
   CONTRACT_STOCK_TYPE: string;
+};
+
+export type MoveTransactionParams = {
+  tx: TransactionBlock;
+  packageId: string;
+};
+
+export type TransferStockMoveTransactionParams = MoveTransactionParams & {
+  contractId: string;
+  contractStockId: string;
+  receiverAddress: string;
+};
+
+export type MergeStockMoveTransactionParams = MoveTransactionParams & {
+  contractStock1Id: string;
+  contractStock2Id: string;
+};
+export type SplitStockMoveTransactionParams = MoveTransactionParams & {
+  contractStockId: string;
+  shares: number;
+};
+export type VoteMoveTransactionParams = MoveTransactionParams & {
+  contractId: string;
+  voteRequest: string;
+  choice: boolean;
 };

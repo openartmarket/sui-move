@@ -1,6 +1,6 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getClient, getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getSigner, handleTransactionResponse, transferMoveCall } from "./helpers";
 import { TransferContractStockParams, TransferContractStockResult } from "./types";
 
 /**
@@ -15,10 +15,7 @@ export async function transferContractStock(
   const client = getClient(network);
   const tx = new TransactionBlock();
 
-  tx.moveCall({
-    target: `${packageId}::open_art_market::transfer_contract_stock`,
-    arguments: [tx.object(contractId), tx.pure(contractStockId), tx.pure(receiverAddress)],
-  });
+  transferMoveCall({ tx, packageId, contractId, contractStockId, receiverAddress });
 
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
