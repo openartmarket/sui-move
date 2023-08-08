@@ -31,7 +31,7 @@ export function handleTransactionResponse(txRes: SuiTransactionBlockResponse): v
   }
 }
 
-export function getExecutionStatus(txRes: SuiTransactionBlockResponse): string {
+function getExecutionStatus(txRes: SuiTransactionBlockResponse): string {
   const status = txRes.effects?.status;
   if (status === undefined) {
     throw new Error("Failed to get execution status");
