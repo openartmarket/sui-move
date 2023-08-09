@@ -96,13 +96,15 @@ export async function batchMintContractStock(
       console.log(contractStock.data);
       if (!contractStock.data?.content) throw new Error("No content found");
       const content = contractStock.data.content;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       results.push({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         contractId: content.fields.contract_id,
         contractStockId,
         digest: txRes.digest,
         owner: receiverAddress,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         shares: +content.fields.shares,
       });
     }
