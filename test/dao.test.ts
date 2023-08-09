@@ -20,7 +20,6 @@ import {
 } from "./test-helpers";
 
 const network = SUI_NETWORK as NetworkName;
-console.log({ network });
 
 describe("DAO Voting structure", () => {
   let contractId: string;
