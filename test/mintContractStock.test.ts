@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from "mocha";
 
 import { availableStock } from "../src/available_stock";
 import { mintContract } from "../src/contract";
-import { mintContractStock } from "../src/contract_stock";
+import { batchMintContractStock, mintContractStock } from "../src/contract_stock";
 import {
   ADMIN_ADDRESS,
   baseOptions,
@@ -11,6 +11,7 @@ import {
   network,
   USER1_ADDRESS,
   USER2_ADDRESS,
+  USER3_ADDRESS,
 } from "./test-helpers";
 
 describe("mintContractStock", () => {
@@ -31,6 +32,31 @@ describe("mintContractStock", () => {
       network,
     });
     assert.equal(sharesLeft, 498);
+  });
+
+  it.only("should batch issue new shares", async () => {
+    const contractId2 = await mintContract(mintContractOptions);
+    const res = await batchMintContractStock({
+      ...baseOptions,
+      list: [
+        { contractId: contractId2, receiverAddress: USER1_ADDRESS, shares: 20 },
+        { contractId: contractId2, receiverAddress: USER1_ADDRESS, shares: 10 },
+        { contractId, receiverAddress: USER1_ADDRESS, shares: 2 },
+        { contractId, receiverAddress: USER2_ADDRESS, shares: 3 },
+        { contractId, receiverAddress: USER3_ADDRESS, shares: 5 },
+      ],
+    });
+    assert.equal(res.results.length, 5);
+    const sharesLeft = await availableStock({
+      contractId,
+      network,
+    });
+    const sharesLeft2 = await availableStock({
+      contractId: contractId2,
+      network,
+    });
+    assert.equal(sharesLeft, 490);
+    assert.equal(sharesLeft2, 470);
   });
 
   it("should not issue new shares, when asking for too much", async () => {

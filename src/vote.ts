@@ -22,6 +22,7 @@ export async function vote({
   const tx = new TransactionBlock();
 
   voteMoveCall({ tx, packageId, contractId, voteRequest, choice });
+
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
     transactionBlock: tx,
