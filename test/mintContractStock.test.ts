@@ -36,7 +36,7 @@ describe("mintContractStock", () => {
 
   it("should batch issue new shares", async () => {
     const contractId2 = await mintContract(mintContractOptions);
-    const res = await batchMintContractStock({
+    await batchMintContractStock({
       ...baseOptions,
       list: [
         { contractId: contractId2, receiverAddress: USER1_ADDRESS, shares: 20 },
