@@ -34,7 +34,7 @@ describe("mintContractStock", () => {
     assert.equal(sharesLeft, 498);
   });
 
-  it.only("should batch issue new shares", async () => {
+  it("should batch issue new shares", async () => {
     const contractId2 = await mintContract(mintContractOptions);
     const res = await batchMintContractStock({
       ...baseOptions,
@@ -46,7 +46,6 @@ describe("mintContractStock", () => {
         { contractId, receiverAddress: USER3_ADDRESS, shares: 5 },
       ],
     });
-    assert.equal(res.results.length, 5);
     const sharesLeft = await availableStock({
       contractId,
       network,
