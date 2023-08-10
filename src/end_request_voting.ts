@@ -1,6 +1,6 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getClient, getExecutionStatus, getSigner, handleTransactionResponse } from "./helpers";
+import { getClient, getSigner, handleTransactionResponse } from "./helpers";
 import { EndVoteRequestParams } from "./types";
 
 export async function endRequestVoting({
@@ -29,5 +29,5 @@ export async function endRequestVoting({
   });
   handleTransactionResponse(txRes);
 
-  return getExecutionStatus(txRes);
+  return "success";
 }

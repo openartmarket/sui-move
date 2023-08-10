@@ -26,6 +26,32 @@ export function findObjectIdWithOwnerAddress(txRes: SuiTransactionBlockResponse,
   return objectId;
 }
 
+export async function findObjectsWithOwnerAddress(
+  txRes: SuiTransactionBlockResponse,
+  address: string
+) {
+  const objects = getCreatedObjects(txRes);
+  if (!objects) throw new Error("Failed to mint contract stock");
+  const objectsWithOwnerAddress = objects.filter((obj) => {
+    if (typeof obj.owner === "string") return false;
+    if ("AddressOwner" in obj.owner) {
+      return obj.owner.AddressOwner === address;
+    } else {
+      return false;
+    }
+  });
+  if (!objectsWithOwnerAddress)
+    throw new Error(
+      `Failed to find object with owner address ${address} in objects: ${JSON.stringify(
+        objects,
+        null,
+        2
+      )}`
+    );
+
+  return objectsWithOwnerAddress.map((obj) => obj.objectId);
+}
+
 export function findObjectIdInOwnedObjectList(
   list: OwnedObjectList,
   objectId: string
