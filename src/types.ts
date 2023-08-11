@@ -85,7 +85,7 @@ export type BurnContractResult = ContractStockDetails & {
   success: boolean;
 };
 
-type BuyShareInfo = {
+export type BuyShareInfo = {
   contractId: string;
   receiverAddress: string;
   shares: number;
