@@ -107,7 +107,7 @@ export type BatchMintContractStockParams = BaseContractParams & {
   list: BuyShareInfo[];
 };
 
-type BuyShareResult = Omit<BuyShareInfo, "receiverAddress"> &
+export type BuyShareResult = Omit<BuyShareInfo, "receiverAddress"> &
   Omit<MintContractStockResult, "filledQuantity">;
 
 export type BatchMintContractStockResult = {
