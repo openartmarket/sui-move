@@ -61,7 +61,6 @@ export async function batchMintContractStock(
   const tx = new TransactionBlock();
 
   for (const { contractId, receiverAddress, shares } of list) {
-    console.log({ contractId, receiverAddress, shares });
     tx.moveCall({
       target: `${packageId}::open_art_market::mint_contract_stock`,
       arguments: [
@@ -72,7 +71,6 @@ export async function batchMintContractStock(
       ],
     });
   }
-  console.log(tx);
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
     transactionBlock: tx,
@@ -93,7 +91,6 @@ export async function batchMintContractStock(
         id: contractStockId,
         options: { showContent: true },
       });
-      console.log(contractStock.data);
       if (!contractStock.data?.content) throw new Error("No content found");
       const content = contractStock.data.content;
       results.push({
