@@ -32,12 +32,12 @@ export type AvailableStockParams = {
 // Mint Contract
 export type MintContractParams = BaseContractParams & {
   adminCapId: string;
-  totalSupply: number;
+  totalShareCount: number;
   sharePrice: number;
   outgoingPrice: number;
   name: string;
   artist: string;
-  creationDate: string;
+  creationTimestampMillis: number;
   description: string;
   currency: Currency;
   image: string;
