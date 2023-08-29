@@ -55,6 +55,10 @@ export async function batchMintContractStock(
   params: BatchMintContractStockParams
 ): Promise<BatchMintContractStockResult> {
   const { signerPhrase, packageId, adminCapId, list, network } = params;
+  console.log("list", list)
+  console.log("packageId", packageId)
+  console.log("adminCapId", adminCapId)
+  console.log("network", network)
   const { keypair } = getSigner(signerPhrase);
   const client = getClient(network);
 
