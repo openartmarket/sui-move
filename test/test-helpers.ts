@@ -63,10 +63,10 @@ export const baseOptions = {
 
 export const mintContractOptions: MintContractParams = {
   ...baseOptions,
-  totalSupply: 500,
+  totalShareCount: 500,
   sharePrice: 10,
   outgoingPrice: 100,
-  creationDate: "1685548680595",
+  creationTimestampMillis: 1685548680595,
   name: "Mona Lisa",
   artist: "Leonardo da Vinci",
   description: "Choconta painting",
