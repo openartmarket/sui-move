@@ -1,6 +1,7 @@
+import { SuiClient } from "@mysten/sui.js/dist/cjs/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getClient, getSigner } from "./helpers";
+import { getSigner } from "./helpers";
 import { CreateContractDisplayParams } from "./types";
 
 // This is the function you can update to change the display fields
@@ -18,17 +19,14 @@ function getContractDisplayFields() {
   };
 }
 
-export async function createContractDisplay({
-  CONTRACT_TYPE,
-  PUBLISHER_ID,
-  ADMIN_PHRASE,
-  SUI_NETWORK,
-}: CreateContractDisplayParams) {
+export async function createContractDisplay(
+  client: SuiClient,
+  { CONTRACT_TYPE, PUBLISHER_ID, ADMIN_PHRASE }: CreateContractDisplayParams,
+) {
   const contractDisplayFields = getContractDisplayFields();
 
   const { keypair } = getSigner(ADMIN_PHRASE);
   const address = keypair.getPublicKey().toSuiAddress();
-  const client = getClient(SUI_NETWORK);
   const tx = new TransactionBlock();
 
   const contractDisplay = tx.moveCall({

@@ -25,7 +25,7 @@ jobs:
     - run: direnv exec . npm test
     - run: npm run format
     - run: npm run lint
-    - run: npm run build
+    - run: npm run compile
     - run: ./scripts/fail-if-dirty
     - name: Print environment variables
       run: |

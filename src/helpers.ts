@@ -1,14 +1,8 @@
-import {
-  getFullnodeUrl,
-  SuiClient,
-  SuiObjectChangeCreated,
-  SuiTransactionBlockResponse,
-} from "@mysten/sui.js/client";
+import { SuiObjectChangeCreated, SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 
 import {
   MergeStockMoveTransactionParams,
-  NetworkName,
   SplitStockMoveTransactionParams,
   TransferStockMoveTransactionParams,
   VoteMoveTransactionParams,
@@ -43,17 +37,11 @@ function getExecutionStatus(txRes: SuiTransactionBlockResponse): string {
 }
 
 export function getCreatedObjects(
-  txRes: SuiTransactionBlockResponse
+  txRes: SuiTransactionBlockResponse,
 ): SuiObjectChangeCreated[] | null {
   return txRes.objectChanges?.filter(
-    (change) => change.type === "created"
+    (change) => change.type === "created",
   ) as SuiObjectChangeCreated[];
-}
-
-export function getClient(network: NetworkName = "localnet") {
-  return new SuiClient({
-    url: getFullnodeUrl(network),
-  });
 }
 
 export function transferMoveCall({

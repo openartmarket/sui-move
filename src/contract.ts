@@ -1,13 +1,14 @@
+import { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getClient, getCreatedObjects, getSigner, handleTransactionResponse } from "./helpers";
+import { getCreatedObjects, getSigner, handleTransactionResponse } from "./helpers";
 import { MintContractParams } from "./types";
 /**
  * Mints a new contract
  * @param params
  * @returns the contract id
  */
-export async function mintContract(params: MintContractParams): Promise<string> {
+export async function mintContract(client: SuiClient, params: MintContractParams): Promise<string> {
   const {
     adminCapId,
     packageId,
@@ -21,13 +22,11 @@ export async function mintContract(params: MintContractParams): Promise<string> 
     description,
     currency,
     image,
-    network,
   } = params;
 
   // console.log("Mint contract: %s", name + " by " + artist);
 
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

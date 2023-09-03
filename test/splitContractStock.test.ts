@@ -4,25 +4,32 @@ import { beforeEach, describe, it } from "mocha";
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/contract_stock";
 import { splitContractStock } from "../src/split_contract_stock";
-import { baseOptions, mintContractOptions, USER1_ADDRESS, USER1_PHRASE } from "./test-helpers";
+import {
+  baseOptions,
+  getClient,
+  mintContractOptions,
+  USER1_ADDRESS,
+  USER1_PHRASE,
+} from "./test-helpers";
 import { getObject } from "./test-helpers";
 
 describe("splitContractStock", () => {
+  const client = getClient();
   let contractId: string;
   beforeEach(async function () {
     this.timeout(20_000);
-    contractId = await mintContract(mintContractOptions);
+    contractId = await mintContract(client, mintContractOptions);
   });
 
   it("should split an contract stock", async () => {
-    const { contractStockId } = await mintContractStock({
+    const { contractStockId } = await mintContractStock(client, {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 10,
     });
 
-    const splitStockId = await splitContractStock({
+    const splitStockId = await splitContractStock(client, {
       ...baseOptions,
       contractStockId,
       signerPhrase: USER1_PHRASE,
@@ -43,20 +50,20 @@ describe("splitContractStock", () => {
   }).timeout(30_000);
 
   it("should split a split stock", async () => {
-    const { contractStockId } = await mintContractStock({
+    const { contractStockId } = await mintContractStock(client, {
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 12,
       ...baseOptions,
     });
 
-    const splitStockId = await splitContractStock({
+    const splitStockId = await splitContractStock(client, {
       ...baseOptions,
       contractStockId,
       signerPhrase: USER1_PHRASE,
       shares: 5,
     });
-    const splitAgainStockId = await splitContractStock({
+    const splitAgainStockId = await splitContractStock(client, {
       ...baseOptions,
       contractStockId: splitStockId.contractStockId,
       signerPhrase: USER1_PHRASE,

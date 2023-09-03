@@ -9,6 +9,7 @@ import { splitContractStock } from "../src/split_contract_stock";
 import { transferContractStock } from "../src/transfer_contract_stock";
 import {
   baseOptions,
+  getClient,
   getObject,
   getOwnedObjects,
   mintContractOptions,
@@ -19,20 +20,21 @@ import {
 } from "./test-helpers";
 
 describe("transferContractStock", () => {
+  const client = getClient();
   let contractId: string;
   beforeEach(async () => {
-    contractId = await mintContract(mintContractOptions);
+    contractId = await mintContract(client, mintContractOptions);
   });
 
   it("should mint a stock and then transfer it", async () => {
-    const { contractStockId } = await mintContractStock({
+    const { contractStockId } = await mintContractStock(client, {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 12,
     });
 
-    await transferContractStock({
+    await transferContractStock(client, {
       ...baseOptions,
       contractId,
       contractStockId,
@@ -47,14 +49,14 @@ describe("transferContractStock", () => {
   }).timeout(30_000);
 
   it("should split a split stock and transfer it to new owner", async () => {
-    const { contractStockId } = await mintContractStock({
+    const { contractStockId } = await mintContractStock(client, {
       ...baseOptions,
       contractId,
       receiverAddress: USER2_ADDRESS,
       shares: 12,
     });
 
-    const splitStockId1 = await splitContractStock({
+    const splitStockId1 = await splitContractStock(client, {
       ...baseOptions,
       contractStockId,
       signerPhrase: USER2_PHRASE,
@@ -71,7 +73,7 @@ describe("transferContractStock", () => {
     // @ts-ignore
     assert.strictEqual(splitStock.data.content.fields.shares, "5");
 
-    const transferContractStockResponse = await transferContractStock({
+    const transferContractStockResponse = await transferContractStock(client, {
       ...baseOptions,
       contractId,
       contractStockId: splitStockId1.contractStockId,
@@ -83,7 +85,7 @@ describe("transferContractStock", () => {
 
     const transferredStock = findObjectIdInOwnedObjectList(
       ownedObjects as OwnedObjectList,
-      splitStockId1.contractStockId
+      splitStockId1.contractStockId,
     );
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

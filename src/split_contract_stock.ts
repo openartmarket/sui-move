@@ -1,16 +1,17 @@
+import { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { findObjectIdWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
-import { getClient, getSigner, handleTransactionResponse, splitMoveCall } from "./helpers";
+import { getSigner, handleTransactionResponse, splitMoveCall } from "./helpers";
 import { ContractStockDetails, SplitContractStockParams } from "./types";
 
 export async function splitContractStock(
-  params: SplitContractStockParams
+  client: SuiClient,
+  params: SplitContractStockParams,
 ): Promise<ContractStockDetails> {
-  const { contractStockId, signerPhrase, shares, packageId, network } = params;
+  const { contractStockId, signerPhrase, shares, packageId } = params;
   const { keypair } = getSigner(signerPhrase);
   const address = keypair.getPublicKey().toSuiAddress();
-  const client = getClient(network);
   const tx = new TransactionBlock();
 
   splitMoveCall({ tx, packageId, contractStockId, shares });

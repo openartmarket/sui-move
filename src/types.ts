@@ -15,7 +15,6 @@ export type Currency = "USD" | "EUR" | "GBP" | "NOK";
 export type BaseContractParams = {
   packageId: string;
   signerPhrase: string;
-  network?: NetworkName;
 };
 
 // Common interface for contract stock details

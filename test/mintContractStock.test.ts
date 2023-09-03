@@ -7,36 +7,36 @@ import { batchMintContractStock, mintContractStock } from "../src/contract_stock
 import {
   ADMIN_ADDRESS,
   baseOptions,
+  getClient,
   mintContractOptions,
-  network,
   USER1_ADDRESS,
   USER2_ADDRESS,
   USER3_ADDRESS,
 } from "./test-helpers";
 
 describe("mintContractStock", () => {
+  const client = getClient();
   let contractId: string;
   beforeEach(async () => {
-    contractId = await mintContract(mintContractOptions);
+    contractId = await mintContract(client, mintContractOptions);
   });
 
   it("should issue new shares", async () => {
-    await mintContractStock({
+    await mintContractStock(client, {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 2,
     });
-    const sharesLeft = await availableStock({
+    const sharesLeft = await availableStock(client, {
       contractId,
-      network,
     });
     assert.equal(sharesLeft, 498);
   });
 
   it("should batch issue new shares", async () => {
-    const contractId2 = await mintContract(mintContractOptions);
-    await batchMintContractStock({
+    const contractId2 = await mintContract(client, mintContractOptions);
+    await batchMintContractStock(client, {
       ...baseOptions,
       list: [
         { contractId: contractId2, receiverAddress: USER1_ADDRESS, shares: 20 },
@@ -46,13 +46,11 @@ describe("mintContractStock", () => {
         { contractId, receiverAddress: USER3_ADDRESS, shares: 5 },
       ],
     });
-    const sharesLeft = await availableStock({
+    const sharesLeft = await availableStock(client, {
       contractId,
-      network,
     });
-    const sharesLeft2 = await availableStock({
+    const sharesLeft2 = await availableStock(client, {
       contractId: contractId2,
-      network,
     });
     assert.equal(sharesLeft, 490);
     assert.equal(sharesLeft2, 470);
@@ -60,64 +58,63 @@ describe("mintContractStock", () => {
 
   it("should not issue new shares, when asking for too much", async () => {
     await assert.rejects(
-      mintContractStock({
+      mintContractStock(client, {
         contractId,
         shares: 501,
         receiverAddress: USER1_ADDRESS,
         ...baseOptions,
-      })
+      }),
     );
   });
 
   it("should not issue new shares, when sold out", async () => {
-    await mintContractStock({
+    await mintContractStock(client, {
       contractId,
       shares: 150,
       receiverAddress: USER1_ADDRESS,
       ...baseOptions,
     });
-    await mintContractStock({
+    await mintContractStock(client, {
       contractId,
       receiverAddress: USER2_ADDRESS,
       shares: 250,
       ...baseOptions,
     });
-    await mintContractStock({
+    await mintContractStock(client, {
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 98,
       ...baseOptions,
     });
-    const sharesLeft = await availableStock({
+    const sharesLeft = await availableStock(client, {
       contractId,
-      network,
     });
     assert.equal(sharesLeft, 2);
 
     await assert.rejects(
-      mintContractStock({
+      mintContractStock(client, {
         contractId,
         receiverAddress: USER2_ADDRESS,
         shares: 3,
         ...baseOptions,
-      })
+      }),
     );
   }).timeout(30_000);
 
   it("can give shares to OAM and owner", async () => {
-    await mintContractStock({
+    await mintContractStock(client, {
       contractId,
       receiverAddress: ADMIN_ADDRESS,
       shares: 150,
       ...baseOptions,
     });
-    await mintContractStock({
+    await mintContractStock(client, {
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 50,
       ...baseOptions,
     });
-    await mintContractStock({
+    await mintContractStock(client, {
       contractId,
       receiverAddress: USER2_ADDRESS,
       shares: 1,

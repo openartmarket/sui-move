@@ -5,6 +5,7 @@ import { mintContractStock } from "../src/contract_stock";
 import { mergeContractStock } from "../src/merge_contract_stock";
 import {
   baseOptions,
+  getClient,
   getObject,
   mintContractOptions,
   USER1_ADDRESS,
@@ -12,27 +13,28 @@ import {
 } from "./test-helpers";
 
 describe("mergeContractStock", () => {
+  const client = getClient();
   let contractId: string;
   beforeEach(async function () {
     this.timeout(20_000);
-    contractId = await mintContract(mintContractOptions);
+    contractId = await mintContract(client, mintContractOptions);
   });
 
   it("should merge contract stocks", async () => {
-    const { contractStockId } = await mintContractStock({
+    const { contractStockId } = await mintContractStock(client, {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 10,
     });
-    const { contractStockId: contractStock2Id } = await mintContractStock({
+    const { contractStockId: contractStock2Id } = await mintContractStock(client, {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
       shares: 10,
     });
 
-    const mergeContractStocks = await mergeContractStock({
+    const mergeContractStocks = await mergeContractStock(client, {
       ...baseOptions,
       contractStock1Id: contractStockId,
       contractStock2Id,

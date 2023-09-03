@@ -1,10 +1,11 @@
+import { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import {
   findObjectIdWithOwnerAddress,
   findObjectsWithOwnerAddress,
 } from "./findObjectIdWithOwnerAddress";
-import { getClient, getSigner, handleTransactionResponse } from "./helpers";
+import { getSigner, handleTransactionResponse } from "./helpers";
 import {
   BatchMintContractStockParams,
   BatchMintContractStockResult,
@@ -17,12 +18,11 @@ import {
  * @returns contract stock id
  */
 export async function mintContractStock(
-  params: MintContractStockParams
+  client: SuiClient,
+  params: MintContractStockParams,
 ): Promise<MintContractStockResult> {
-  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, shares, network } =
-    params;
+  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, shares } = params;
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient(network);
 
   const tx = new TransactionBlock();
 
@@ -52,11 +52,11 @@ export async function mintContractStock(
 }
 
 export async function batchMintContractStock(
-  params: BatchMintContractStockParams
+  client: SuiClient,
+  params: BatchMintContractStockParams,
 ): Promise<BatchMintContractStockResult> {
-  const { signerPhrase, packageId, adminCapId, list, network } = params;
+  const { signerPhrase, packageId, adminCapId, list } = params;
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient(network);
 
   const tx = new TransactionBlock();
 
