@@ -30,28 +30,28 @@ function getContractStockDisplayFields() {
 
 export async function createContractStockDisplay(
   client: SuiClient,
-  { ADMIN_PHRASE, CONTRACT_STOCK_TYPE, PUBLISHER_ID }: CreateContractStockDisplayParams,
+  { adminPhrase, contractStockType, publisherId }: CreateContractStockDisplayParams,
 ) {
   const contractStockDisplayFields = getContractStockDisplayFields();
 
   const tx = new TransactionBlock();
-  const { keypair } = getSigner(ADMIN_PHRASE);
+  const { keypair } = getSigner(adminPhrase);
   const address = keypair.getPublicKey().toSuiAddress();
 
   const contractStockDisplay = tx.moveCall({
     target: "0x2::display::new_with_fields",
     arguments: [
-      tx.object(PUBLISHER_ID),
+      tx.object(publisherId),
       tx.pure(contractStockDisplayFields.keys),
       tx.pure(contractStockDisplayFields.values),
     ],
-    typeArguments: [CONTRACT_STOCK_TYPE],
+    typeArguments: [contractStockType],
   });
 
   tx.moveCall({
     target: "0x2::display::update_version",
     arguments: [contractStockDisplay],
-    typeArguments: [CONTRACT_STOCK_TYPE],
+    typeArguments: [contractStockType],
   });
 
   tx.transferObjects([contractStockDisplay], tx.pure(address));

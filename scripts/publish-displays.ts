@@ -17,15 +17,15 @@ async function main() {
   const client = getClient();
 
   await createContractDisplay(client, {
-    ADMIN_PHRASE,
-    CONTRACT_TYPE,
-    PUBLISHER_ID,
+    adminPhrase: ADMIN_PHRASE,
+    contractType: CONTRACT_TYPE,
+    publisherId: PUBLISHER_ID,
     SUI_NETWORK: SUI_NETWORK_NAME as NetworkName,
   });
   await createContractStockDisplay(client, {
-    ADMIN_PHRASE,
-    CONTRACT_STOCK_TYPE,
-    PUBLISHER_ID,
+    adminPhrase: ADMIN_PHRASE,
+    contractStockType: CONTRACT_STOCK_TYPE,
+    publisherId: PUBLISHER_ID,
     SUI_NETWORK: SUI_NETWORK_NAME as NetworkName,
   });
 

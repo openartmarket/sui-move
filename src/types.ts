@@ -152,16 +152,15 @@ export type Data = {
 };
 
 type BaseDisplayParams = {
-  PUBLISHER_ID: string;
-  ADMIN_PHRASE: string;
-  SUI_NETWORK: NetworkName;
+  publisherId: string;
+  adminPhrase: string;
 };
 
 export type CreateContractDisplayParams = BaseDisplayParams & {
-  CONTRACT_TYPE: string;
+  contractType: string;
 };
 export type CreateContractStockDisplayParams = BaseDisplayParams & {
-  CONTRACT_STOCK_TYPE: string;
+  contractStockType: string;
 };
 
 export type MoveTransactionParams = {
