@@ -42,7 +42,7 @@
     "test/test-helpers.ts",
     "test_scenarios"
   ],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "test/**/*", "scripts/**/*"],
   "ts-node": {
     "transpileOnly": true,
     "files": true,

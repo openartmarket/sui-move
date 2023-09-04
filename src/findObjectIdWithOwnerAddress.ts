@@ -19,8 +19,8 @@ export function findObjectIdWithOwnerAddress(txRes: SuiTransactionBlockResponse,
       `Failed to find object with owner address ${address} in objects: ${JSON.stringify(
         objects,
         null,
-        2
-      )}`
+        2,
+      )}`,
     );
   const objectId = objectWithOwnerAddress.objectId;
   return objectId;
@@ -28,7 +28,7 @@ export function findObjectIdWithOwnerAddress(txRes: SuiTransactionBlockResponse,
 
 export async function findObjectsWithOwnerAddress(
   txRes: SuiTransactionBlockResponse,
-  address: string
+  address: string,
 ) {
   const objects = getCreatedObjects(txRes);
   if (!objects) throw new Error("Failed to mint contract stock");
@@ -45,8 +45,8 @@ export async function findObjectsWithOwnerAddress(
       `Failed to find object with owner address ${address} in objects: ${JSON.stringify(
         objects,
         null,
-        2
-      )}`
+        2,
+      )}`,
     );
 
   return objectsWithOwnerAddress.map((obj) => obj.objectId);
@@ -54,7 +54,7 @@ export async function findObjectsWithOwnerAddress(
 
 export function findObjectIdInOwnedObjectList(
   list: OwnedObjectList,
-  objectId: string
+  objectId: string,
 ): Daum | false {
   let object: Daum | undefined = undefined;
   list.data.find((obj: Daum) => {

@@ -4,8 +4,8 @@ import {
   PaginatedObjectsResponse,
   SuiObjectResponse,
 } from "@mysten/sui.js";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 
-import { getClient } from "../src/helpers";
 import { MintContractParams, NetworkName } from "../src/types";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
@@ -19,22 +19,25 @@ export const USER1_ADDRESS = getEnv("USER1_ADDRESS");
 export const USER2_ADDRESS = getEnv("USER2_ADDRESS");
 export const USER3_ADDRESS = getEnv("USER3_ADDRESS");
 
-export const SUI_NETWORK = getEnv("SUI_NETWORK");
+export const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
 export const CONTRACT_TYPE = `${PACKAGE_ID}::open_art_market::Contract`;
 export const CONTRACT_STOCK_TYPE = `${PACKAGE_ID}::open_art_market::ContractStock`;
 
-export const network = SUI_NETWORK as NetworkName;
+export function getClient(): SuiClient {
+  const url = getFullnodeUrl(SUI_NETWORK);
+  return new SuiClient({ url });
+}
 
 export async function getObject(objectId: string): Promise<SuiObjectResponse> {
-  return await getClient(network).getObject({
+  return await getClient().getObject({
     id: objectId,
     options: { showContent: true },
   });
 }
 
 export async function getOwnedObjects(address: string): Promise<PaginatedObjectsResponse> {
-  return await getClient(network).getOwnedObjects({
+  return await getClient().getOwnedObjects({
     owner: address,
   });
 }
@@ -58,7 +61,6 @@ export const baseOptions = {
   signerPhrase: ADMIN_PHRASE,
   packageId: PACKAGE_ID,
   adminCapId: ADMIN_CAP_ID,
-  network,
 };
 
 export const mintContractOptions: MintContractParams = {

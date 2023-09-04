@@ -1,6 +1,7 @@
+import { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getClient, getSigner, handleTransactionResponse, transferMoveCall } from "./helpers";
+import { getSigner, handleTransactionResponse, transferMoveCall } from "./helpers";
 import { TransferContractStockParams, TransferContractStockResult } from "./types";
 
 /**
@@ -8,11 +9,11 @@ import { TransferContractStockParams, TransferContractStockResult } from "./type
  * @returns contract stock id
  */
 export async function transferContractStock(
-  params: TransferContractStockParams
+  client: SuiClient,
+  params: TransferContractStockParams,
 ): Promise<TransferContractStockResult> {
-  const { contractId, signerPhrase, receiverAddress, contractStockId, packageId, network } = params;
+  const { contractId, signerPhrase, receiverAddress, contractStockId, packageId } = params;
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient(network);
   const tx = new TransactionBlock();
 
   transferMoveCall({ tx, packageId, contractId, contractStockId, receiverAddress });

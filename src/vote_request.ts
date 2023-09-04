@@ -1,18 +1,14 @@
+import { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getClient, getCreatedObjects, getSigner, handleTransactionResponse } from "./helpers";
+import { getCreatedObjects, getSigner, handleTransactionResponse } from "./helpers";
 import { VoteRequestParams } from "./types";
 
-export async function createVoteRequest({
-  contractId,
-  request,
-  adminCapId,
-  packageId,
-  signerPhrase,
-  network,
-}: VoteRequestParams): Promise<string> {
+export async function createVoteRequest(
+  client: SuiClient,
+  { contractId, request, adminCapId, packageId, signerPhrase }: VoteRequestParams,
+): Promise<string> {
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({

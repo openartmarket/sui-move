@@ -1,16 +1,15 @@
-import { getClient } from "./helpers";
+import { SuiClient } from "@mysten/sui.js/dist/cjs/client";
+
 import { AvailableStockParams } from "./types";
 /**
  * Mints a new contract
  * @param params
  * @returns the contract id
  */
-export async function availableStock({
-  contractId,
-  network,
-}: AvailableStockParams): Promise<number> {
-  const client = getClient(network);
-
+export async function availableStock(
+  client: SuiClient,
+  { contractId }: AvailableStockParams,
+): Promise<number> {
   const txn = await client.getObject({
     id: contractId,
     options: { showContent: true },

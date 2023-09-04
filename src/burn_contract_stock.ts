@@ -1,12 +1,15 @@
+import { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getClient, getSigner, handleTransactionResponse } from "./helpers";
+import { getSigner, handleTransactionResponse } from "./helpers";
 import { BurnContractParams, BurnContractResult } from "./types";
 
-export async function burnContractStock(params: BurnContractParams): Promise<BurnContractResult> {
-  const { contractStockId, contractId, packageId, signerPhrase, network } = params;
+export async function burnContractStock(
+  client: SuiClient,
+  params: BurnContractParams,
+): Promise<BurnContractResult> {
+  const { contractStockId, contractId, packageId, signerPhrase } = params;
   const { keypair } = getSigner(signerPhrase);
-  const client = getClient(network);
   const tx = new TransactionBlock();
 
   tx.moveCall({
