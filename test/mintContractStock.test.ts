@@ -67,6 +67,36 @@ describe("mintContractStock", () => {
     );
   });
 
+  it("should issue remaining shares", async () => {
+    await mintContractStock(client, {
+      contractId,
+      shares: 498,
+      receiverAddress: USER1_ADDRESS,
+      ...baseOptions,
+    });
+
+    await mintContractStock(client, {
+      contractId,
+      shares: 2,
+      receiverAddress: USER1_ADDRESS,
+      ...baseOptions,
+    });
+
+    const sharesLeft = await availableStock(client, {
+      contractId,
+    });
+    assert.equal(sharesLeft, 0);
+
+    await assert.rejects(
+      mintContractStock(client, {
+        contractId,
+        shares: 1,
+        receiverAddress: USER1_ADDRESS,
+        ...baseOptions,
+      }),
+    );
+  });
+
   it("should not issue new shares, when sold out", async () => {
     await mintContractStock(client, {
       contractId,
