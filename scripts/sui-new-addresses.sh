@@ -3,11 +3,8 @@ set -euo pipefail
 
 envs=$(sui client active-env)
 
-if [[ $envs != *"localnet"* ]]; then
-  sui client switch --env localnet
-fi
-
 gas=$(sui client gas --json)
+echo $gas
 sui_coin_object_id=$(echo $gas | jq -r '.[0].id.id')
 
 rm -f .sui.env

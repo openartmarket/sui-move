@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-network=${SUI_NETWORK_NAME:-localnet}
+network=${SUI_NETWORK:-localnet}
 SUI_URL="https://fullnode.$network.sui.io:443"
 
 echo "👉 Switching to $network on $SUI_URL"

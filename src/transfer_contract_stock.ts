@@ -5,7 +5,7 @@ import { getSigner, handleTransactionResponse, transferMoveCall } from "./helper
 import { TransferContractStockParams, TransferContractStockResult } from "./types";
 
 /**
- * Mints an contract stock
+ * Transfers an contract stock
  * @returns contract stock id
  */
 export async function transferContractStock(

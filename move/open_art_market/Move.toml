@@ -4,7 +4,7 @@ version = "0.0.1"
 
 [dependencies]
 # Keep the version in sync with bootstrap.sh and Dockerfile
-Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "testnet-v1.6.2" }
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "mainnet-v1.8.2" }
 
 [addresses]
 open_art_market = "0x0"
