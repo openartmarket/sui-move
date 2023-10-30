@@ -1,10 +1,9 @@
 import {
-  Connection,
-  JsonRpcProvider,
+  getFullnodeUrl,
   PaginatedObjectsResponse,
+  SuiClient,
   SuiObjectResponse,
-} from "@mysten/sui.js";
-import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
+} from "@mysten/sui.js/client";
 
 import { MintContractParams, NetworkName } from "../src/types";
 
@@ -42,11 +41,9 @@ export async function getOwnedObjects(address: string): Promise<PaginatedObjects
   });
 }
 
-export function getProvider(SUI_NETWORK: string) {
-  const connOptions = new Connection({
-    fullnode: SUI_NETWORK,
-  });
-  return new JsonRpcProvider(connOptions);
+export function getProvider(SUI_NETWORK: NetworkName) {
+  
+  return new SuiClient({ url: getFullnodeUrl(SUI_NETWORK)});
 }
 
 export function getEnv(name: string): string {
@@ -55,7 +52,7 @@ export function getEnv(name: string): string {
   if (!value) throw new Error(`Missing env variable ${name}`);
   return value;
 }
-export const provider = getProvider(SUI_NETWORK);
+export const provider = getProvider(SUI_NETWORK as NetworkName);
 
 export const baseOptions = {
   signerPhrase: ADMIN_PHRASE,
