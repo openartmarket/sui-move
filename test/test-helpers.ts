@@ -42,8 +42,7 @@ export async function getOwnedObjects(address: string): Promise<PaginatedObjects
 }
 
 export function getProvider(SUI_NETWORK: NetworkName) {
-  
-  return new SuiClient({ url: getFullnodeUrl(SUI_NETWORK)});
+  return new SuiClient({ url: getFullnodeUrl(SUI_NETWORK) });
 }
 
 export function getEnv(name: string): string {
