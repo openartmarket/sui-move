@@ -7,49 +7,20 @@ env:
 on:
   workflow_dispatch: # Allow running on-demand
   schedule:
-    # Runs every night at 04:20 UTC
-    - cron: '20 4 * * *'
+    # Runs every night at 04:10 UTC
+    - cron: '10 4 * * *'
 
 jobs:
   upgrade:
     name: Create Upgrade PR
     runs-on: self-hosted
-    env:
-      # This branch will receive updates each time the workflow runs
-      # It doesn't matter if it's deleted when merged, it'll be re-created
-      BRANCH_NAME: auto-dependency-upgrades
     steps:
       - uses: actions/checkout@v3
-      - run: ./scripts/upgrade
-      - name: Detect changes
-        id: changes
-        run:
-          # This output boolean tells us if the dependencies have actually changed
-          echo "count=$(git status --porcelain=v1 2>/dev/null | wc -l)" >> $GITHUB_OUTPUT
-      - name: Commit & push changes
-        # Only push if changes exist
-        if: steps.changes.outputs.count > 0
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "Automated dependency upgrades"
-          git push -f origin ${{ github.ref_name }}:$BRANCH_NAME
+      - run: ./scripts/asdf-install.sh
+      - run: npm ci
+      - run: npm run upgrade
       - name: Open pull request if needed
-        if: steps.changes.outputs.count > 0
+        run: ./scripts/gha-open-pr.sh auto-dependency-upgrades "Automated dependency upgrades" "package.json"
         env:
           # https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
-          # 
-          GITHUB_TOKEN: ${{ secrets.GHA_PR_GITHUB_TOKEN }}
-        # Only open a PR if the branch is not attached to an existing one
-        run: |
-          PR=$(gh pr list --head $BRANCH_NAME --json number -q '.[0].number')
-          if [ -z $PR ]; then
-            pr_url=$(gh pr create \
-              --head $BRANCH_NAME \
-              --title "Automated dependency upgrades" \
-              --body "Full log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}")
-            gh pr merge --auto --merge "${pr_url}"
-          else
-            echo "Pull request already exists, won't create a new one."
-          fi
+          GH_TOKEN: ${{ secrets.GHA_PR_GITHUB_TOKEN }}
