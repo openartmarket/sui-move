@@ -3,4 +3,3 @@ tmp/
 dist/
 sui.log.*
 .sui.env
-.sui.test.env
