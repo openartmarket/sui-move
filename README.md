@@ -1,3 +1,5 @@
+[![Continuous Integration](https://github.com/openartmarket/sui-move/actions/workflows/ci.yml/badge.svg)](https://github.com/openartmarket/sui-move/actions/workflows/ci.yml)
+
 # Open Art Market SUI Move contracts
 
 [Open Art Market](https://openartmarket.com) uses blockchain technology to provide a public, transparent and decentralized way to manage unique artwork assets and their shares.
