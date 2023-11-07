@@ -16,8 +16,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-      - run: ./scripts/asdf-install.sh
-      - run: direnv allow
+      - run: npm ci
       - run: npm run upgrade
       - name: Open pull request if needed
         run: ./scripts/gha-open-pr.sh auto-dependency-upgrades "Automated dependency upgrades" "package.json"
