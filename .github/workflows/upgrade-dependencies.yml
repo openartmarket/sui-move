@@ -16,6 +16,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
+      - run: ./scripts/asdf-install.sh
       - run: npm ci
       - run: npm run upgrade
       - name: Open pull request if needed
