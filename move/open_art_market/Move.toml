@@ -3,7 +3,7 @@ name = "open_art_market"
 version = "0.0.1"
 
 [dependencies]
-# Keep the version in sync with bootstrap.sh and Dockerfile
+# Keep the version in sync with scripts/install-sui.sh
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "mainnet-v1.8.2" }
 
 [addresses]
