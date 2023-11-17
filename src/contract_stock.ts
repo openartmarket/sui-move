@@ -1,10 +1,7 @@
 import { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import {
-  findObjectIdWithOwnerAddress,
-  findObjectsWithOwnerAddress,
-} from "./findObjectIdWithOwnerAddress";
+import { findObjectsWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
 import { getSigner, handleTransactionResponse } from "./helpers";
 import {
   BatchMintContractStockParams,
@@ -47,7 +44,12 @@ export async function mintContractStock(
     },
   });
   handleTransactionResponse(txRes);
-  const contractStockId = findObjectIdWithOwnerAddress(txRes, receiverAddress);
+  const contractStockIds = findObjectsWithOwnerAddress(txRes, receiverAddress).map(
+    (obj) => obj.objectId,
+  );
+  if (contractStockIds.length !== 1)
+    throw new Error(`Expected 1 contract stock id, got ${JSON.stringify(contractStockIds)}`);
+  const contractStockId = contractStockIds[0];
   const { digest } = txRes;
   return { contractStockId, digest };
 }
@@ -86,8 +88,10 @@ export async function batchMintContractStock(
   const results: BuyShareResult[] = [];
 
   for (const { receiverAddress } of list) {
-    const contractStocks = await findObjectsWithOwnerAddress(txRes, receiverAddress);
-    for (const contractStockId of contractStocks) {
+    const contractStockIds = findObjectsWithOwnerAddress(txRes, receiverAddress).map(
+      (obj) => obj.objectId,
+    );
+    for (const contractStockId of contractStockIds) {
       const contractStock = await client.getObject({
         id: contractStockId,
         options: { showContent: true },
@@ -103,7 +107,7 @@ export async function batchMintContractStock(
         receiverAddress,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        shares: +content.fields.shares,
+        quantity: +content.fields.shares,
       });
     }
   }

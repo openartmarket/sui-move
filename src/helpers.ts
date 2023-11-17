@@ -36,10 +36,8 @@ function getExecutionStatus(txRes: SuiTransactionBlockResponse): string {
   return status.status;
 }
 
-export function getCreatedObjects(
-  txRes: SuiTransactionBlockResponse,
-): SuiObjectChangeCreated[] | null {
-  return txRes.objectChanges?.filter(
+export function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[] {
+  return (txRes.objectChanges || []).filter(
     (change) => change.type === "created",
   ) as SuiObjectChangeCreated[];
 }

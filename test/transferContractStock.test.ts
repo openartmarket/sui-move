@@ -4,7 +4,6 @@ import { beforeEach, describe, it } from "mocha";
 import { OwnedObjectList } from "../src";
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/contract_stock";
-import { findObjectIdInOwnedObjectList } from "../src/findObjectIdWithOwnerAddress";
 import { splitContractStock } from "../src/split_contract_stock";
 import { transferContractStock } from "../src/transfer_contract_stock";
 import {
@@ -31,7 +30,7 @@ describe("transferContractStock", () => {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
-      shares: 12,
+      quantity: 12,
     });
 
     await transferContractStock(client, {
@@ -53,14 +52,14 @@ describe("transferContractStock", () => {
       ...baseOptions,
       contractId,
       receiverAddress: USER2_ADDRESS,
-      shares: 12,
+      quantity: 12,
     });
 
     const splitStockId1 = await splitContractStock(client, {
       ...baseOptions,
       contractStockId,
       signerPhrase: USER2_PHRASE,
-      shares: 5,
+      quantity: 5,
     });
 
     const oldStock = await getObject(contractStockId);
@@ -73,7 +72,7 @@ describe("transferContractStock", () => {
     // @ts-ignore
     assert.strictEqual(splitStock.data.content.fields.shares, "5");
 
-    const transferContractStockResponse = await transferContractStock(client, {
+    await transferContractStock(client, {
       ...baseOptions,
       contractId,
       contractStockId: splitStockId1.contractStockId,
@@ -81,7 +80,7 @@ describe("transferContractStock", () => {
       receiverAddress: USER1_ADDRESS,
     });
 
-    const ownedObjects = await getOwnedObjects(transferContractStockResponse.owner);
+    const ownedObjects = await getOwnedObjects(USER1_ADDRESS);
 
     const transferredStock = findObjectIdInOwnedObjectList(
       ownedObjects as OwnedObjectList,
@@ -92,3 +91,7 @@ describe("transferContractStock", () => {
     assert.strictEqual(transferredStock.data.objectId, splitStockId1.contractStockId);
   }).timeout(30_000);
 });
+
+function findObjectIdInOwnedObjectList(list: OwnedObjectList, objectId: string) {
+  return list.data.find((obj) => obj.data.objectId === objectId);
+}

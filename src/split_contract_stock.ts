@@ -1,7 +1,7 @@
 import { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { findObjectIdWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
+import { findObjectsWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
 import { getSigner, handleTransactionResponse, splitMoveCall } from "./helpers";
 import { ContractStockDetails, SplitContractStockParams } from "./types";
 
@@ -27,7 +27,10 @@ export async function splitContractStock(
 
   handleTransactionResponse(txRes);
 
-  const newContractStockId = findObjectIdWithOwnerAddress(txRes, address);
+  const contractStockIds = findObjectsWithOwnerAddress(txRes, address).map((obj) => obj.objectId);
+  if (contractStockIds.length !== 1)
+    throw new Error(`Expected 1 contract stock id, got ${JSON.stringify(contractStockIds)}`);
+  const newContractStockId = contractStockIds[0];
   return {
     contractStockId: newContractStockId,
     // owner: address,
