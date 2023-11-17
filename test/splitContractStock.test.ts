@@ -2,7 +2,7 @@ import assert from "assert";
 import { beforeEach, describe, it } from "mocha";
 
 import { mintContract } from "../src/contract";
-import { mintContractStock } from "../src/contract_stock";
+import { mintContractStock } from "../src/mint_contract_stock";
 import { splitContractStock } from "../src/split_contract_stock";
 import {
   baseOptions,

@@ -2,8 +2,8 @@ import assert from "assert";
 import { before, describe, it } from "mocha";
 
 import { mintContract } from "../src/contract";
-import { mintContractStock } from "../src/contract_stock";
 import { endRequestVoting } from "../src/end_request_voting";
+import { mintContractStock } from "../src/mint_contract_stock";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
 import {

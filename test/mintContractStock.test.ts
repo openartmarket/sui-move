@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from "mocha";
 
 import { availableStock } from "../src/available_stock";
 import { mintContract } from "../src/contract";
-import { batchMintContractStock, mintContractStock } from "../src/contract_stock";
+import { batchMintContractStock, mintContractStock } from "../src/mint_contract_stock";
 import {
   ADMIN_ADDRESS,
   baseOptions,
