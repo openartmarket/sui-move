@@ -9,6 +9,7 @@ import { getSigner, handleTransactionResponse } from "./helpers";
 import {
   BatchMintContractStockParams,
   BatchMintContractStockResult,
+  BuyShareResult,
   MintContractStockParams,
   MintContractStockResult,
 } from "./types";
@@ -21,7 +22,7 @@ export async function mintContractStock(
   client: SuiClient,
   params: MintContractStockParams,
 ): Promise<MintContractStockResult> {
-  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, shares } = params;
+  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, quantity } = params;
   const { keypair } = getSigner(signerPhrase);
 
   const tx = new TransactionBlock();
@@ -31,7 +32,7 @@ export async function mintContractStock(
     arguments: [
       tx.object(adminCapId),
       tx.object(contractId),
-      tx.pure(shares),
+      tx.pure(quantity),
       tx.pure(receiverAddress),
     ],
   });
@@ -48,7 +49,7 @@ export async function mintContractStock(
   handleTransactionResponse(txRes);
   const contractStockId = findObjectIdWithOwnerAddress(txRes, receiverAddress);
   const { digest } = txRes;
-  return { contractStockId, digest, owner: receiverAddress, filledQuantity: shares };
+  return { contractStockId, digest };
 }
 
 export async function batchMintContractStock(
@@ -60,13 +61,13 @@ export async function batchMintContractStock(
 
   const tx = new TransactionBlock();
 
-  for (const { contractId, receiverAddress, shares } of list) {
+  for (const { contractId, receiverAddress, quantity } of list) {
     tx.moveCall({
       target: `${packageId}::open_art_market::mint_contract_stock`,
       arguments: [
         tx.object(adminCapId),
         tx.object(contractId),
-        tx.pure(shares),
+        tx.pure(quantity),
         tx.pure(receiverAddress),
       ],
     });
@@ -82,7 +83,7 @@ export async function batchMintContractStock(
   });
   handleTransactionResponse(txRes);
 
-  const results = [];
+  const results: BuyShareResult[] = [];
 
   for (const { receiverAddress } of list) {
     const contractStocks = await findObjectsWithOwnerAddress(txRes, receiverAddress);
@@ -99,7 +100,7 @@ export async function batchMintContractStock(
         contractId: content.fields.contract_id,
         contractStockId,
         digest: txRes.digest,
-        owner: receiverAddress,
+        receiverAddress,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         shares: +content.fields.shares,

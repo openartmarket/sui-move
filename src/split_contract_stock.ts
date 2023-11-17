@@ -9,12 +9,12 @@ export async function splitContractStock(
   client: SuiClient,
   params: SplitContractStockParams,
 ): Promise<ContractStockDetails> {
-  const { contractStockId, signerPhrase, shares, packageId } = params;
+  const { contractStockId, signerPhrase, quantity, packageId } = params;
   const { keypair } = getSigner(signerPhrase);
   const address = keypair.getPublicKey().toSuiAddress();
   const tx = new TransactionBlock();
 
-  splitMoveCall({ tx, packageId, contractStockId, shares });
+  splitMoveCall({ tx, packageId, contractStockId, quantity });
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
     transactionBlock: tx,
@@ -30,6 +30,6 @@ export async function splitContractStock(
   const newContractStockId = findObjectIdWithOwnerAddress(txRes, address);
   return {
     contractStockId: newContractStockId,
-    owner: address,
+    // owner: address,
   };
 }

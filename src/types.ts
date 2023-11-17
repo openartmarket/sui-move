@@ -20,7 +20,7 @@ export type BaseContractParams = {
 // Common interface for contract stock details
 export type ContractStockDetails = {
   contractStockId: string;
-  owner: string;
+  // owner: string;
 };
 
 export type AvailableStockParams = {
@@ -44,8 +44,8 @@ export type MintContractParams = BaseContractParams & {
 
 // Merge Contract Stock
 export type MergeContractStockParams = BaseContractParams & {
-  contractStock1Id: string;
-  contractStock2Id: string;
+  toContractStockId: string;
+  fromContractStockId: string;
 };
 
 // Transfer Contract Stock
@@ -55,14 +55,14 @@ export type TransferContractStockParams = BaseContractParams & {
   receiverAddress: string;
 };
 
-export type TransferContractStockResult = ContractStockDetails & {
+export type TransferContractStockResult = {
   digest: string;
 };
 
 // Split Contract Stock
 export type SplitContractStockParams = BaseContractParams & {
   contractStockId: string;
-  shares: number;
+  quantity: number;
 };
 
 // End Vote Request
@@ -80,14 +80,14 @@ export type BurnContractParams = {
   network?: NetworkName;
 };
 
-export type BurnContractResult = ContractStockDetails & {
-  success: boolean;
-};
+// export type BurnContractResult = {
+//   success: boolean;
+// };
 
 export type BuyShareInfo = {
   contractId: string;
   receiverAddress: string;
-  shares: number;
+  quantity: number;
 };
 // Mint Contract Stock
 export type MintContractStockParams = BaseContractParams &
@@ -96,9 +96,9 @@ export type MintContractStockParams = BaseContractParams &
   };
 
 // Common interface for minted contract stock details
-export type MintContractStockResult = ContractStockDetails & {
+export type MintContractStockResult = {
+  contractStockId: string;
   digest: string;
-  filledQuantity: number;
 };
 
 export type BatchMintContractStockParams = BaseContractParams & {
@@ -106,8 +106,7 @@ export type BatchMintContractStockParams = BaseContractParams & {
   list: BuyShareInfo[];
 };
 
-export type BuyShareResult = Omit<BuyShareInfo, "receiverAddress"> &
-  Omit<MintContractStockResult, "filledQuantity">;
+export type BuyShareResult = BuyShareInfo & MintContractStockResult;
 
 export type BatchMintContractStockResult = {
   digest: string;
@@ -175,12 +174,12 @@ export type TransferStockMoveTransactionParams = MoveTransactionParams & {
 };
 
 export type MergeStockMoveTransactionParams = MoveTransactionParams & {
-  contractStock1Id: string;
-  contractStock2Id: string;
+  toContractStockId: string;
+  fromContractStockId: string;
 };
 export type SplitStockMoveTransactionParams = MoveTransactionParams & {
   contractStockId: string;
-  shares: number;
+  quantity: number;
 };
 export type VoteMoveTransactionParams = MoveTransactionParams & {
   contractId: string;

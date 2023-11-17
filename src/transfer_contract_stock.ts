@@ -30,5 +30,5 @@ export async function transferContractStock(
 
   handleTransactionResponse(txRes);
   const { digest } = txRes;
-  return { contractStockId, digest, owner: receiverAddress };
+  return { digest };
 }

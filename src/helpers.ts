@@ -59,23 +59,23 @@ export function transferMoveCall({
 export function mergeMoveCall({
   tx,
   packageId,
-  contractStock1Id,
-  contractStock2Id,
+  toContractStockId,
+  fromContractStockId,
 }: MergeStockMoveTransactionParams): void {
   tx.moveCall({
     target: `${packageId}::open_art_market::merge_contract_stocks`,
-    arguments: [tx.object(contractStock1Id), tx.object(contractStock2Id)],
+    arguments: [tx.object(toContractStockId), tx.object(fromContractStockId)],
   });
 }
 export function splitMoveCall({
   tx,
   packageId,
   contractStockId,
-  shares,
+  quantity,
 }: SplitStockMoveTransactionParams): void {
   tx.moveCall({
     target: `${packageId}::open_art_market::split_contract_stock`,
-    arguments: [tx.object(contractStockId), tx.pure(shares)],
+    arguments: [tx.object(contractStockId), tx.pure(quantity)],
   });
 }
 export function voteMoveCall({
