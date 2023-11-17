@@ -1,5 +1,5 @@
 import assert from "assert";
-import { beforeEach, describe, it } from "mocha";
+import { beforeEach, describe, it } from "vitest";
 
 import { availableStock } from "../src/available_stock";
 import { mintContract } from "../src/contract";
@@ -129,7 +129,7 @@ describe("mintContractStock", () => {
         ...baseOptions,
       }),
     );
-  }).timeout(30_000);
+  }, 30_000);
 
   it("can give shares to OAM and owner", async () => {
     await mintContractStock(client, {
@@ -150,7 +150,7 @@ describe("mintContractStock", () => {
       quantity: 1,
       ...baseOptions,
     });
-  }).timeout(30_000);
+  }, 30_000);
 
   it.skip("can set the outgoing sale price of the contract", async () => {
     assert.ok(false);

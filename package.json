@@ -1,50 +1,109 @@
 {
   "name": "@openartmarket/sui",
-  "repository": "git://github.com/openartmarket/sui-move.git",
-  "keywords": [],
-  "author": "Open Art Market",
-  "license": "MIT",
-  "version": "1.0.0",
+  "version": "0.3.0",
   "description": "Contracts for Open Art Market (https://www.openartmarket.com/)",
-  "main": "./dist/esm/index.js",
+  "author": {
+    "name": "Open Art Market",
+    "email": "hi@openartmarket.com",
+    "url": "https://github.com/openartmarket/sui-move"
+  },
+  "files": [
+    "./dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
-    "compile": "npm run compile:cjs && npm run compile:esm",
-    "compile:cjs": "tsc --build tsconfig.cjs.json",
-    "compile:esm": "tsc --build tsconfig.esm.json",
-    "clean": "rm -rf ~/.sui",
-    "deploy-contracts": "./scripts/publish-contracts.sh",
-    "format": "prettier --write '{src,test,scripts}/**/*.{ts,d.ts}'",
-    "lint": "eslint --ext ts --fix --max-warnings 0 '{src,test,scripts}/**/*.{ts,d.ts}'",
-    "postinstall": "npm run compile",
-    "start": "npm run clean && npm run compile && npm run start-node",
-    "start-node": "sui start",
-    "test": "mocha test",
-    "upgrade": "npm-check-updates --upgrade"
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "compile": "tsc --build",
+    "build": "tsup --dts --format cjs,esm --clean --entry src/index.ts --entry src/aws-lambda/index.ts",
+    "upgrade": "npm-check-updates --upgrade",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged",
+    "format": "prettier './**/*.ts' --write",
+    "lint": "eslint './**/*.ts' --fix",
+    "prepublishOnly": "npm run build"
   },
+  "repository": "oselvar/openapi-routes",
+  "license": "MIT",
   "dependencies": {
     "@mysten/bcs": "0.8.1",
     "@mysten/sui.js": "0.45.1",
     "@types/node": "20.9.0"
   },
   "devDependencies": {
-    "@types/mocha": "10.0.4",
-    "@typescript-eslint/eslint-plugin": "6.10.0",
+    "@typescript-eslint/eslint-plugin": "6.11.0",
+    "@typescript-eslint/parser": "6.11.0",
+    "@vitest/coverage-v8": "0.34.6",
+    "@vitest/ui": "0.34.6",
     "eslint": "8.53.0",
     "eslint-config-prettier": "9.0.0",
-    "eslint-plugin-import": "2.29.0",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-prettier": "5.0.1",
     "eslint-plugin-simple-import-sort": "10.0.0",
-    "mocha": "10.2.0",
+    "husky": "8.0.3",
+    "lint-staged": "15.1.0",
     "npm-check-updates": "16.14.6",
     "prettier": "3.1.0",
-    "ts-node": "10.9.1",
-    "typescript": "5.2.2"
+    "tsup": "7.3.0",
+    "typescript": "5.2.2",
+    "vite": "5.0.0",
+    "vitest": "0.34.6"
+  },
+  "prettier": {
+    "semi": true,
+    "plugins": [],
+    "printWidth": 100,
+    "singleQuote": false,
+    "trailingComma": "all",
+    "arrowParens": "always"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --quiet --fix"
+    ],
+    "*.{json,ts}": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error"
+    },
+    "plugins": [
+      "simple-import-sort"
+    ],
+    "env": {
+      "node": true
+    }
+  },
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true
   }
 }

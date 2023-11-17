@@ -1,5 +1,5 @@
 import assert from "assert";
-import { beforeEach, describe, it } from "mocha";
+import { beforeEach, describe, it } from "vitest";
 
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/mint_contract_stock";
@@ -17,9 +17,8 @@ describe("splitContractStock", () => {
   const client = getClient();
   let contractId: string;
   beforeEach(async function () {
-    this.timeout(20_000);
     contractId = await mintContract(client, mintContractOptions);
-  });
+  }, 20_000);
 
   it("should split an contract stock", async () => {
     const { contractStockId } = await mintContractStock(client, {
@@ -47,7 +46,7 @@ describe("splitContractStock", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(oldStock.data.content.fields.shares, "8");
-  }).timeout(30_000);
+  }, 30_000);
 
   it("should split a split stock", async () => {
     const { contractStockId } = await mintContractStock(client, {
@@ -85,5 +84,5 @@ describe("splitContractStock", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(splitAgainStock.data.content.fields.shares, "3");
-  }).timeout(30_000);
+  }, 30_000);
 });

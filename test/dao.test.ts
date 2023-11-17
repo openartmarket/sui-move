@@ -1,5 +1,5 @@
 import assert from "assert";
-import { before, describe, it } from "mocha";
+import { beforeEach, describe, it } from "vitest";
 
 import { mintContract } from "../src/contract";
 import { endRequestVoting } from "../src/end_request_voting";
@@ -21,8 +21,8 @@ import {
 describe("DAO Voting structure", () => {
   const client = getClient();
   let contractId: string;
-  before(async function () {
-    this.timeout(30_000);
+
+  beforeEach(async function () {
     contractId = await mintContract(client, mintContractOptions);
     await mintContractStock(client, {
       contractId,
@@ -42,7 +42,7 @@ describe("DAO Voting structure", () => {
       quantity: 100,
       ...baseOptions,
     });
-  });
+  }, 30_000);
 
   it("can start a voting session", async () => {
     const voteRequest = await createVoteRequest(client, {
@@ -51,7 +51,7 @@ describe("DAO Voting structure", () => {
       ...baseOptions,
     });
     assert.ok(voteRequest);
-  }).timeout(30_000);
+  }, 30_000);
 
   it("can vote as a shareholder", async () => {
     const voteRequest = await createVoteRequest(client, {
@@ -94,7 +94,7 @@ describe("DAO Voting structure", () => {
         ...baseOptions,
       }),
     );
-  }).timeout(30_000);
+  }, 30_000);
 
   it("cannot vote if not a shareholder", async () => {
     const voteRequest = await createVoteRequest(client, {
@@ -143,5 +143,5 @@ describe("DAO Voting structure", () => {
         ...baseOptions,
       }),
     );
-  }).timeout(30_000);
+  }, 30_000);
 });

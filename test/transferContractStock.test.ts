@@ -1,5 +1,5 @@
 import assert from "assert";
-import { beforeEach, describe, it } from "mocha";
+import { beforeEach, describe, it } from "vitest";
 
 import { OwnedObjectList } from "../src";
 import { mintContract } from "../src/contract";
@@ -45,7 +45,7 @@ describe("transferContractStock", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(transferredStock.data.content.fields.shares, "12");
-  }).timeout(30_000);
+  }, 30_000);
 
   it("should split a split stock and transfer it to new owner", async () => {
     const { contractStockId } = await mintContractStock(client, {
@@ -89,7 +89,7 @@ describe("transferContractStock", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(transferredStock.data.objectId, splitStockId1.contractStockId);
-  }).timeout(30_000);
+  }, 30_000);
 });
 
 function findObjectIdInOwnedObjectList(list: OwnedObjectList, objectId: string) {

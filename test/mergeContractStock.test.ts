@@ -1,4 +1,5 @@
 import assert from "assert";
+import { beforeEach, describe, it } from "vitest";
 
 import { mintContract } from "../src/contract";
 import { mergeContractStock } from "../src/merge_contract_stock";
@@ -16,9 +17,8 @@ describe("mergeContractStock", () => {
   const client = getClient();
   let contractId: string;
   beforeEach(async function () {
-    this.timeout(20_000);
     contractId = await mintContract(client, mintContractOptions);
-  });
+  }, 20_000);
 
   it("should merge contract stocks", async () => {
     const { contractStockId: toContractStockId } = await mintContractStock(client, {
@@ -48,5 +48,5 @@ describe("mergeContractStock", () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(burnedStock.error.code, "deleted");
-  }).timeout(30_000);
+  }, 30_000);
 });
