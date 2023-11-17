@@ -27,11 +27,13 @@
     "test": "mocha test",
     "upgrade": "npm-check-updates --upgrade"
   },
-  "devDependencies": {
+  "dependencies": {
     "@mysten/bcs": "0.8.1",
     "@mysten/sui.js": "0.45.1",
+    "@types/node": "20.9.0"
+  },
+  "devDependencies": {
     "@types/mocha": "10.0.4",
-    "@types/node": "20.9.0",
     "@typescript-eslint/eslint-plugin": "6.10.0",
     "eslint": "8.53.0",
     "eslint-config-prettier": "9.0.0",
