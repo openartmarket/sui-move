@@ -1,8 +1,8 @@
 import assert from "assert";
 
 import { mintContract } from "../src/contract";
-import { mintContractStock } from "../src/contract_stock";
 import { mergeContractStock } from "../src/merge_contract_stock";
+import { mintContractStock } from "../src/mint_contract_stock";
 import {
   baseOptions,
   getClient,
