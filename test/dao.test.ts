@@ -27,19 +27,19 @@ describe("DAO Voting structure", () => {
     await mintContractStock(client, {
       contractId,
       receiverAddress: ADMIN_ADDRESS,
-      shares: 151,
+      quantity: 151,
       ...baseOptions,
     });
     await mintContractStock(client, {
       contractId,
       receiverAddress: USER1_ADDRESS,
-      shares: 249,
+      quantity: 249,
       ...baseOptions,
     });
     await mintContractStock(client, {
       contractId,
       receiverAddress: USER2_ADDRESS,
-      shares: 100,
+      quantity: 100,
       ...baseOptions,
     });
   });

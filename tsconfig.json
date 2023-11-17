@@ -8,7 +8,6 @@
     "module": "commonjs",
     "lib": [
       "es2020",
-      "DOM"
     ],
     "strict": true,
     "declaration": true,
@@ -35,18 +34,12 @@
   },
   "exclude": [
     "dist",
-    "node_modules",
-    "scripts",
-    "src/*_display.ts",
-    "test/*.ts",
-    "test/test-helpers.ts",
-    "test_scenarios"
+    "node_modules"
   ],
   "include": ["src/**/*", "test/**/*", "scripts/**/*"],
   "ts-node": {
     "transpileOnly": true,
     "files": true,
     "esm": true,
-    
   }
 }

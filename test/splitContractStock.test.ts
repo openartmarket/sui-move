@@ -26,14 +26,14 @@ describe("splitContractStock", () => {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
-      shares: 10,
+      quantity: 10,
     });
 
     const splitStockId = await splitContractStock(client, {
       ...baseOptions,
       contractStockId,
       signerPhrase: USER1_PHRASE,
-      shares: 2,
+      quantity: 2,
     });
 
     // Get the stock and check that it has 2 shares
@@ -53,7 +53,7 @@ describe("splitContractStock", () => {
     const { contractStockId } = await mintContractStock(client, {
       contractId,
       receiverAddress: USER1_ADDRESS,
-      shares: 12,
+      quantity: 12,
       ...baseOptions,
     });
 
@@ -61,13 +61,13 @@ describe("splitContractStock", () => {
       ...baseOptions,
       contractStockId,
       signerPhrase: USER1_PHRASE,
-      shares: 5,
+      quantity: 5,
     });
     const splitAgainStockId = await splitContractStock(client, {
       ...baseOptions,
       contractStockId: splitStockId.contractStockId,
       signerPhrase: USER1_PHRASE,
-      shares: 3,
+      quantity: 3,
     });
 
     const oldStock = await getObject(contractStockId);

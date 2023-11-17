@@ -21,27 +21,27 @@ describe("mergeContractStock", () => {
   });
 
   it("should merge contract stocks", async () => {
-    const { contractStockId } = await mintContractStock(client, {
+    const { contractStockId: toContractStockId } = await mintContractStock(client, {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
-      shares: 10,
+      quantity: 10,
     });
-    const { contractStockId: contractStock2Id } = await mintContractStock(client, {
+    const { contractStockId: fromContractStockId } = await mintContractStock(client, {
       ...baseOptions,
       contractId,
       receiverAddress: USER1_ADDRESS,
-      shares: 10,
+      quantity: 10,
     });
 
-    const mergeContractStocks = await mergeContractStock(client, {
+    await mergeContractStock(client, {
       ...baseOptions,
-      contractStock1Id: contractStockId,
-      contractStock2Id,
+      toContractStockId,
+      fromContractStockId,
       signerPhrase: USER1_PHRASE,
     });
-    const burnedStock = await getObject(contractStock2Id);
-    const newStock = await getObject(mergeContractStocks.contractStockId);
+    const burnedStock = await getObject(fromContractStockId);
+    const newStock = await getObject(toContractStockId);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     assert.strictEqual(newStock.data.content.fields.shares, "20");
