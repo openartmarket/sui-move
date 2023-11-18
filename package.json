@@ -31,12 +31,12 @@
     "upgrade": "npm-check-updates --upgrade",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
-    "format": "prettier './**/*.ts' --write",
+    "format": "prettier './**/*.{ts,json}' --write",
     "lint": "eslint './**/*.ts' --fix",
     "prepublishOnly": "npm run build",
     "postinstall": "npm run build"
   },
-  "repository": "oselvar/openapi-routes",
+  "repository": "openartmarket/sui-move",
   "license": "MIT",
   "dependencies": {
     "@mysten/bcs": "0.8.1",
@@ -109,11 +109,22 @@
     ]
   },
   "tsup": {
-    "entry": [
+    "dts": true,
+    "entryPoints": [
       "src/index.ts"
     ],
-    "splitting": false,
+    "external": [
+      "@mysten/bcs",
+      "@mysten/sui.js"
+    ],
+    "format": [
+      "cjs",
+      "esm"
+    ],
+    "legacyOutput": false,
     "sourcemap": true,
+    "splitting": false,
+    "bundle": true,
     "clean": true
   }
 }
