@@ -8,7 +8,6 @@
     "url": "https://github.com/openartmarket/sui-move"
   },
   "files": [
-    "./tsup.config.ts",
     "./tsconfig.json",
     "./src",
     "./dist"
@@ -121,7 +120,6 @@
       "cjs",
       "esm"
     ],
-    "legacyOutput": false,
     "sourcemap": true,
     "splitting": false,
     "bundle": true,
