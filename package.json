@@ -8,6 +8,7 @@
     "url": "https://github.com/openartmarket/sui-move"
   },
   "files": [
+    "./src",
     "./dist"
   ],
   "type": "module",
