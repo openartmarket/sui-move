@@ -8,8 +8,6 @@
     "url": "https://github.com/openartmarket/sui-move"
   },
   "files": [
-    "./tsconfig.json",
-    "./src",
     "./dist"
   ],
   "type": "module",
@@ -31,9 +29,7 @@
     "prepare": "husky install",
     "lint-staged": "lint-staged",
     "format": "prettier './**/*.{ts,json}' --write",
-    "lint": "eslint './**/*.ts' --fix",
-    "prepublishOnly": "npm run build",
-    "postinstall": "npm run build"
+    "lint": "eslint './**/*.ts' --fix"
   },
   "repository": "openartmarket/sui-move",
   "license": "MIT",
