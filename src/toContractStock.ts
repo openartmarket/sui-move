@@ -1,4 +1,4 @@
-import { MoveStruct, MoveValue, SuiObjectResponse } from "@mysten/sui.js/dist/cjs/client";
+import type { MoveStruct, MoveValue, SuiObjectResponse } from "@mysten/sui.js/dist/cjs/client";
 
 export type ContractStock = {
   contractStockId: string;

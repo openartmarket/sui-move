@@ -1,11 +1,7 @@
-import {
-  getFullnodeUrl,
-  PaginatedObjectsResponse,
-  SuiClient,
-  SuiObjectResponse,
-} from "@mysten/sui.js/client";
+import type { PaginatedObjectsResponse, SuiObjectResponse } from "@mysten/sui.js/client";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 
-import { MintContractParams, NetworkName } from "../src/types";
+import type { MintContractParams, NetworkName } from "../src/types";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");

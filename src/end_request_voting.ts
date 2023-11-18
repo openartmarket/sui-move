@@ -1,8 +1,8 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
-import { EndVoteRequestParams } from "./types";
+import { getSigner, handleTransactionResponse } from "./helpers.js";
+import type { EndVoteRequestParams } from "./types.js";
 
 export async function endRequestVoting(
   client: SuiClient,

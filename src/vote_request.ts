@@ -1,8 +1,8 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { getCreatedObjects, getSigner, handleTransactionResponse } from "./helpers";
-import { VoteRequestParams } from "./types";
+import type { VoteRequestParams } from "./types";
 
 export async function createVoteRequest(
   client: SuiClient,

@@ -1,12 +1,12 @@
-import { SuiObjectChangeCreated, SuiTransactionBlockResponse } from "@mysten/sui.js/client";
+import type { SuiObjectChangeCreated, SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 
-import {
+import type {
   MergeStockMoveTransactionParams,
   SplitStockMoveTransactionParams,
   TransferStockMoveTransactionParams,
   VoteMoveTransactionParams,
-} from "./types";
+} from "./types.js";
 
 export function getSigner(phrase: string): {
   keypair: Ed25519Keypair;

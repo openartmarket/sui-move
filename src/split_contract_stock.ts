@@ -1,9 +1,9 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { findObjectsWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
 import { getSigner, handleTransactionResponse, splitMoveCall } from "./helpers";
-import { ContractStockDetails, SplitContractStockParams } from "./types";
+import type { ContractStockDetails, SplitContractStockParams } from "./types";
 
 export async function splitContractStock(
   client: SuiClient,

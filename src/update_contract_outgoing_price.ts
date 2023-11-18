@@ -1,8 +1,8 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { getSigner, handleTransactionResponse } from "./helpers";
-import { UpdateOutgoingPriceParams } from "./types";
+import type { UpdateOutgoingPriceParams } from "./types";
 
 export async function updateOutgoingPrice(
   client: SuiClient,

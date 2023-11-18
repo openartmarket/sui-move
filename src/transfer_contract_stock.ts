@@ -1,8 +1,8 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { getSigner, handleTransactionResponse, transferMoveCall } from "./helpers";
-import { TransferContractStockParams, TransferContractStockResult } from "./types";
+import type { TransferContractStockParams, TransferContractStockResult } from "./types";
 
 /**
  * Transfers an contract stock

@@ -1,6 +1,6 @@
-import { SuiObjectChangeCreated, SuiTransactionBlockResponse } from "@mysten/sui.js/client";
+import type { SuiObjectChangeCreated, SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 
-import { getCreatedObjects } from "./helpers";
+import { getCreatedObjects } from "./helpers.js";
 
 export function findObjectsWithOwnerAddress(
   txRes: SuiTransactionBlockResponse,

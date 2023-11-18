@@ -1,8 +1,8 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
-import { BurnContractParams } from "./types";
+import { getSigner, handleTransactionResponse } from "./helpers.js";
+import type { BurnContractParams } from "./types.js";
 
 export async function burnContractStock(
   client: SuiClient,

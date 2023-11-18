@@ -1,8 +1,8 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getCreatedObjects, getSigner, handleTransactionResponse } from "./helpers";
-import { MintContractParams } from "./types";
+import { getCreatedObjects, getSigner, handleTransactionResponse } from "./helpers.js";
+import type { MintContractParams } from "./types.js";
 /**
  * Mints a new contract
  * @param params

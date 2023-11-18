@@ -1,8 +1,8 @@
-import { SuiClient } from "@mysten/sui.js/dist/cjs/client";
+import type { SuiClient } from "@mysten/sui.js/dist/cjs/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner } from "./helpers";
-import { CreateContractStockDisplayParams } from "./types";
+import { getSigner } from "./helpers.js";
+import type { CreateContractStockDisplayParams } from "./types.js";
 
 // This is the function you can update to change the display fields
 function getContractStockDisplayFields() {

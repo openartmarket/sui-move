@@ -1,7 +1,7 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import { OwnedObjectList } from "../src";
+import type { OwnedObjectList } from "../src";
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/mint_contract_stock";
 import { splitContractStock } from "../src/split_contract_stock";

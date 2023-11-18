@@ -1,8 +1,8 @@
-import { SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { getSigner, handleTransactionResponse, mergeMoveCall } from "./helpers";
-import { MergeContractStockParams } from "./types";
+import type { MergeContractStockParams } from "./types";
 
 export async function mergeContractStock(
   client: SuiClient,

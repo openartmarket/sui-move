@@ -1,4 +1,4 @@
-import { TransactionBlock } from "@mysten/sui.js/transactions";
+import type { TransactionBlock } from "@mysten/sui.js/transactions";
 
 export type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
 

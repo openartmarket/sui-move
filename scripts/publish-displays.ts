@@ -1,12 +1,12 @@
-import { createContractDisplay } from "../src/contract_display";
-import { createContractStockDisplay } from "../src/contract_stock_display";
+import { createContractDisplay } from "../src/contract_display.js";
+import { createContractStockDisplay } from "../src/contract_stock_display.js";
 import {
   ADMIN_PHRASE,
   CONTRACT_STOCK_TYPE,
   CONTRACT_TYPE,
   getClient,
   PUBLISHER_ID,
-} from "../test/test-helpers";
+} from "../test/test-helpers.js";
 
 async function main() {
   const client = getClient();

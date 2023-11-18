@@ -1,6 +1,6 @@
-import { SuiClient } from "@mysten/sui.js/dist/cjs/client";
+import type { SuiClient } from "@mysten/sui.js/dist/cjs/client";
 
-import { AvailableStockParams } from "./types";
+import type { AvailableStockParams } from "./types.js";
 /**
  * Mints a new contract
  * @param params
