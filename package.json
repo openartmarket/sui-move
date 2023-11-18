@@ -7,11 +7,6 @@
     "email": "hi@openartmarket.com",
     "url": "https://github.com/openartmarket/sui-move"
   },
-  "files": [
-    "./tsup.config.ts",
-    "./src",
-    "./dist"
-  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
