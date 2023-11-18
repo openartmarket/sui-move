@@ -24,7 +24,7 @@
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "compile": "tsc --build",
-    "build": "npx tsup --dts --format cjs,esm --clean --entry src/index.ts --entry src/aws-lambda/index.ts",
+    "build": "npx tsup --dts --format cjs,esm --clean src/index.ts",
     "upgrade": "npm-check-updates --upgrade",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
