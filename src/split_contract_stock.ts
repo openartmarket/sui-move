@@ -27,12 +27,11 @@ export async function splitContractStock(
 
   handleTransactionResponse(txRes);
 
-  const contractStockIds = findObjectsWithOwnerAddress(txRes, address).map((obj) => obj.objectId);
-  if (contractStockIds.length !== 1)
-    throw new Error(`Expected 1 contract stock id, got ${JSON.stringify(contractStockIds)}`);
-  const newContractStockId = contractStockIds[0];
+  const contractStocks = findObjectsWithOwnerAddress(txRes, address);
+  if (contractStocks.length !== 1)
+    throw new Error(`Expected 1 contract stock, got ${JSON.stringify(contractStocks)}`);
+  const newContractStockId = contractStocks[0].objectId;
   return {
     contractStockId: newContractStockId,
-    // owner: address,
   };
 }

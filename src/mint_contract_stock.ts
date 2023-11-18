@@ -44,12 +44,10 @@ export async function mintContractStock(
     },
   });
   handleTransactionResponse(txRes);
-  const contractStockIds = findObjectsWithOwnerAddress(txRes, receiverAddress).map(
-    (obj) => obj.objectId,
-  );
-  if (contractStockIds.length !== 1)
-    throw new Error(`Expected 1 contract stock id, got ${JSON.stringify(contractStockIds)}`);
-  const contractStockId = contractStockIds[0];
+  const contractStocks = findObjectsWithOwnerAddress(txRes, receiverAddress);
+  if (contractStocks.length !== 1)
+    throw new Error(`Expected 1 contract stock id, got ${JSON.stringify(contractStocks)}`);
+  const contractStockId = contractStocks[0].objectId;
   const { digest } = txRes;
   return { contractStockId, digest };
 }
