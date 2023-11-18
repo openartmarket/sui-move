@@ -2,7 +2,7 @@ export * from "./available_stock";
 export * from "./burn_contract_stock";
 export * from "./contract";
 export * from "./end_request_voting";
-export * from "./findObjectIdWithOwnerAddress";
+export * from "./findObjectsWithOwnerAddress";
 export * from "./helpers";
 export * from "./merge_contract_stock";
 export * from "./mint_contract_stock";

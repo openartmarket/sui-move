@@ -25,7 +25,7 @@
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "compile": "tsc --build",
-    "build": "tsup --dts --format cjs,esm --clean src/index.ts",
+    "build": "tsup",
     "upgrade": "npm-check-updates --upgrade",
     "prepare": "husky install",
     "lint-staged": "lint-staged",

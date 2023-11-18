@@ -1,7 +1,7 @@
 import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { findObjectsWithOwnerAddress } from "./findObjectIdWithOwnerAddress";
+import { findObjectsWithOwnerAddress } from "./findObjectsWithOwnerAddress";
 import { getSigner, handleTransactionResponse } from "./helpers";
 import type {
   BatchMintContractStockParams,
