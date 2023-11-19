@@ -94,7 +94,14 @@ export async function batchMintContractStock(
         id: contractStockId,
         options: { showContent: true },
       });
-      if (!contractStock.data?.content) throw new Error("No content found");
+      if (!contractStock.data?.content)
+        throw new Error(
+          `No content found for contractStockId=${contractStockId}: ${JSON.stringify(
+            contractStock,
+            null,
+            2,
+          )}`,
+        );
       const content = contractStock.data.content;
       results.push({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
