@@ -143,7 +143,6 @@ type VoteMoveTransactionParams = MoveTransactionParams & {
 
 /**
  * Mints a new contract
- *
  * @param params
  * @returns the contract id
  */

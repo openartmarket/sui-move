@@ -28,8 +28,8 @@
     "upgrade": "npm-check-updates --upgrade",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
-    "format": "prettier './**/*.{ts,json}' --write",
-    "lint": "eslint './**/*.ts' --fix"
+    "format": "prettier '{scripts,src,test}/**/*.ts' --write --list-different",
+    "lint": "eslint '{scripts,src,test}/**/*.ts' --quiet --fix"
   },
   "repository": "openartmarket/sui-move",
   "license": "MIT",
@@ -64,11 +64,9 @@
     "arrowParens": "always"
   },
   "lint-staged": {
-    "*.ts": [
-      "eslint --quiet --fix"
-    ],
-    "*.{json,ts}": [
-      "prettier --write"
+    "{scripts,src,test}/**/*.ts": [
+      "eslint --quiet --fix",
+      "prettier --write --list-different"
     ]
   },
   "eslintConfig": {
