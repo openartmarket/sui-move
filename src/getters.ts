@@ -1,9 +1,28 @@
 import type {
   MoveStruct,
+  SuiObjectChangeCreated,
   SuiObjectData,
   SuiObjectResponse,
   SuiParsedData,
+  SuiTransactionBlockResponse,
 } from "@mysten/sui.js/dist/cjs/client";
+
+export function getCreatedObjectsWithOwnerAddress(
+  txRes: SuiTransactionBlockResponse,
+  address: string,
+): SuiObjectChangeCreated[] {
+  const objects = getCreatedObjects(txRes);
+  return objects.filter((obj) => {
+    if (typeof obj.owner === "string") return false;
+    return "AddressOwner" in obj.owner && obj.owner.AddressOwner === address;
+  });
+}
+
+function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[] {
+  return (txRes.objectChanges || []).filter(
+    (change) => change.type === "created",
+  ) as SuiObjectChangeCreated[];
+}
 
 export function getObjectData(response: SuiObjectResponse): SuiObjectData {
   const { error, data } = response;

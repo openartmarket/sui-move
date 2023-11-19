@@ -20,7 +20,6 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  batchMintContractStock: () => batchMintContractStock,
   burnContractStock: () => burnContractStock,
   createVoteRequest: () => createVoteRequest,
   endRequestVoting: () => endRequestVoting,
@@ -176,6 +175,19 @@ function findObjectsWithOwnerAddress(txRes, address) {
 }
 
 // src/getters.ts
+function getCreatedObjectsWithOwnerAddress(txRes, address) {
+  const objects = getCreatedObjects2(txRes);
+  return objects.filter((obj) => {
+    if (typeof obj.owner === "string")
+      return false;
+    return "AddressOwner" in obj.owner && obj.owner.AddressOwner === address;
+  });
+}
+function getCreatedObjects2(txRes) {
+  return (txRes.objectChanges || []).filter(
+    (change) => change.type === "created"
+  );
+}
 function getObjectData(response) {
   const { error, data } = response;
   if (error) {
@@ -267,106 +279,52 @@ async function mergeContractStock(client, params) {
   handleTransactionResponse(txRes);
 }
 
-// src/mint_contract_stock.ts
-var import_transactions5 = require("@mysten/sui.js/transactions");
-async function mintContractStock(client, params) {
-  const { contractId, signerPhrase, receiverAddress, packageId, adminCapId, quantity } = params;
-  const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions5.TransactionBlock();
-  tx.moveCall({
-    target: `${packageId}::open_art_market::mint_contract_stock`,
-    arguments: [
-      tx.object(adminCapId),
-      tx.object(contractId),
-      tx.pure(quantity),
-      tx.pure(receiverAddress)
-    ]
-  });
-  const txRes = await client.signAndExecuteTransactionBlock({
-    signer: keypair,
-    transactionBlock: tx,
-    requestType: "WaitForLocalExecution",
-    options: {
-      showObjectChanges: true,
-      showEffects: true
+// src/mintContractStock.ts
+async function mintContractStock(executor, paramsArray) {
+  const response = await executor.execute((txb, packageId) => {
+    for (const { adminCapId, contractId, quantity, receiverAddress } of paramsArray) {
+      txb.moveCall({
+        target: `${packageId}::open_art_market::mint_contract_stock`,
+        arguments: [
+          txb.object(adminCapId),
+          txb.object(contractId),
+          txb.pure(quantity),
+          txb.pure(receiverAddress)
+        ]
+      });
     }
   });
-  handleTransactionResponse(txRes);
-  const contractStocks = findObjectsWithOwnerAddress(txRes, receiverAddress);
-  if (contractStocks.length !== 1)
-    throw new Error(`Expected 1 contract stock id, got ${JSON.stringify(contractStocks)}`);
-  const contractStockId = contractStocks[0].objectId;
-  const { digest } = txRes;
-  return { contractStockId, digest };
-}
-async function batchMintContractStock(client, params) {
-  const { signerPhrase, packageId, adminCapId, list } = params;
-  const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions5.TransactionBlock();
-  for (const { contractId, receiverAddress, quantity } of list) {
-    tx.moveCall({
-      target: `${packageId}::open_art_market::mint_contract_stock`,
-      arguments: [
-        tx.object(adminCapId),
-        tx.object(contractId),
-        tx.pure(quantity),
-        tx.pure(receiverAddress)
-      ]
-    });
-  }
-  const txRes = await client.signAndExecuteTransactionBlock({
-    signer: keypair,
-    transactionBlock: tx,
-    requestType: "WaitForLocalExecution",
-    options: {
-      showObjectChanges: true,
-      showEffects: true
-    }
-  });
-  handleTransactionResponse(txRes);
-  const results = [];
-  for (const { receiverAddress } of list) {
-    const contractStockIds = findObjectsWithOwnerAddress(txRes, receiverAddress).map(
-      (obj) => obj.objectId
-    );
-    for (const contractStockId of contractStockIds) {
-      const contractStock = await client.getObject({
-        id: contractStockId,
+  const contractStockIds = [];
+  const receiverAddresses = new Set(paramsArray.map(({ receiverAddress }) => receiverAddress));
+  for (const receiverAddress of receiverAddresses) {
+    const objects = getCreatedObjectsWithOwnerAddress(response, receiverAddress);
+    for (const object of objects) {
+      const contractStock = await executor.client.getObject({
+        id: object.objectId,
         options: { showContent: true }
       });
-      if (!contractStock.data?.content)
-        throw new Error(
-          `No content found for contractStockId=${contractStockId}: ${JSON.stringify(
-            contractStock,
-            null,
-            2
-          )}`
-        );
-      const content = contractStock.data.content;
-      results.push({
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        contractId: content.fields.contract_id,
-        contractStockId,
-        digest: txRes.digest,
-        receiverAddress,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        quantity: +content.fields.shares
-      });
+      const objectData = getObjectData(contractStock);
+      const parsedData = getParsedData(objectData);
+      const contractStockId = getStringField(parsedData, "contract_id");
+      contractStockIds.push(contractStockId);
     }
   }
-  const { digest } = txRes;
-  return { digest, results };
+  if (contractStockIds.length !== paramsArray.length) {
+    throw new Error(
+      `Expected ${paramsArray.length} contract stock ids, got ${JSON.stringify(contractStockIds)}`
+    );
+  }
+  const { digest } = response;
+  return { contractStockIds, digest };
 }
 
 // src/split_contract_stock.ts
-var import_transactions6 = require("@mysten/sui.js/transactions");
+var import_transactions5 = require("@mysten/sui.js/transactions");
 async function splitContractStock(client, params) {
   const { contractStockId, signerPhrase, quantity, packageId } = params;
   const { keypair } = getSigner(signerPhrase);
   const address = keypair.getPublicKey().toSuiAddress();
-  const tx = new import_transactions6.TransactionBlock();
+  const tx = new import_transactions5.TransactionBlock();
   tx.moveCall({
     target: `${packageId}::open_art_market::split_contract_stock`,
     arguments: [tx.object(contractStockId), tx.pure(quantity)]
@@ -404,11 +362,11 @@ function toContractStock(response) {
 }
 
 // src/transfer_contract_stock.ts
-var import_transactions7 = require("@mysten/sui.js/transactions");
+var import_transactions6 = require("@mysten/sui.js/transactions");
 async function transferContractStock(client, params) {
   const { contractId, signerPhrase, receiverAddress, contractStockId, packageId } = params;
   const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions7.TransactionBlock();
+  const tx = new import_transactions6.TransactionBlock();
   tx.moveCall({
     target: `${packageId}::open_art_market::transfer_contract_stock`,
     arguments: [tx.object(contractId), tx.pure(contractStockId), tx.pure(receiverAddress)]
@@ -428,10 +386,10 @@ async function transferContractStock(client, params) {
 }
 
 // src/update_contract_outgoing_price.ts
-var import_transactions8 = require("@mysten/sui.js/transactions");
+var import_transactions7 = require("@mysten/sui.js/transactions");
 async function updateOutgoingPrice(client, { contractId, newOutgoingPrice, packageId, adminCapId, signerPhrase }) {
   const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions8.TransactionBlock();
+  const tx = new import_transactions7.TransactionBlock();
   tx.moveCall({
     target: `${packageId}::open_art_market::update_outgoing_price`,
     arguments: [tx.object(adminCapId), tx.object(contractId), tx.pure(newOutgoingPrice)]
@@ -448,10 +406,10 @@ async function updateOutgoingPrice(client, { contractId, newOutgoingPrice, packa
 }
 
 // src/vote.ts
-var import_transactions9 = require("@mysten/sui.js/transactions");
+var import_transactions8 = require("@mysten/sui.js/transactions");
 async function vote(client, { contractId, voteRequest, voterAccount, choice, packageId }) {
   const { keypair } = getSigner(voterAccount);
-  const tx = new import_transactions9.TransactionBlock();
+  const tx = new import_transactions8.TransactionBlock();
   tx.moveCall({
     target: `${packageId}::dao::vote`,
     arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)]
@@ -469,10 +427,10 @@ async function vote(client, { contractId, voteRequest, voterAccount, choice, pac
 }
 
 // src/vote_request.ts
-var import_transactions10 = require("@mysten/sui.js/transactions");
+var import_transactions9 = require("@mysten/sui.js/transactions");
 async function createVoteRequest(client, { contractId, request, adminCapId, packageId, signerPhrase }) {
   const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions10.TransactionBlock();
+  const tx = new import_transactions9.TransactionBlock();
   tx.moveCall({
     target: `${packageId}::dao::start_vote`,
     arguments: [tx.object(adminCapId), tx.pure(contractId), tx.pure(request)]
@@ -494,7 +452,6 @@ async function createVoteRequest(client, { contractId, request, adminCapId, pack
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  batchMintContractStock,
   burnContractStock,
   createVoteRequest,
   endRequestVoting,

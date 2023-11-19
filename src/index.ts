@@ -5,7 +5,7 @@ export * from "./findObjectsWithOwnerAddress";
 export * from "./getAvailableStock";
 export * from "./helpers";
 export * from "./merge_contract_stock";
-export * from "./mint_contract_stock";
+export * from "./mintContractStock";
 export * from "./split_contract_stock";
 export * from "./toContractStock";
 export * from "./transfer_contract_stock";

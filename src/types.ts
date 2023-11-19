@@ -75,39 +75,6 @@ export type BurnContractParams = {
   network?: NetworkName;
 };
 
-// export type BurnContractResult = {
-//   success: boolean;
-// };
-
-export type BuyShareInfo = {
-  contractId: string;
-  receiverAddress: string;
-  quantity: number;
-};
-// Mint Contract Stock
-export type MintContractStockParams = BaseContractParams &
-  BuyShareInfo & {
-    adminCapId: string;
-  };
-
-// Common interface for minted contract stock details
-export type MintContractStockResult = {
-  contractStockId: string;
-  digest: string;
-};
-
-export type BatchMintContractStockParams = BaseContractParams & {
-  adminCapId: string;
-  list: BuyShareInfo[];
-};
-
-export type BuyShareResult = BuyShareInfo & MintContractStockResult;
-
-export type BatchMintContractStockResult = {
-  digest: string;
-  results: BuyShareResult[];
-};
-
 export type UpdateOutgoingPriceParams = BaseContractParams & {
   adminCapId: string;
   contractId: string;
