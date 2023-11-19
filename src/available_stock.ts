@@ -3,7 +3,6 @@ import type { SuiClient } from "@mysten/sui.js/dist/cjs/client";
 import type { AvailableStockParams } from "./types.js";
 /**
  * Mints a new contract
- *
  * @param params
  * @returns the contract id
  */
