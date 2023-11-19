@@ -208,9 +208,7 @@ function getStringField(data, key) {
   }
   function getStringField2(struct, key2) {
     if (Array.isArray(struct)) {
-      throw new Error(
-        `Unexpected response.data.content.fields as array: ${JSON.stringify(data)}`
-      );
+      throw new Error(`Unexpected response.data.content.fields as array: ${JSON.stringify(data)}`);
     }
     if (!(key2 in struct)) {
       throw new Error(`No response.data.content.fields[${key2}]: ${JSON.stringify(data)}`);
@@ -343,7 +341,13 @@ async function batchMintContractStock(client, params) {
         options: { showContent: true }
       });
       if (!contractStock.data?.content)
-        throw new Error("No content found");
+        throw new Error(
+          `No content found for contractStockId=${contractStockId}: ${JSON.stringify(
+            contractStock,
+            null,
+            2
+          )}`
+        );
       const content = contractStock.data.content;
       results.push({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
