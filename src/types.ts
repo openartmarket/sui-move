@@ -161,23 +161,3 @@ export type MoveTransactionParams = {
   tx: TransactionBlock;
   packageId: string;
 };
-
-export type TransferStockMoveTransactionParams = MoveTransactionParams & {
-  contractId: string;
-  contractStockId: string;
-  receiverAddress: string;
-};
-
-export type MergeStockMoveTransactionParams = MoveTransactionParams & {
-  toContractStockId: string;
-  fromContractStockId: string;
-};
-export type SplitStockMoveTransactionParams = MoveTransactionParams & {
-  contractStockId: string;
-  quantity: number;
-};
-export type VoteMoveTransactionParams = MoveTransactionParams & {
-  contractId: string;
-  voteRequest: string;
-  choice: boolean;
-};

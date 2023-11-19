@@ -1,7 +1,7 @@
 import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse, voteMoveCall } from "./helpers";
+import { getSigner, handleTransactionResponse } from "./helpers";
 import type { VoteParams } from "./types";
 
 export async function vote(
@@ -11,7 +11,10 @@ export async function vote(
   const { keypair } = getSigner(voterAccount);
   const tx = new TransactionBlock();
 
-  voteMoveCall({ tx, packageId, contractId, voteRequest, choice });
+  tx.moveCall({
+    target: `${packageId}::dao::vote`,
+    arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)],
+  });
 
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,

@@ -30,17 +30,13 @@ __export(src_exports, {
   getSigner: () => getSigner,
   handleTransactionResponse: () => handleTransactionResponse,
   mergeContractStock: () => mergeContractStock,
-  mergeMoveCall: () => mergeMoveCall,
   mintContract: () => mintContract,
   mintContractStock: () => mintContractStock,
   splitContractStock: () => splitContractStock,
-  splitMoveCall: () => splitMoveCall,
   toContractStock: () => toContractStock,
   transferContractStock: () => transferContractStock,
-  transferMoveCall: () => transferMoveCall,
   updateOutgoingPrice: () => updateOutgoingPrice,
-  vote: () => vote,
-  voteMoveCall: () => voteMoveCall
+  vote: () => vote
 });
 module.exports = __toCommonJS(src_exports);
 
@@ -76,52 +72,6 @@ function getCreatedObjects(txRes) {
   return (txRes.objectChanges || []).filter(
     (change) => change.type === "created"
   );
-}
-function transferMoveCall({
-  tx,
-  packageId,
-  contractId,
-  contractStockId,
-  receiverAddress
-}) {
-  tx.moveCall({
-    target: `${packageId}::open_art_market::transfer_contract_stock`,
-    arguments: [tx.object(contractId), tx.pure(contractStockId), tx.pure(receiverAddress)]
-  });
-}
-function mergeMoveCall({
-  tx,
-  packageId,
-  toContractStockId,
-  fromContractStockId
-}) {
-  tx.moveCall({
-    target: `${packageId}::open_art_market::merge_contract_stocks`,
-    arguments: [tx.object(toContractStockId), tx.object(fromContractStockId)]
-  });
-}
-function splitMoveCall({
-  tx,
-  packageId,
-  contractStockId,
-  quantity
-}) {
-  tx.moveCall({
-    target: `${packageId}::open_art_market::split_contract_stock`,
-    arguments: [tx.object(contractStockId), tx.pure(quantity)]
-  });
-}
-function voteMoveCall({
-  tx,
-  packageId,
-  contractId,
-  voteRequest,
-  choice
-}) {
-  tx.moveCall({
-    target: `${packageId}::dao::vote`,
-    arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)]
-  });
 }
 
 // src/burn_contract_stock.ts
@@ -301,11 +251,9 @@ async function mergeContractStock(client, params) {
   const { toContractStockId, fromContractStockId, signerPhrase, packageId } = params;
   const { keypair } = getSigner(signerPhrase);
   const tx = new import_transactions4.TransactionBlock();
-  mergeMoveCall({
-    tx,
-    packageId,
-    toContractStockId,
-    fromContractStockId
+  tx.moveCall({
+    target: `${packageId}::open_art_market::merge_contract_stocks`,
+    arguments: [tx.object(toContractStockId), tx.object(fromContractStockId)]
   });
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
@@ -419,7 +367,10 @@ async function splitContractStock(client, params) {
   const { keypair } = getSigner(signerPhrase);
   const address = keypair.getPublicKey().toSuiAddress();
   const tx = new import_transactions6.TransactionBlock();
-  splitMoveCall({ tx, packageId, contractStockId, quantity });
+  tx.moveCall({
+    target: `${packageId}::open_art_market::split_contract_stock`,
+    arguments: [tx.object(contractStockId), tx.pure(quantity)]
+  });
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
     transactionBlock: tx,
@@ -458,7 +409,10 @@ async function transferContractStock(client, params) {
   const { contractId, signerPhrase, receiverAddress, contractStockId, packageId } = params;
   const { keypair } = getSigner(signerPhrase);
   const tx = new import_transactions7.TransactionBlock();
-  transferMoveCall({ tx, packageId, contractId, contractStockId, receiverAddress });
+  tx.moveCall({
+    target: `${packageId}::open_art_market::transfer_contract_stock`,
+    arguments: [tx.object(contractId), tx.pure(contractStockId), tx.pure(receiverAddress)]
+  });
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
     transactionBlock: tx,
@@ -498,7 +452,10 @@ var import_transactions9 = require("@mysten/sui.js/transactions");
 async function vote(client, { contractId, voteRequest, voterAccount, choice, packageId }) {
   const { keypair } = getSigner(voterAccount);
   const tx = new import_transactions9.TransactionBlock();
-  voteMoveCall({ tx, packageId, contractId, voteRequest, choice });
+  tx.moveCall({
+    target: `${packageId}::dao::vote`,
+    arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)]
+  });
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
     transactionBlock: tx,
@@ -547,16 +504,12 @@ async function createVoteRequest(client, { contractId, request, adminCapId, pack
   getSigner,
   handleTransactionResponse,
   mergeContractStock,
-  mergeMoveCall,
   mintContract,
   mintContractStock,
   splitContractStock,
-  splitMoveCall,
   toContractStock,
   transferContractStock,
-  transferMoveCall,
   updateOutgoingPrice,
-  vote,
-  voteMoveCall
+  vote
 });
 //# sourceMappingURL=index.cjs.map

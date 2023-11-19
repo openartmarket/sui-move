@@ -2,7 +2,7 @@ import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 import { findObjectsWithOwnerAddress } from "./findObjectsWithOwnerAddress";
-import { getSigner, handleTransactionResponse, splitMoveCall } from "./helpers";
+import { getSigner, handleTransactionResponse } from "./helpers";
 import type { ContractStockDetails, SplitContractStockParams } from "./types";
 
 export async function splitContractStock(
@@ -14,7 +14,11 @@ export async function splitContractStock(
   const address = keypair.getPublicKey().toSuiAddress();
   const tx = new TransactionBlock();
 
-  splitMoveCall({ tx, packageId, contractStockId, quantity });
+  tx.moveCall({
+    target: `${packageId}::open_art_market::split_contract_stock`,
+    arguments: [tx.object(contractStockId), tx.pure(quantity)],
+  });
+
   const txRes = await client.signAndExecuteTransactionBlock({
     signer: keypair,
     transactionBlock: tx,

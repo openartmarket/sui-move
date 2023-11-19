@@ -118,24 +118,6 @@ type MoveTransactionParams = {
     tx: TransactionBlock;
     packageId: string;
 };
-type TransferStockMoveTransactionParams = MoveTransactionParams & {
-    contractId: string;
-    contractStockId: string;
-    receiverAddress: string;
-};
-type MergeStockMoveTransactionParams = MoveTransactionParams & {
-    toContractStockId: string;
-    fromContractStockId: string;
-};
-type SplitStockMoveTransactionParams = MoveTransactionParams & {
-    contractStockId: string;
-    quantity: number;
-};
-type VoteMoveTransactionParams = MoveTransactionParams & {
-    contractId: string;
-    voteRequest: string;
-    choice: boolean;
-};
 
 declare function burnContractStock(client: SuiClient, params: BurnContractParams): Promise<void>;
 
@@ -158,10 +140,6 @@ declare function getSigner(phrase: string): {
 };
 declare function handleTransactionResponse(txRes: SuiTransactionBlockResponse): void;
 declare function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[];
-declare function transferMoveCall({ tx, packageId, contractId, contractStockId, receiverAddress, }: TransferStockMoveTransactionParams): void;
-declare function mergeMoveCall({ tx, packageId, toContractStockId, fromContractStockId, }: MergeStockMoveTransactionParams): void;
-declare function splitMoveCall({ tx, packageId, contractStockId, quantity, }: SplitStockMoveTransactionParams): void;
-declare function voteMoveCall({ tx, packageId, contractId, voteRequest, choice, }: VoteMoveTransactionParams): void;
 
 declare function mergeContractStock(client: SuiClient, params: MergeContractStockParams): Promise<void>;
 
@@ -195,4 +173,4 @@ declare function vote(client: SuiClient, { contractId, voteRequest, voterAccount
 
 declare function createVoteRequest(client: SuiClient, { contractId, request, adminCapId, packageId, signerPhrase }: VoteRequestParams): Promise<string>;
 
-export { type BaseContractParams, type BatchMintContractStockParams, type BatchMintContractStockResult, type BurnContractParams, type BuyShareInfo, type BuyShareResult, type ContractMethod, type ContractStock, type ContractStockDetails, type CreateContractDisplayParams, type CreateContractStockDisplayParams, type Currency, type Data, type Daum, type EndVoteRequestParams, type MergeContractStockParams, type MergeStockMoveTransactionParams, type MintContractParams, type MintContractStockParams, type MintContractStockResult, type MoveTransactionParams, type NetworkName, type OwnedObjectList, type SplitContractStockParams, type SplitStockMoveTransactionParams, type TransferContractStockParams, type TransferContractStockResult, type TransferStockMoveTransactionParams, type UpdateOutgoingPriceParams, type VoteMoveTransactionParams, type VoteParams, type VoteRequestParams, batchMintContractStock, burnContractStock, createVoteRequest, endRequestVoting, findObjectsWithOwnerAddress, getAvailableStock, getCreatedObjects, getSigner, handleTransactionResponse, mergeContractStock, mergeMoveCall, mintContract, mintContractStock, splitContractStock, splitMoveCall, toContractStock, transferContractStock, transferMoveCall, updateOutgoingPrice, vote, voteMoveCall };
+export { type BaseContractParams, type BatchMintContractStockParams, type BatchMintContractStockResult, type BurnContractParams, type BuyShareInfo, type BuyShareResult, type ContractMethod, type ContractStock, type ContractStockDetails, type CreateContractDisplayParams, type CreateContractStockDisplayParams, type Currency, type Data, type Daum, type EndVoteRequestParams, type MergeContractStockParams, type MintContractParams, type MintContractStockParams, type MintContractStockResult, type MoveTransactionParams, type NetworkName, type OwnedObjectList, type SplitContractStockParams, type TransferContractStockParams, type TransferContractStockResult, type UpdateOutgoingPriceParams, type VoteParams, type VoteRequestParams, batchMintContractStock, burnContractStock, createVoteRequest, endRequestVoting, findObjectsWithOwnerAddress, getAvailableStock, getCreatedObjects, getSigner, handleTransactionResponse, mergeContractStock, mintContract, mintContractStock, splitContractStock, toContractStock, transferContractStock, updateOutgoingPrice, vote };

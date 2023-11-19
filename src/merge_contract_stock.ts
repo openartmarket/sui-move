@@ -1,7 +1,7 @@
 import type { SuiClient } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
-import { getSigner, handleTransactionResponse, mergeMoveCall } from "./helpers";
+import { getSigner, handleTransactionResponse } from "./helpers";
 import type { MergeContractStockParams } from "./types";
 
 export async function mergeContractStock(
@@ -12,11 +12,9 @@ export async function mergeContractStock(
   const { keypair } = getSigner(signerPhrase);
   const tx = new TransactionBlock();
 
-  mergeMoveCall({
-    tx,
-    packageId,
-    toContractStockId,
-    fromContractStockId,
+  tx.moveCall({
+    target: `${packageId}::open_art_market::merge_contract_stocks`,
+    arguments: [tx.object(toContractStockId), tx.object(fromContractStockId)],
   });
 
   const txRes = await client.signAndExecuteTransactionBlock({
