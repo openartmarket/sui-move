@@ -23,11 +23,6 @@ export type ContractStockDetails = {
   // owner: string;
 };
 
-export type AvailableStockParams = {
-  contractId: string;
-  network?: NetworkName;
-};
-
 // Mint Contract
 export type MintContractParams = BaseContractParams & {
   adminCapId: string;

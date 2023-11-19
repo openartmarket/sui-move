@@ -1,16 +1,3 @@
-// src/available_stock.ts
-async function availableStock(client, { contractId }) {
-  const txn = await client.getObject({
-    id: contractId,
-    options: { showContent: true }
-  });
-  let availableStock2 = 0;
-  if (txn?.data?.content?.fields?.shares) {
-    availableStock2 = +(txn?.data?.content?.fields?.shares || "0");
-  }
-  return availableStock2;
-}
-
 // src/burn_contract_stock.ts
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 
@@ -192,6 +179,78 @@ function findObjectsWithOwnerAddress(txRes, address) {
   });
 }
 
+// src/getters.ts
+function getObjectData(response) {
+  const { error, data } = response;
+  if (error) {
+    throw new Error(`response error: ${JSON.stringify(response)}`);
+  }
+  if (!data) {
+    throw new Error(`No data: ${JSON.stringify(response)}`);
+  }
+  return data;
+}
+function getParsedData(data) {
+  const { content } = data;
+  if (!content) {
+    throw new Error(`No content: ${JSON.stringify(data)}`);
+  }
+  return content;
+}
+function getStringField(data, key) {
+  const { dataType } = data;
+  if (dataType !== "moveObject") {
+    throw new Error(`Unexpected txn.data.content.dataType: ${JSON.stringify(data)}`);
+  }
+  const { fields } = data;
+  if (!fields) {
+    throw new Error(`No txn.data.content.fields: ${JSON.stringify(data)}`);
+  }
+  function getStringField2(struct, key2) {
+    if (Array.isArray(struct)) {
+      throw new Error(
+        `Unexpected response.data.content.fields as array: ${JSON.stringify(data)}`
+      );
+    }
+    if (!(key2 in struct)) {
+      throw new Error(`No response.data.content.fields[${key2}]: ${JSON.stringify(data)}`);
+    }
+    const value = Reflect.get(struct, key2);
+    if (typeof value !== "string") {
+      throw new Error(
+        `Unexpected type for response.data.content.fields[${key2}]: ${JSON.stringify(data)}`
+      );
+    }
+    return value;
+  }
+  return getStringField2(fields, key);
+}
+function getIntField(data, key) {
+  const value = getStringField(data, key);
+  return toInt(value);
+}
+function toInt(s) {
+  if (!s.match(/^[0-9]+$/)) {
+    throw new Error(`${s} is not a valid integer`);
+  }
+  const number = parseInt(s, 10);
+  if (isNaN(number) || !Number.isInteger(number)) {
+    throw new Error(`${s} is not a valid integer`);
+  }
+  return number;
+}
+
+// src/getAvailableStock.ts
+async function getAvailableStock(client, contractId) {
+  const response = await client.getObject({
+    id: contractId,
+    options: { showContent: true }
+  });
+  const objectData = getObjectData(response);
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
+
 // src/merge_contract_stock.ts
 import { TransactionBlock as TransactionBlock4 } from "@mysten/sui.js/transactions";
 async function mergeContractStock(client, params) {
@@ -332,53 +391,15 @@ async function splitContractStock(client, params) {
 
 // src/toContractStock.ts
 function toContractStock(response) {
-  if (response.error) {
-    throw new Error(`ObjectResponseError: ${JSON.stringify(response)}`);
-  }
-  if (!response.data) {
-    throw new Error(`No response.data: ${JSON.stringify(response)}`);
-  }
-  if (!response.data.content) {
-    throw new Error(`No response.data.content: ${JSON.stringify(response)}`);
-  }
-  if (response.data.content.dataType !== "moveObject") {
-    throw new Error(`Unexpected response.data.content.dataType: ${JSON.stringify(response)}`);
-  }
-  const { fields } = response.data.content;
-  function getValue(struct, key, type) {
-    if (Array.isArray(struct)) {
-      throw new Error(
-        `Unexpected response.data.content.fields as array: ${JSON.stringify(response)}`
-      );
-    }
-    if (key in struct) {
-      const value = Reflect.get(struct, key);
-      if (typeof value === type) {
-        return value;
-      }
-      throw new Error(
-        `Unexpected type for response.data.content.fields[${key}]: ${JSON.stringify(response)}`
-      );
-    }
-    throw new Error(`No response.data.content.fields[${key}]: ${JSON.stringify(response)}`);
-  }
+  const objectData = getObjectData(response);
+  const parsedData = getParsedData(objectData);
   return {
-    contractStockId: response.data.objectId,
-    digest: response.data.digest,
-    contractId: getValue(fields, "contract_id", "string"),
-    quantity: toInt(getValue(fields, "shares", "string")),
-    productId: getValue(fields, "reference", "string")
+    contractStockId: objectData.objectId,
+    digest: objectData.digest,
+    contractId: getStringField(parsedData, "contract_id"),
+    quantity: getIntField(parsedData, "shares"),
+    productId: getStringField(parsedData, "reference")
   };
-}
-function toInt(s) {
-  if (!s.match(/^[0-9]+$/)) {
-    throw new Error(`${s} is not a valid integer`);
-  }
-  const number = parseInt(s, 10);
-  if (isNaN(number) || !Number.isInteger(number)) {
-    throw new Error(`${s} is not a valid integer`);
-  }
-  return number;
 }
 
 // src/transfer_contract_stock.ts
@@ -465,12 +486,12 @@ async function createVoteRequest(client, { contractId, request, adminCapId, pack
   return vote_request_id;
 }
 export {
-  availableStock,
   batchMintContractStock,
   burnContractStock,
   createVoteRequest,
   endRequestVoting,
   findObjectsWithOwnerAddress,
+  getAvailableStock,
   getCreatedObjects,
   getSigner,
   handleTransactionResponse,

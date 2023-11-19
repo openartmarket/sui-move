@@ -1,7 +1,7 @@
 import assert from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import type { OwnedObjectList } from "../src";
+import { getAvailableStock, type OwnedObjectList } from "../src";
 import { mintContract } from "../src/contract";
 import { mintContractStock } from "../src/mint_contract_stock";
 import { splitContractStock } from "../src/split_contract_stock";
@@ -62,15 +62,11 @@ describe("transferContractStock", () => {
       quantity: 5,
     });
 
-    const oldStock = await getObject(contractStockId);
-    const splitStock = await getObject(splitStockId1.contractStockId);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(oldStock.data.content.fields.shares, "7");
+    const oldQuantity = await getAvailableStock(client, contractStockId);
+    expect(oldQuantity).toBe(7);
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(splitStock.data.content.fields.shares, "5");
+    const splitQuantity = await getAvailableStock(client, splitStockId1.contractStockId);
+    expect(splitQuantity).toBe(5);
 
     await transferContractStock(client, {
       ...baseOptions,

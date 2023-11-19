@@ -1,8 +1,8 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import { availableStock } from "../src/available_stock";
 import { mintContract } from "../src/contract";
+import { getAvailableStock } from "../src/getAvailableStock";
 import { batchMintContractStock, mintContractStock } from "../src/mint_contract_stock";
 import {
   ADMIN_ADDRESS,
@@ -28,9 +28,7 @@ describe("mintContractStock", () => {
       receiverAddress: USER1_ADDRESS,
       quantity: 2,
     });
-    const sharesLeft = await availableStock(client, {
-      contractId,
-    });
+    const sharesLeft = await getAvailableStock(client, contractId);
     assert.equal(sharesLeft, 498);
   });
 
@@ -46,12 +44,8 @@ describe("mintContractStock", () => {
         { contractId, receiverAddress: USER3_ADDRESS, quantity: 5 },
       ],
     });
-    const sharesLeft = await availableStock(client, {
-      contractId,
-    });
-    const sharesLeft2 = await availableStock(client, {
-      contractId: contractId2,
-    });
+    const sharesLeft = await getAvailableStock(client, contractId);
+    const sharesLeft2 = await getAvailableStock(client, contractId2);
     assert.equal(sharesLeft, 490);
     assert.equal(sharesLeft2, 470);
   });
@@ -82,9 +76,7 @@ describe("mintContractStock", () => {
       ...baseOptions,
     });
 
-    const sharesLeft = await availableStock(client, {
-      contractId,
-    });
+    const sharesLeft = await getAvailableStock(client, contractId);
     assert.equal(sharesLeft, 0);
 
     await assert.rejects(
@@ -116,9 +108,7 @@ describe("mintContractStock", () => {
       quantity: 98,
       ...baseOptions,
     });
-    const sharesLeft = await availableStock(client, {
-      contractId,
-    });
+    const sharesLeft = await getAvailableStock(client, contractId);
     assert.equal(sharesLeft, 2);
 
     await assert.rejects(

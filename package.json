@@ -21,8 +21,7 @@
     }
   },
   "scripts": {
-    "test": "vitest",
-    "coverage": "vitest run --coverage",
+    "test": "vitest run --coverage",
     "compile": "tsc --build",
     "build": "tsup",
     "upgrade": "npm-check-updates --upgrade",

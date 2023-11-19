@@ -2,3 +2,4 @@ node_modules/
 tmp/
 sui.log.*
 .sui.env
+coverage
