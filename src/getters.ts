@@ -32,12 +32,12 @@ export function getParsedData(data: SuiObjectData): SuiParsedData {
   return content;
 }
 
+export function getType(data: SuiParsedData): string {
+  return getMoveObject(data).type;
+}
+
 export function getStringField(data: SuiParsedData, key: string): string {
-  const { dataType } = data;
-  if (dataType !== "moveObject") {
-    throw new Error(`Unexpected txn.data.content.dataType: ${JSON.stringify(data)}`);
-  }
-  const { fields } = data;
+  const { fields } = getMoveObject(data);
   if (!fields) {
     throw new Error(`No txn.data.content.fields: ${JSON.stringify(data)}`);
   }
@@ -59,6 +59,14 @@ export function getStringField(data: SuiParsedData, key: string): string {
   }
 
   return getStringField(fields, key);
+}
+
+function getMoveObject(data: SuiParsedData) {
+  const { dataType } = data;
+  if (dataType !== "moveObject") {
+    throw new Error(`Unexpected txn.data.content.dataType: ${JSON.stringify(data)}`);
+  }
+  return data;
 }
 
 export function getIntField(data: SuiParsedData, key: string): number {

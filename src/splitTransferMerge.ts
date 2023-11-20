@@ -1,13 +1,14 @@
 import type { SuiObjectData } from "@mysten/sui.js/dist/cjs/client";
 
 import type { Executor } from "./Executor";
-import { getObjectData } from "./getters";
+import { getObjectData, getParsedData, getStringField, getType } from "./getters";
 import type { MergeContractStockParam } from "./mergeContractStock";
-import { mergeContractStockCalls } from "./mergeContractStock";
-import { splitContractStockCall } from "./splitContractStock";
-import { transferContractStockCall } from "./transferContractStock";
+import { mergeContractStock } from "./mergeContractStock";
+import { splitContractStock } from "./splitContractStock";
+import { transferContractStock } from "./transferContractStock";
 
 export type SplitMergeTransferParams = {
+  packageId: string;
   fromExecutor: Executor;
   toExecutor: Executor;
   contractId: string;
@@ -16,36 +17,56 @@ export type SplitMergeTransferParams = {
   quantity: number;
 };
 
+export type SplitMergeTransferResult = {
+  fromContractStockId: string;
+  toContractStockId: string;
+};
+
 /**
  * Transfers a quantity of contract stock from one address to another.
  * Takes care of splitting and merging so that aftet the transfer,
  * both addresses have a single stock.
  */
 export async function splitTransferMerge({
+  packageId,
   fromExecutor,
   toExecutor,
   contractId,
   fromAddress,
   toAddress,
   quantity,
-}: SplitMergeTransferParams) {
-  // Run merge/split/transfer in a single transaction block
-  await fromExecutor.execute(async (txb, packageId) => {
-    const contractStocks = await getContractStocks(fromExecutor, fromAddress, contractId);
-    const mergeContractStockParams = makeMergeContractStockParams(contractStocks);
-    // Ideally the stocks are already merged, but in case they are not, merge them
-    mergeContractStockCalls(txb, packageId, mergeContractStockParams);
-
-    const contractStockId = contractStocks[0].objectId;
-    splitContractStockCall(txb, packageId, { contractStockId, quantity });
-    transferContractStockCall(txb, packageId, { contractId, contractStockId, toAddress });
+}: SplitMergeTransferParams): Promise<SplitMergeTransferResult> {
+  const fromContractStocks = await getContractStocks(
+    fromExecutor,
+    fromAddress,
+    contractId,
+    packageId,
+  );
+  for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
+    fromContractStocks,
+  )) {
+    await mergeContractStock(fromExecutor, [{ fromContractStockId, toContractStockId }]);
+  }
+  const { splitContractStockId } = await splitContractStock(fromExecutor, {
+    contractStockId: fromContractStocks[0].objectId,
+    quantity,
+  });
+  await transferContractStock(fromExecutor, {
+    contractId,
+    contractStockId: splitContractStockId,
+    toAddress,
   });
 
-  await toExecutor.execute(async (txb, packageId) => {
-    const contractStocks = await getContractStocks(toExecutor, toAddress, contractId);
-    const mergeContractStockParams = makeMergeContractStockParams(contractStocks);
-    mergeContractStockCalls(txb, packageId, mergeContractStockParams);
-  });
+  const toContractStocks = await getContractStocks(toExecutor, toAddress, contractId, packageId);
+  for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
+    toContractStocks,
+  )) {
+    await mergeContractStock(toExecutor, [{ fromContractStockId, toContractStockId }]);
+  }
+  return {
+    fromContractStockId: fromContractStocks[0].objectId,
+    toContractStockId: toContractStocks[0].objectId,
+  };
 }
 
 function makeMergeContractStockParams(
@@ -62,19 +83,31 @@ async function getContractStocks(
   executor: Executor,
   owner: string,
   contractId: string,
+  packageId: string,
+  cursor?: string,
 ): Promise<readonly SuiObjectData[]> {
+  const type = `${packageId}::open_art_market::ContractStock`;
   const response = await executor.suiClient.getOwnedObjects({
     owner,
     options: {
       showContent: true,
     },
+    cursor,
   });
-  if (response.hasNextPage) {
-    throw new Error("TODO: implement pagination");
+  const data = response.data.map(getObjectData).filter((object) => {
+    const parsedData = getParsedData(object);
+    return getType(parsedData) === type && getStringField(parsedData, "contract_id") === contractId;
+  });
+  if (response.hasNextPage && response.nextCursor) {
+    const nextData = await getContractStocks(
+      executor,
+      owner,
+      contractId,
+      packageId,
+      response.nextCursor,
+    );
+    return [...data, ...nextData];
   }
-  console.log(
-    `TODO: filter on contractId=${contractId} so we don't merge EVERYTHING the user owns`,
-  );
 
-  return response.data.map(getObjectData);
+  return data;
 }
