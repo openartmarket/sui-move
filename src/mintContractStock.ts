@@ -1,10 +1,5 @@
 import type { Executor } from "./Executor";
-import {
-  getCreatedObjectsWithOwnerAddress,
-  getObjectData,
-  getParsedData,
-  getStringField,
-} from "./getters";
+import { getCreatedObjectsWithOwnerAddress, getObjectData } from "./getters";
 
 export type MintContractStockParams = {
   adminCapId: string;
@@ -46,8 +41,7 @@ export async function mintContractStock(
         options: { showContent: true },
       });
       const objectData = getObjectData(contractStock);
-      const parsedData = getParsedData(objectData);
-      const contractStockId = getStringField(parsedData, "contract_id");
+      const contractStockId = objectData.objectId;
       contractStockIds.push(contractStockId);
     }
   }

@@ -3,15 +3,20 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { getAvailableStock, type OwnedObjectList } from "../src";
 import { mintContract } from "../src/contract";
-import { mintContractStock } from "../src/mint_contract_stock";
+import type { Executor } from "../src/Executor";
+import { SuiExecutor } from "../src/Executor";
+import { mintContractStock } from "../src/mintContractStock";
 import { splitContractStock } from "../src/split_contract_stock";
 import { transferContractStock } from "../src/transfer_contract_stock";
 import {
+  ADMIN_CAP_ID,
+  ADMIN_PHRASE,
   baseOptions,
   getClient,
   getObject,
   getOwnedObjects,
   mintContractOptions,
+  PACKAGE_ID,
   USER1_ADDRESS,
   USER1_PHRASE,
   USER2_ADDRESS,
@@ -19,19 +24,25 @@ import {
 } from "./test-helpers";
 
 describe("transferContractStock", () => {
+  let executor: Executor;
   const client = getClient();
   let contractId: string;
   beforeEach(async () => {
+    executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
     contractId = await mintContract(client, mintContractOptions);
   });
 
   it("should mint a stock and then transfer it", async () => {
-    const { contractStockId } = await mintContractStock(client, {
-      ...baseOptions,
-      contractId,
-      receiverAddress: USER1_ADDRESS,
-      quantity: 12,
-    });
+    const {
+      contractStockIds: [contractStockId],
+    } = await mintContractStock(executor, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: USER1_ADDRESS,
+        quantity: 12,
+      },
+    ]);
 
     await transferContractStock(client, {
       ...baseOptions,
@@ -48,12 +59,16 @@ describe("transferContractStock", () => {
   }, 30_000);
 
   it("should split a split stock and transfer it to new owner", async () => {
-    const { contractStockId } = await mintContractStock(client, {
-      ...baseOptions,
-      contractId,
-      receiverAddress: USER2_ADDRESS,
-      quantity: 12,
-    });
+    const {
+      contractStockIds: [contractStockId],
+    } = await mintContractStock(executor, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: USER2_ADDRESS,
+        quantity: 12,
+      },
+    ]);
 
     const splitStockId1 = await splitContractStock(client, {
       ...baseOptions,

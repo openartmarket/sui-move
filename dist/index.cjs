@@ -304,8 +304,7 @@ async function mintContractStock(executor, paramsArray) {
         options: { showContent: true }
       });
       const objectData = getObjectData(contractStock);
-      const parsedData = getParsedData(objectData);
-      const contractStockId = getStringField(parsedData, "contract_id");
+      const contractStockId = objectData.objectId;
       contractStockIds.push(contractStockId);
     }
   }
