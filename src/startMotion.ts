@@ -20,7 +20,7 @@ export async function startMotion(
   params: StartMotionParams,
 ): Promise<StartMotionResult> {
   const { adminCapId, contractId, motion } = params;
-  const response = await executor.execute((txb, packageId) => {
+  const response = await executor.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::start_vote`,
       arguments: [txb.object(adminCapId), txb.pure(contractId), txb.pure(motion)],

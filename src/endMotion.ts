@@ -14,7 +14,7 @@ export async function endMotion(
   params: EndMotionParams,
 ): Promise<EndMotionResult> {
   const { adminCapId, motionId } = params;
-  const response = await executor.execute((txb, packageId) => {
+  const response = await executor.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::end_vote`,
       arguments: [txb.object(adminCapId), txb.object(motionId)],

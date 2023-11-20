@@ -17,7 +17,7 @@ export async function splitContractStock(
   executor: Executor,
   params: SplitContractStockParams,
 ): Promise<SplitContractStockResult> {
-  const response = await executor.execute((txb, packageId) => {
+  const response = await executor.execute(async (txb, packageId) => {
     splitContractStockCall(txb, packageId, params);
   });
   const { digest } = response;

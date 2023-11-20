@@ -36,7 +36,7 @@ export async function mintContract(
     currency,
     image,
   } = params;
-  const response = await executor.execute((txb, packageId) => {
+  const response = await executor.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::open_art_market::mint_contract`,
       arguments: [

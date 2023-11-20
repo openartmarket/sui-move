@@ -36,7 +36,7 @@ export async function createDisplay(
 ): Promise<CreateDisplayResult> {
   const { publisherId, fields, type, address } = params;
 
-  const response = await executor.execute((txb, packageId) => {
+  const response = await executor.execute(async (txb, packageId) => {
     const typeArgument = `${packageId}::open_art_market::${type}`;
 
     const keys = Object.keys(fields);

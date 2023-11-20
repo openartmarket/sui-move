@@ -19,7 +19,7 @@ export async function mintContractStock(
   executor: Executor,
   params: MintContractStockParam[],
 ): Promise<MintContractStockResult> {
-  const response = await executor.execute((txb, packageId) => {
+  const response = await executor.execute(async (txb, packageId) => {
     mintContractStockCalls(txb, packageId, params);
   });
 

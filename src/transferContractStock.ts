@@ -16,7 +16,7 @@ export async function transferContractStock(
   executor: Executor,
   params: TransferContractStockParams,
 ): Promise<TransferContractStockResult> {
-  const response = await executor.execute((txb, packageId) => {
+  const response = await executor.execute(async (txb, packageId) => {
     transferContractStockCall(txb, packageId, params);
   });
   const { digest } = response;

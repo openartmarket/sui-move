@@ -15,7 +15,7 @@ export async function mergeContractStock(
   executor: Executor,
   params: readonly MergeContractStockParam[],
 ): Promise<MergeContractStockResult> {
-  const response = await executor.execute((txb, packageId) => {
+  const response = await executor.execute(async (txb, packageId) => {
     mergeContractStockCalls(txb, packageId, params);
   });
 
