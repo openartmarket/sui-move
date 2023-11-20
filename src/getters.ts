@@ -16,7 +16,7 @@ export function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObject
 export function getObjectData(response: SuiObjectResponse): SuiObjectData {
   const { error, data } = response;
   if (error) {
-    throw new Error(`response error: ${JSON.stringify(response)}`);
+    throw error;
   }
   if (!data) {
     throw new Error(`No data: ${JSON.stringify(response)}`);

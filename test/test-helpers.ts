@@ -1,9 +1,9 @@
 import { exec } from "node:child_process";
 
-import type { PaginatedObjectsResponse, SuiObjectResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 
 import type { MintContractParams } from "../src";
+import { getIntField, getObjectData, getParsedData } from "../src/getters";
 import type { NetworkName } from "../src/types";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
@@ -25,31 +25,12 @@ export function getClient(): SuiClient {
   return new SuiClient({ url });
 }
 
-export async function getObject(objectId: string): Promise<SuiObjectResponse> {
-  return await getClient().getObject({
-    id: objectId,
-    options: { showContent: true },
-  });
-}
-
-/** @deprecated */
-export async function getOwnedObjects(address: string): Promise<PaginatedObjectsResponse> {
-  return await getClient().getOwnedObjects({
-    owner: address,
-  });
-}
-
-export function getProvider(SUI_NETWORK: NetworkName) {
-  return new SuiClient({ url: getFullnodeUrl(SUI_NETWORK) });
-}
-
 export function getEnv(name: string): string {
   const value = process.env[name];
   if (!value && name.match(/^USER/)) return "";
   if (!value) throw new Error(`Missing env variable ${name}`);
   return value;
 }
-export const provider = getProvider(SUI_NETWORK as NetworkName);
 
 export const mintContractOptions: MintContractParams = {
   adminCapId: ADMIN_CAP_ID,
@@ -63,6 +44,19 @@ export const mintContractOptions: MintContractParams = {
   currency: "USD",
   image: "reference-id-for-contract",
 };
+
+/**
+ * Get the quantity of a contract or a contract stock.
+ */
+export async function getQuantity(client: SuiClient, id: string): Promise<number> {
+  const response = await client.getObject({
+    id,
+    options: { showContent: true },
+  });
+  const objectData = getObjectData(response);
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
 
 export type SuiAddress = {
   readonly address: string;

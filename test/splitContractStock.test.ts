@@ -1,6 +1,5 @@
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import assert from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
@@ -11,12 +10,12 @@ import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getClient,
+  getQuantity,
   mintContractOptions,
   PACKAGE_ID,
   USER1_ADDRESS,
   USER1_PHRASE,
 } from "./test-helpers";
-import { getObject } from "./test-helpers";
 
 describe("splitContractStock", () => {
   let executor: Executor;
@@ -54,17 +53,8 @@ describe("splitContractStock", () => {
       quantity: 2,
     });
 
-    // Get the stock and check that it has 2 shares
-    const splitStock = await getObject(splitContractStockId);
-    const oldStock = await getObject(contractStockId);
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(splitStock.data.content.fields.shares, "2");
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(oldStock.data.content.fields.shares, "8");
+    expect(await getQuantity(client, splitContractStockId)).toEqual(2);
+    expect(await getQuantity(client, contractStockId)).toEqual(8);
   }, 30_000);
 
   it("should split a split stock", async () => {
@@ -97,20 +87,8 @@ describe("splitContractStock", () => {
       },
     );
 
-    const oldStock = await getObject(contractStockId);
-    const splitStock = await getObject(splitContractStockId);
-    const splitAgainStock = await getObject(splitAgainContractStockId);
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(oldStock.data.content.fields.shares, "7");
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(splitStock.data.content.fields.shares, "2");
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(splitAgainStock.data.content.fields.shares, "3");
+    expect(await getQuantity(client, contractStockId)).toEqual(7);
+    expect(await getQuantity(client, splitContractStockId)).toEqual(2);
+    expect(await getQuantity(client, splitAgainContractStockId)).toEqual(3);
   }, 30_000);
 });

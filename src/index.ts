@@ -1,5 +1,4 @@
 export * from "./endMotion";
-export * from "./getAvailableStock";
 export * from "./mergeContractStock";
 export * from "./mintContract";
 export * from "./mintContractStock";

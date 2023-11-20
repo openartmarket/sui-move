@@ -1,7 +1,6 @@
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { getAvailableStock } from "../src";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { getObjectData } from "../src/getters";
@@ -13,6 +12,7 @@ import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getClient,
+  getQuantity,
   mintContractOptions,
   PACKAGE_ID,
   USER1_ADDRESS,
@@ -91,11 +91,8 @@ describe("transferContractStock", () => {
       quantity: 5,
     });
 
-    const oldQuantity = await getAvailableStock(client, contractStockId);
-    expect(oldQuantity).toBe(7);
-
-    const splitQuantity = await getAvailableStock(client, splitContractStockId);
-    expect(splitQuantity).toBe(5);
+    expect(await getQuantity(client, contractStockId)).toEqual(7);
+    expect(await getQuantity(client, splitContractStockId)).toEqual(5);
 
     await transferContractStock(user2Executor, {
       contractId,

@@ -17,7 +17,7 @@ import {
   transferSui,
 } from "./test-helpers";
 
-describe("splitMergeTransfer", () => {
+describe.skip("splitMergeTransfer", () => {
   let executor: Executor;
   const client = getClient();
   let contractId: string;

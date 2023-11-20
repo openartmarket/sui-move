@@ -1,6 +1,5 @@
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import assert from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
@@ -11,7 +10,7 @@ import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getClient,
-  getObject,
+  getQuantity,
   mintContractOptions,
   PACKAGE_ID,
   USER1_ADDRESS,
@@ -65,13 +64,12 @@ describe("mergeContractStock", () => {
       fromContractStockId,
     });
 
-    const burnedStock = await getObject(fromContractStockId);
-    const newStock = await getObject(toContractStockId);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(newStock.data.content.fields.shares, "20");
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(burnedStock.error.code, "deleted");
+    expect(await getQuantity(client, toContractStockId)).toEqual(20);
+    await expect(getQuantity(client, fromContractStockId)).rejects.toSatisfy((err) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      expect(err.code).toEqual("deleted");
+      return true;
+    });
   }, 30_000);
 });

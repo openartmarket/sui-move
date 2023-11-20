@@ -1,10 +1,10 @@
+import assert from "node:assert";
+
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import assert from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
-import { getAvailableStock } from "../src/getAvailableStock";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import {
@@ -12,6 +12,7 @@ import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getClient,
+  getQuantity,
   mintContractOptions,
   PACKAGE_ID,
   USER1_ADDRESS,
@@ -52,10 +53,9 @@ describe("mintContractStock", () => {
       { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: USER2_ADDRESS, quantity: 3 },
       { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: USER3_ADDRESS, quantity: 5 },
     ]);
-    const sharesLeft = await getAvailableStock(client, contractId);
-    const sharesLeft2 = await getAvailableStock(client, contractId2);
-    assert.equal(sharesLeft, 490);
-    assert.equal(sharesLeft2, 470);
+
+    expect(await getQuantity(client, contractId)).toEqual(490);
+    expect(await getQuantity(client, contractId2)).toEqual(470);
   });
 
   it("should not issue new shares, when asking for too much", async () => {
@@ -90,7 +90,7 @@ describe("mintContractStock", () => {
       },
     ]);
 
-    const sharesLeft = await getAvailableStock(client, contractId);
+    const sharesLeft = await getQuantity(client, contractId);
     assert.equal(sharesLeft, 0);
 
     await assert.rejects(
@@ -130,8 +130,8 @@ describe("mintContractStock", () => {
         quantity: 98,
       },
     ]);
-    const sharesLeft = await getAvailableStock(client, contractId);
-    assert.equal(sharesLeft, 2);
+
+    expect(await getQuantity(client, contractId)).toEqual(2);
 
     await assert.rejects(
       mintContractStock(executor, [
