@@ -1,29 +1,23 @@
-import type { SuiClient } from "@mysten/sui.js/client";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
+import type { Executor } from "./Executor";
 
-import { getSigner, handleTransactionResponse } from "./helpers";
-import type { VoteParams } from "./types";
+export type VoteParams = {
+  contractId: string;
+  motionId: string;
+  choice: boolean;
+};
 
-export async function vote(
-  client: SuiClient,
-  { contractId, voteRequest, voterAccount, choice, packageId }: VoteParams,
-) {
-  const { keypair } = getSigner(voterAccount);
-  const tx = new TransactionBlock();
+export type VoteResult = {
+  digest: string;
+};
 
-  tx.moveCall({
-    target: `${packageId}::dao::vote`,
-    arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)],
+export async function vote(executor: Executor, params: VoteParams): Promise<VoteResult> {
+  const { contractId, motionId, choice } = params;
+  const response = await executor.execute((txb, packageId) => {
+    txb.moveCall({
+      target: `${packageId}::dao::vote`,
+      arguments: [txb.object(contractId), txb.object(motionId), txb.pure(choice)],
+    });
   });
-
-  const txRes = await client.signAndExecuteTransactionBlock({
-    signer: keypair,
-    transactionBlock: tx,
-    requestType: "WaitForLocalExecution",
-    options: {
-      showEffects: true,
-    },
-  });
-  handleTransactionResponse(txRes);
-  return "success";
+  const { digest } = response;
+  return { digest };
 }

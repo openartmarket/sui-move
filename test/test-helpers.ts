@@ -51,15 +51,6 @@ export function getEnv(name: string): string {
 }
 export const provider = getProvider(SUI_NETWORK as NetworkName);
 
-/**
- * @deprecated
- */
-export const baseOptions = {
-  signerPhrase: ADMIN_PHRASE,
-  packageId: PACKAGE_ID,
-  adminCapId: ADMIN_CAP_ID,
-};
-
 export const mintContractOptions: MintContractParams = {
   adminCapId: ADMIN_CAP_ID,
   totalShareCount: 500,

@@ -1,55 +1,20 @@
-import { SuiClient, SuiTransactionBlockResponse, SuiObjectChangeCreated, SuiObjectResponse } from '@mysten/sui.js/client';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
+import { SuiTransactionBlockResponse, SuiObjectChangeCreated, SuiClient, SuiObjectResponse } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
 
-type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
-type ContractMethod = "vote" | "merge_contract_stocks" | "mint_contract_stock" | "split_contract_stock" | "safe_burn_contract_stock";
-type Currency = "USD" | "EUR" | "GBP" | "NOK";
-type BaseContractParams = {
-    packageId: string;
-    signerPhrase: string;
-};
-type EndVoteRequestParams = BaseContractParams & {
-    adminCapId: string;
-    voteRequest: string;
-};
-type BurnContractParams = {
-    contractId: string;
-    contractStockId: string;
-    packageId: string;
-    signerPhrase: string;
-    network?: NetworkName;
-};
-type UpdateOutgoingPriceParams = BaseContractParams & {
-    adminCapId: string;
-    contractId: string;
-    newOutgoingPrice: number;
-};
-type VoteRequestParams = BaseContractParams & {
-    contractId: string;
-    request: string;
-    adminCapId: string;
-};
-type VoteParams = {
-    contractId: string;
-    packageId: string;
-    voteRequest: string;
-    voterAccount: string;
-    choice: boolean;
-    network?: NetworkName;
-};
-type BaseDisplayParams = {
-    publisherId: string;
-    adminPhrase: string;
-};
-type CreateContractDisplayParams = BaseDisplayParams & {
-    contractType: string;
-};
-type CreateContractStockDisplayParams = BaseDisplayParams & {
-    contractStockType: string;
-};
+interface Executor {
+    execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
+}
+type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => void;
 
-declare function endRequestVoting(client: SuiClient, { voteRequest, packageId, signerPhrase, adminCapId }: EndVoteRequestParams): Promise<string>;
+type EndMotionParams = {
+    adminCapId: string;
+    motionId: string;
+};
+type EndMotionResult = {
+    digest: string;
+};
+declare function endMotion(executor: Executor, params: EndMotionParams): Promise<EndMotionResult>;
 
 declare function findObjectsWithOwnerAddress(txRes: SuiTransactionBlockResponse, address: string): SuiObjectChangeCreated[];
 
@@ -62,11 +27,6 @@ declare function getSigner(phrase: string): {
 declare function handleTransactionResponse(txRes: SuiTransactionBlockResponse): void;
 declare function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[];
 
-interface Executor {
-    execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
-}
-type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => void;
-
 type MergeContractStockParams = {
     toContractStockId: string;
     fromContractStockId: string;
@@ -75,6 +35,19 @@ type MergeContractStockResult = {
     digest: string;
 };
 declare function mergeContractStock(executor: Executor, params: MergeContractStockParams): Promise<MergeContractStockResult>;
+
+type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
+type Currency = "USD" | "EUR" | "GBP" | "NOK";
+type CreateContractDisplayParams = {
+    publisherId: string;
+    adminPhrase: string;
+    contractType: string;
+};
+type CreateContractStockDisplayParams = {
+    publisherId: string;
+    adminPhrase: string;
+    contractStockType: string;
+};
 
 type MintContractParams = {
     adminCapId: string;
@@ -116,6 +89,20 @@ type SplitContractStockResult = {
 };
 declare function splitContractStock(executor: Executor, params: SplitContractStockParams): Promise<SplitContractStockResult>;
 
+type StartMotionParams = {
+    adminCapId: string;
+    contractId: string;
+    /**
+     * The motion to vote on
+     */
+    motion: string;
+};
+type StartMotionResult = {
+    digest: string;
+    motionId: string;
+};
+declare function startMotion(executor: Executor, params: StartMotionParams): Promise<StartMotionResult>;
+
 type ContractStock = {
     contractStockId: string;
     digest: string;
@@ -135,8 +122,14 @@ type TransferContractStockResult = {
 };
 declare function transferContractStock(executor: Executor, params: TransferContractStockParams): Promise<TransferContractStockResult>;
 
-declare function vote(client: SuiClient, { contractId, voteRequest, voterAccount, choice, packageId }: VoteParams): Promise<string>;
+type VoteParams = {
+    contractId: string;
+    motionId: string;
+    choice: boolean;
+};
+type VoteResult = {
+    digest: string;
+};
+declare function vote(executor: Executor, params: VoteParams): Promise<VoteResult>;
 
-declare function createVoteRequest(client: SuiClient, { contractId, request, adminCapId, packageId, signerPhrase }: VoteRequestParams): Promise<string>;
-
-export { type BaseContractParams, type BurnContractParams, type ContractMethod, type ContractStock, type CreateContractDisplayParams, type CreateContractStockDisplayParams, type Currency, type EndVoteRequestParams, type MergeContractStockParams, type MergeContractStockResult, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type SplitContractStockParams, type SplitContractStockResult, type TransferContractStockParams, type TransferContractStockResult, type UpdateOutgoingPriceParams, type VoteParams, type VoteRequestParams, createVoteRequest, endRequestVoting, findObjectsWithOwnerAddress, getAvailableStock, getCreatedObjects, getSigner, handleTransactionResponse, mergeContractStock, mintContract, mintContractStock, splitContractStock, toContractStock, transferContractStock, vote };
+export { type ContractStock, type CreateContractDisplayParams, type CreateContractStockDisplayParams, type Currency, type EndMotionParams, type EndMotionResult, type MergeContractStockParams, type MergeContractStockResult, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type SplitContractStockParams, type SplitContractStockResult, type StartMotionParams, type StartMotionResult, type TransferContractStockParams, type TransferContractStockResult, type VoteParams, type VoteResult, endMotion, findObjectsWithOwnerAddress, getAvailableStock, getCreatedObjects, getSigner, handleTransactionResponse, mergeContractStock, mintContract, mintContractStock, splitContractStock, startMotion, toContractStock, transferContractStock, vote };

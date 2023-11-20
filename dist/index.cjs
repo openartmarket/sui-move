@@ -20,8 +20,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  createVoteRequest: () => createVoteRequest,
-  endRequestVoting: () => endRequestVoting,
+  endMotion: () => endMotion,
   findObjectsWithOwnerAddress: () => findObjectsWithOwnerAddress,
   getAvailableStock: () => getAvailableStock,
   getCreatedObjects: () => getCreatedObjects,
@@ -31,14 +30,25 @@ __export(src_exports, {
   mintContract: () => mintContract,
   mintContractStock: () => mintContractStock,
   splitContractStock: () => splitContractStock,
+  startMotion: () => startMotion,
   toContractStock: () => toContractStock,
   transferContractStock: () => transferContractStock,
   vote: () => vote
 });
 module.exports = __toCommonJS(src_exports);
 
-// src/end_request_voting.ts
-var import_transactions = require("@mysten/sui.js/transactions");
+// src/endMotion.ts
+async function endMotion(executor, params) {
+  const { adminCapId, motionId } = params;
+  const response = await executor.execute((txb, packageId) => {
+    txb.moveCall({
+      target: `${packageId}::dao::end_vote`,
+      arguments: [txb.object(adminCapId), txb.object(motionId)]
+    });
+  });
+  const { digest } = response;
+  return { digest };
+}
 
 // src/helpers.ts
 var import_ed25519 = require("@mysten/sui.js/keypairs/ed25519");
@@ -69,26 +79,6 @@ function getCreatedObjects(txRes) {
   return (txRes.objectChanges || []).filter(
     (change) => change.type === "created"
   );
-}
-
-// src/end_request_voting.ts
-async function endRequestVoting(client, { voteRequest, packageId, signerPhrase, adminCapId }) {
-  const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions.TransactionBlock();
-  tx.moveCall({
-    target: `${packageId}::dao::end_vote`,
-    arguments: [tx.object(adminCapId), tx.object(voteRequest)]
-  });
-  const txRes = await client.signAndExecuteTransactionBlock({
-    signer: keypair,
-    transactionBlock: tx,
-    requestType: "WaitForLocalExecution",
-    options: {
-      showEffects: true
-    }
-  });
-  handleTransactionResponse(txRes);
-  return "success";
 }
 
 // src/findObjectsWithOwnerAddress.ts
@@ -275,6 +265,25 @@ async function splitContractStock(executor, params) {
   return { digest, splitContractStockId };
 }
 
+// src/startMotion.ts
+async function startMotion(executor, params) {
+  const { adminCapId, contractId, motion } = params;
+  const response = await executor.execute((txb, packageId) => {
+    txb.moveCall({
+      target: `${packageId}::dao::start_vote`,
+      arguments: [txb.object(adminCapId), txb.pure(contractId), txb.pure(motion)]
+    });
+  });
+  const { digest } = response;
+  const createdObjects = getCreatedObjects2(response);
+  if (createdObjects.length !== 1) {
+    throw new Error(`Expected 1 created object, got ${JSON.stringify(createdObjects)}`);
+  }
+  const createdObject = createdObjects[0];
+  const motionId = createdObject.objectId;
+  return { digest, motionId };
+}
+
 // src/toContractStock.ts
 function toContractStock(response) {
   const objectData = getObjectData(response);
@@ -302,54 +311,20 @@ async function transferContractStock(executor, params) {
 }
 
 // src/vote.ts
-var import_transactions2 = require("@mysten/sui.js/transactions");
-async function vote(client, { contractId, voteRequest, voterAccount, choice, packageId }) {
-  const { keypair } = getSigner(voterAccount);
-  const tx = new import_transactions2.TransactionBlock();
-  tx.moveCall({
-    target: `${packageId}::dao::vote`,
-    arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)]
+async function vote(executor, params) {
+  const { contractId, motionId, choice } = params;
+  const response = await executor.execute((txb, packageId) => {
+    txb.moveCall({
+      target: `${packageId}::dao::vote`,
+      arguments: [txb.object(contractId), txb.object(motionId), txb.pure(choice)]
+    });
   });
-  const txRes = await client.signAndExecuteTransactionBlock({
-    signer: keypair,
-    transactionBlock: tx,
-    requestType: "WaitForLocalExecution",
-    options: {
-      showEffects: true
-    }
-  });
-  handleTransactionResponse(txRes);
-  return "success";
-}
-
-// src/vote_request.ts
-var import_transactions3 = require("@mysten/sui.js/transactions");
-async function createVoteRequest(client, { contractId, request, adminCapId, packageId, signerPhrase }) {
-  const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions3.TransactionBlock();
-  tx.moveCall({
-    target: `${packageId}::dao::start_vote`,
-    arguments: [tx.object(adminCapId), tx.pure(contractId), tx.pure(request)]
-  });
-  const txRes = await client.signAndExecuteTransactionBlock({
-    signer: keypair,
-    transactionBlock: tx,
-    requestType: "WaitForLocalExecution",
-    options: {
-      showObjectChanges: true,
-      showEffects: true
-    }
-  });
-  handleTransactionResponse(txRes);
-  const vote_request_id = getCreatedObjects(txRes)?.[0].objectId;
-  if (!vote_request_id)
-    throw new Error("Vote request not created");
-  return vote_request_id;
+  const { digest } = response;
+  return { digest };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  createVoteRequest,
-  endRequestVoting,
+  endMotion,
   findObjectsWithOwnerAddress,
   getAvailableStock,
   getCreatedObjects,
@@ -359,6 +334,7 @@ async function createVoteRequest(client, { contractId, request, adminCapId, pack
   mintContract,
   mintContractStock,
   splitContractStock,
+  startMotion,
   toContractStock,
   transferContractStock,
   vote

@@ -67,10 +67,11 @@ export class ShinamiExecutor implements Executor {
 
     // Sign the sponsored tx.
     const { signature } = await signer.signTransactionBlock(fromB64(txBytes));
+    const signatures = [signature, gasSignature];
     // Execute the sponsored & signed tx.
     const response = await suiClient.executeTransactionBlock({
       transactionBlock: txBytes,
-      signature: [signature, gasSignature],
+      signature: signatures,
       requestType: "WaitForLocalExecution",
       options: {
         showObjectChanges: true,

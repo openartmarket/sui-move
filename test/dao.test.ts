@@ -2,18 +2,17 @@ import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import { endRequestVoting } from "../src/end_request_voting";
+import { endMotion } from "../src";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
+import { startMotion } from "../src/startMotion";
 import { vote } from "../src/vote";
-import { createVoteRequest } from "../src/vote_request";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
-  baseOptions,
   getClient,
   mintContractOptions,
   PACKAGE_ID,
@@ -29,8 +28,11 @@ describe("DAO Voting structure", () => {
   let contractId: string;
 
   beforeEach(async function () {
-    const keypair = Ed25519Keypair.deriveKeypair(ADMIN_PHRASE);
-    executor = new SuiExecutor({ suiClient: client, keypair, packageId: PACKAGE_ID });
+    executor = new SuiExecutor({
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
+      packageId: PACKAGE_ID,
+    });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
 
@@ -60,103 +62,105 @@ describe("DAO Voting structure", () => {
     ]);
   }, 30_000);
 
-  it("can start a voting session", async () => {
-    const voteRequest = await createVoteRequest(client, {
+  it("can start a motion", async () => {
+    const voteRequest = await startMotion(executor, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
     assert.ok(voteRequest);
   }, 30_000);
 
   it("can vote as a shareholder", async () => {
-    const voteRequest = await createVoteRequest(client, {
+    const { motionId } = await startMotion(executor, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
-    assert.ok(voteRequest);
-    const userVote = await vote(client, {
-      contractId,
-      voteRequest,
+
+    const voterExecutor = new SuiExecutor({
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
       packageId: PACKAGE_ID,
-      voterAccount: USER1_PHRASE,
+    });
+    await vote(voterExecutor, {
+      contractId,
+      motionId,
       choice: true,
     });
-    assert.ok(userVote);
   });
 
   it("cannot double vote as a shareholder", async () => {
-    const voteRequest = await createVoteRequest(client, {
+    const { motionId } = await startMotion(executor, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
-    assert.ok(voteRequest);
-    const userVote = await vote(client, {
+
+    const voterExecutor = new SuiExecutor({
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      packageId: PACKAGE_ID,
+    });
+    await vote(voterExecutor, {
       contractId,
-      voteRequest,
-      voterAccount: USER1_PHRASE,
+      motionId,
       choice: true,
-      ...baseOptions,
     });
-    assert.ok(userVote);
     await assert.rejects(
-      vote(client, {
+      vote(voterExecutor, {
         contractId,
-        voteRequest,
-        voterAccount: USER1_PHRASE,
+        motionId,
         choice: true,
-        ...baseOptions,
       }),
     );
   }, 30_000);
 
   it("cannot vote if not a shareholder", async () => {
-    const voteRequest = await createVoteRequest(client, {
+    const { motionId } = await startMotion(executor, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
-    assert.ok(voteRequest);
+
+    const voterExecutor = new SuiExecutor({
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(USER3_PHRASE),
+      packageId: PACKAGE_ID,
+    });
+
     await assert.rejects(
-      vote(client, {
+      vote(voterExecutor, {
         contractId,
-        voteRequest,
-        voterAccount: USER3_PHRASE,
-        packageId: PACKAGE_ID,
+        motionId,
         choice: true,
       }),
     );
   });
 
-  it("cannot vote if vote is closed", async () => {
-    const voteRequest = await createVoteRequest(client, {
+  it("cannot vote if motion is closed", async () => {
+    const { motionId } = await startMotion(executor, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
-    assert.ok(voteRequest);
-    const userVote = await vote(client, {
-      contractId,
-      voteRequest,
-      voterAccount: USER1_PHRASE,
-      choice: true,
-      ...baseOptions,
+
+    await endMotion(executor, {
+      adminCapId: ADMIN_CAP_ID,
+      motionId,
     });
-    assert.ok(userVote);
-    const endVoteRequest = await endRequestVoting(client, {
-      voteRequest,
-      ...baseOptions,
+
+    const voterExecutor = new SuiExecutor({
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      packageId: PACKAGE_ID,
     });
-    assert.ok(endVoteRequest);
+
     await assert.rejects(
-      vote(client, {
+      vote(voterExecutor, {
         contractId,
-        voteRequest,
-        voterAccount: USER1_PHRASE,
+        motionId,
         choice: true,
-        ...baseOptions,
       }),
     );
   }, 30_000);
