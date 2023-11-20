@@ -4,7 +4,7 @@ import type { SuiObjectResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 
 import type { MintContractParams } from "../src";
-import { getIntField, getObjectData, getParsedData } from "../src/getters";
+import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { NetworkName } from "../src/types";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
