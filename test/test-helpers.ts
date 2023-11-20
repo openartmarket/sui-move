@@ -31,6 +31,7 @@ export async function getObject(objectId: string): Promise<SuiObjectResponse> {
   });
 }
 
+/** @deprecated */
 export async function getOwnedObjects(address: string): Promise<PaginatedObjectsResponse> {
   return await getClient().getOwnedObjects({
     owner: address,

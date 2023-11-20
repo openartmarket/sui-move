@@ -37,17 +37,6 @@ export type MintContractParams = BaseContractParams & {
   image: string;
 };
 
-// Transfer Contract Stock
-export type TransferContractStockParams = BaseContractParams & {
-  contractId: string;
-  contractStockId: string;
-  receiverAddress: string;
-};
-
-export type TransferContractStockResult = {
-  digest: string;
-};
-
 // End Vote Request
 export type EndVoteRequestParams = BaseContractParams & {
   adminCapId: string;
@@ -84,16 +73,25 @@ export type VoteParams = {
   network?: NetworkName;
 };
 
+/**
+ * @deprecated
+ */
 export type OwnedObjectList = {
   data: Daum[];
   nextCursor: string;
   hasNextPage: boolean;
 };
 
+/**
+ * @deprecated
+ */
 export type Daum = {
   data: Data;
 };
 
+/**
+ * @deprecated
+ */
 export type Data = {
   objectId: string;
   version: string;

@@ -1,20 +1,17 @@
-import assert from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { getAvailableStock, type OwnedObjectList } from "../src";
+import { getAvailableStock } from "../src";
 import { mintContract } from "../src/contract";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
+import { getObjectData } from "../src/getters";
 import { mintContractStock } from "../src/mintContractStock";
-import { splitContractStock } from "../src/split_contract_stock";
-import { transferContractStock } from "../src/transfer_contract_stock";
+import { splitContractStock } from "../src/splitContractStock";
+import { transferContractStock } from "../src/transferContractStock";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
-  baseOptions,
   getClient,
-  getObject,
-  getOwnedObjects,
   mintContractOptions,
   PACKAGE_ID,
   USER1_ADDRESS,
@@ -44,18 +41,26 @@ describe("transferContractStock", () => {
       },
     ]);
 
-    await transferContractStock(client, {
-      ...baseOptions,
+    const user1Executor = new SuiExecutor({
+      client,
+      signerPhrase: USER1_PHRASE,
+      packageId: PACKAGE_ID,
+    });
+    await transferContractStock(user1Executor, {
       contractId,
       contractStockId,
-      signerPhrase: USER1_PHRASE,
       receiverAddress: USER2_ADDRESS,
     });
 
-    const transferredStock = await getObject(contractStockId);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(transferredStock.data.content.fields.shares, "12");
+    const ownedObjects = await client.getOwnedObjects({
+      owner: USER2_ADDRESS,
+    });
+
+    const ownedObject = ownedObjects.data.find((response) => {
+      const objectData = getObjectData(response);
+      return objectData.objectId === contractStockId;
+    });
+    expect(ownedObject).toBeDefined();
   }, 30_000);
 
   it("should split a split stock and transfer it to new owner", async () => {
@@ -70,39 +75,35 @@ describe("transferContractStock", () => {
       },
     ]);
 
-    const splitStockId1 = await splitContractStock(client, {
-      ...baseOptions,
-      contractStockId,
+    const user2Executor = new SuiExecutor({
+      client,
       signerPhrase: USER2_PHRASE,
+      packageId: PACKAGE_ID,
+    });
+    const { splitContractStockId } = await splitContractStock(user2Executor, {
+      contractStockId,
       quantity: 5,
     });
 
     const oldQuantity = await getAvailableStock(client, contractStockId);
     expect(oldQuantity).toBe(7);
 
-    const splitQuantity = await getAvailableStock(client, splitStockId1.contractStockId);
+    const splitQuantity = await getAvailableStock(client, splitContractStockId);
     expect(splitQuantity).toBe(5);
 
-    await transferContractStock(client, {
-      ...baseOptions,
+    await transferContractStock(user2Executor, {
       contractId,
-      contractStockId: splitStockId1.contractStockId,
-      signerPhrase: USER2_PHRASE,
+      contractStockId: splitContractStockId,
       receiverAddress: USER1_ADDRESS,
     });
 
-    const ownedObjects = await getOwnedObjects(USER1_ADDRESS);
-
-    const transferredStock = findObjectIdInOwnedObjectList(
-      ownedObjects as OwnedObjectList,
-      splitStockId1.contractStockId,
-    );
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(transferredStock.data.objectId, splitStockId1.contractStockId);
+    const ownedObjects = await client.getOwnedObjects({
+      owner: USER1_ADDRESS,
+    });
+    const ownedObject = ownedObjects.data.find((response) => {
+      const objectData = getObjectData(response);
+      return objectData.objectId === splitContractStockId;
+    });
+    expect(ownedObject).toBeDefined();
   }, 30_000);
 });
-
-function findObjectIdInOwnedObjectList(list: OwnedObjectList, objectId: string) {
-  return list.data.find((obj) => obj.data.objectId === objectId);
-}

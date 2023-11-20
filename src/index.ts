@@ -8,7 +8,7 @@ export * from "./mergeContractStock";
 export * from "./mintContractStock";
 export * from "./splitContractStock";
 export * from "./toContractStock";
-export * from "./transfer_contract_stock";
+export * from "./transferContractStock";
 export * from "./types";
 export * from "./update_contract_outgoing_price";
 export * from "./vote";
