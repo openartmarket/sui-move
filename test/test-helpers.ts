@@ -1,3 +1,5 @@
+import { exec } from "node:child_process";
+
 import type { PaginatedObjectsResponse, SuiObjectResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 
@@ -61,3 +63,52 @@ export const mintContractOptions: MintContractParams = {
   currency: "USD",
   image: "reference-id-for-contract",
 };
+
+export type SuiAddress = {
+  readonly address: string;
+  readonly phrase: string;
+};
+
+export async function getSuiCoinObjectId(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    exec("sui client gas --json", (err, stdout, stderr) => {
+      if (err) return reject(err);
+      if (stderr) return reject(new Error(stderr));
+      const [
+        {
+          id: { id },
+        },
+      ] = JSON.parse(stdout);
+      resolve(id);
+    });
+  });
+}
+
+export async function newAddress(): Promise<SuiAddress> {
+  return new Promise((resolve, reject) => {
+    exec("sui client new-address ed25519 --json", (err, stdout, stderr) => {
+      if (err) return reject(err);
+      if (stderr) return reject(new Error(stderr));
+      const [address, phrase] = JSON.parse(stdout);
+      resolve({ address, phrase });
+    });
+  });
+}
+
+export type TransferSuiParams = {
+  to: string;
+  suiCoinObjectId: string;
+  amount?: number;
+  gasBudget?: number;
+};
+
+export async function transferSui({
+  to,
+  suiCoinObjectId,
+  amount = 20_000_000,
+  gasBudget = 200_000_000,
+}: TransferSuiParams) {
+  exec(
+    `sui client transfer-sui --amount ${amount} --to "${to}" --gas-budget ${gasBudget} --sui-coin-object-id "${suiCoinObjectId}"`,
+  );
+}

@@ -55,7 +55,7 @@ describe("transferContractStock", () => {
     await transferContractStock(user1Executor, {
       contractId,
       contractStockId,
-      receiverAddress: USER2_ADDRESS,
+      toAddress: USER2_ADDRESS,
     });
 
     const ownedObjects = await client.getOwnedObjects({
@@ -100,7 +100,7 @@ describe("transferContractStock", () => {
     await transferContractStock(user2Executor, {
       contractId,
       contractStockId: splitContractStockId,
-      receiverAddress: USER1_ADDRESS,
+      toAddress: USER1_ADDRESS,
     });
 
     const ownedObjects = await client.getOwnedObjects({

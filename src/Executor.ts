@@ -6,6 +6,7 @@ import type { GasStationClient, ShinamiWalletSigner } from "@shinami/clients";
 import { buildGaslessTransactionBytes } from "@shinami/clients";
 
 export interface Executor {
+  readonly suiClient: SuiClient;
   execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
 }
 
@@ -18,7 +19,11 @@ export type SuiExecutorParams = {
 };
 
 export class SuiExecutor implements Executor {
-  constructor(private readonly params: SuiExecutorParams) {}
+  readonly suiClient: SuiClient;
+
+  constructor(private readonly params: SuiExecutorParams) {
+    this.suiClient = params.suiClient;
+  }
 
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
     const txb = new TransactionBlock();
@@ -50,7 +55,11 @@ export type ShinamiExecutorParams = {
 const SUI_GAS_FEE_LIMIT = 5_000_000;
 
 export class ShinamiExecutor implements Executor {
-  constructor(private readonly params: ShinamiExecutorParams) {}
+  readonly suiClient: SuiClient;
+
+  constructor(private readonly params: ShinamiExecutorParams) {
+    this.suiClient = params.suiClient;
+  }
 
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
     const { suiClient, gasClient, packageId, onBehalfOf, signer } = this.params;
