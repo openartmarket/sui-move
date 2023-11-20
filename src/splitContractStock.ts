@@ -1,4 +1,4 @@
-import type { TransactionBlock } from "@mysten/sui.js/dist/cjs/builder";
+import type { TransactionBlock } from "@mysten/sui.js/builder";
 
 import type { Executor } from "./Executor";
 import { getCreatedObjects } from "./getters";

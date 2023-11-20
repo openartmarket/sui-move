@@ -1,7 +1,7 @@
-import type { SuiObjectData } from "@mysten/sui.js/dist/cjs/client";
+import type { SuiObjectData } from "@mysten/sui.js/client";
 
 import type { Executor } from "./Executor";
-import { getObjectData, getParsedData, getStringField, getType } from "./getters";
+import { getContractStocks } from "./getContractStocks";
 import type { MergeContractStockParam } from "./mergeContractStock";
 import { mergeContractStock } from "./mergeContractStock";
 import { splitContractStock } from "./splitContractStock";
@@ -36,12 +36,12 @@ export async function splitTransferMerge({
   toAddress,
   quantity,
 }: SplitMergeTransferParams): Promise<SplitMergeTransferResult> {
-  const fromContractStocks = await getContractStocks(
-    fromExecutor,
-    fromAddress,
+  const fromContractStocks = await getContractStocks({
+    suiClient: fromExecutor.suiClient,
+    owner: fromAddress,
     contractId,
     packageId,
-  );
+  });
   for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
     fromContractStocks,
   )) {
@@ -57,7 +57,12 @@ export async function splitTransferMerge({
     toAddress,
   });
 
-  const toContractStocks = await getContractStocks(toExecutor, toAddress, contractId, packageId);
+  const toContractStocks = await getContractStocks({
+    suiClient: toExecutor.suiClient,
+    owner: toAddress,
+    contractId,
+    packageId,
+  });
   for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
     toContractStocks,
   )) {
@@ -77,37 +82,4 @@ function makeMergeContractStockParams(
     fromContractStockId: stock.objectId,
     toContractStockId: contractStocks[0].objectId,
   }));
-}
-
-async function getContractStocks(
-  executor: Executor,
-  owner: string,
-  contractId: string,
-  packageId: string,
-  cursor?: string,
-): Promise<readonly SuiObjectData[]> {
-  const type = `${packageId}::open_art_market::ContractStock`;
-  const response = await executor.suiClient.getOwnedObjects({
-    owner,
-    options: {
-      showContent: true,
-    },
-    cursor,
-  });
-  const data = response.data.map(getObjectData).filter((object) => {
-    const parsedData = getParsedData(object);
-    return getType(parsedData) === type && getStringField(parsedData, "contract_id") === contractId;
-  });
-  if (response.hasNextPage && response.nextCursor) {
-    const nextData = await getContractStocks(
-      executor,
-      owner,
-      contractId,
-      packageId,
-      response.nextCursor,
-    );
-    return [...data, ...nextData];
-  }
-
-  return data;
 }

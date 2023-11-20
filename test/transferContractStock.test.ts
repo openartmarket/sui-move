@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
+import { getContractStocks } from "../src/getContractStocks";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import { transferContractStock } from "../src/transferContractStock";
@@ -10,7 +11,6 @@ import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
   getClient,
-  getOwnedObject,
   mintContractOptions,
   PACKAGE_ID,
   USER1_ADDRESS,
@@ -55,7 +55,13 @@ describe("transferContractStock", () => {
       toAddress: USER2_ADDRESS,
     });
 
-    const ownedObject = await getOwnedObject(client, USER2_ADDRESS, contractStockId);
-    expect(ownedObject).toBeDefined();
+    const contractStocks = await getContractStocks({
+      suiClient: client,
+      owner: USER2_ADDRESS,
+      contractId,
+      packageId: PACKAGE_ID,
+    });
+    expect(contractStocks).toHaveLength(1);
+    expect(contractStocks[0].objectId).toEqual(contractStockId);
   }, 30_000);
 });

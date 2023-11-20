@@ -1,6 +1,5 @@
 import { exec } from "node:child_process";
 
-import type { SuiObjectResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 
 import type { MintContractParams } from "../src";
@@ -31,29 +30,6 @@ export function getEnv(name: string): string {
   if (!value && name.match(/^USER/)) return "";
   if (!value) throw new Error(`Missing env variable ${name}`);
   return value;
-}
-
-export async function getOwnedObject(
-  client: SuiClient,
-  owner: string,
-  objectId: string,
-): Promise<SuiObjectResponse> {
-  const ownedObjects = await client.getOwnedObjects({
-    owner,
-  });
-  if (ownedObjects.hasNextPage) {
-    throw new Error(`Owned objects of ${owner} has more than one page`);
-  }
-
-  const found = ownedObjects.data.find((response) => getObjectData(response).objectId === objectId);
-  if (!found) {
-    throw new Error(
-      `Object ${objectId} not found in owned objects of ${owner}: ${JSON.stringify(
-        ownedObjects.data,
-      )}`,
-    );
-  }
-  return found;
 }
 
 export const mintContractOptions: MintContractParams = {
