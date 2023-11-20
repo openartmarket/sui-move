@@ -1,7 +1,8 @@
 import type { PaginatedObjectsResponse, SuiObjectResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 
-import type { MintContractParams, NetworkName } from "../src/types";
+import type { MintContractParams } from "../src";
+import type { NetworkName } from "../src/types";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
@@ -60,7 +61,7 @@ export const baseOptions = {
 };
 
 export const mintContractOptions: MintContractParams = {
-  ...baseOptions,
+  adminCapId: ADMIN_CAP_ID,
   totalShareCount: 500,
   sharePrice: 10,
   outgoingPrice: 100,

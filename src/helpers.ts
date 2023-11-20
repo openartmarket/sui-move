@@ -29,6 +29,9 @@ function getExecutionStatus(txRes: SuiTransactionBlockResponse): string {
   return status.status;
 }
 
+/*
+@deprecated
+*/
 export function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[] {
   return (txRes.objectChanges || []).filter(
     (change) => change.type === "created",

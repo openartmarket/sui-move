@@ -13,18 +13,6 @@ type BaseContractParams = {
 type ContractStockDetails = {
     contractStockId: string;
 };
-type MintContractParams = BaseContractParams & {
-    adminCapId: string;
-    totalShareCount: number;
-    sharePrice: number;
-    outgoingPrice: number;
-    name: string;
-    artist: string;
-    creationTimestampMillis: number;
-    description: string;
-    currency: Currency;
-    image: string;
-};
 type EndVoteRequestParams = BaseContractParams & {
     adminCapId: string;
     voteRequest: string;
@@ -54,7 +42,6 @@ type VoteParams = {
     choice: boolean;
     network?: NetworkName;
 };
-
 /**
  * @deprecated
  */
@@ -63,13 +50,15 @@ type OwnedObjectList = {
     nextCursor: string;
     hasNextPage: boolean;
 };
-
 /**
  * @deprecated
  */
 type Daum = {
     data: Data;
 };
+/**
+ * @deprecated
+ */
 type Data = {
     objectId: string;
     version: string;
@@ -91,13 +80,6 @@ type MoveTransactionParams = {
 };
 
 declare function burnContractStock(client: SuiClient, params: BurnContractParams): Promise<void>;
-
-/**
- * Mints a new contract
- * @param params
- * @returns the contract id
- */
-declare function mintContract(client: SuiClient, params: MintContractParams): Promise<string>;
 
 declare function endRequestVoting(client: SuiClient, { voteRequest, packageId, signerPhrase, adminCapId }: EndVoteRequestParams): Promise<string>;
 
@@ -126,6 +108,24 @@ type MergeContractStockResult = {
     digest: string;
 };
 declare function mergeContractStock(executor: Executor, params: MergeContractStockParams): Promise<MergeContractStockResult>;
+
+type MintContractParams = {
+    adminCapId: string;
+    totalShareCount: number;
+    sharePrice: number;
+    outgoingPrice: number;
+    name: string;
+    artist: string;
+    creationTimestampMillis: number;
+    description: string;
+    currency: Currency;
+    image: string;
+};
+type MintContractResult = {
+    contractId: string;
+    digest: string;
+};
+declare function mintContract(executor: Executor, params: MintContractParams): Promise<MintContractResult>;
 
 type MintContractStockParams = {
     adminCapId: string;
@@ -174,4 +174,4 @@ declare function vote(client: SuiClient, { contractId, voteRequest, voterAccount
 
 declare function createVoteRequest(client: SuiClient, { contractId, request, adminCapId, packageId, signerPhrase }: VoteRequestParams): Promise<string>;
 
-export { type BaseContractParams, type BurnContractParams, type ContractMethod, type ContractStock, type ContractStockDetails, type CreateContractDisplayParams, type CreateContractStockDisplayParams, type Currency, type Data, type Daum, type EndVoteRequestParams, type MergeContractStockParams, type MergeContractStockResult, type MintContractParams, type MintContractStockParams, type MintContractStockResult, type MoveTransactionParams, type NetworkName, type OwnedObjectList, type SplitContractStockParams, type SplitContractStockResult, type TransferContractStockParams, type TransferContractStockResult, type UpdateOutgoingPriceParams, type VoteParams, type VoteRequestParams, burnContractStock, createVoteRequest, endRequestVoting, findObjectsWithOwnerAddress, getAvailableStock, getCreatedObjects, getSigner, handleTransactionResponse, mergeContractStock, mintContract, mintContractStock, splitContractStock, toContractStock, transferContractStock, updateOutgoingPrice, vote };
+export { type BaseContractParams, type BurnContractParams, type ContractMethod, type ContractStock, type ContractStockDetails, type CreateContractDisplayParams, type CreateContractStockDisplayParams, type Currency, type Data, type Daum, type EndVoteRequestParams, type MergeContractStockParams, type MergeContractStockResult, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type MoveTransactionParams, type NetworkName, type OwnedObjectList, type SplitContractStockParams, type SplitContractStockResult, type TransferContractStockParams, type TransferContractStockResult, type UpdateOutgoingPriceParams, type VoteParams, type VoteRequestParams, burnContractStock, createVoteRequest, endRequestVoting, findObjectsWithOwnerAddress, getAvailableStock, getCreatedObjects, getSigner, handleTransactionResponse, mergeContractStock, mintContract, mintContractStock, splitContractStock, toContractStock, transferContractStock, updateOutgoingPrice, vote };

@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { getAvailableStock } from "../src";
-import { mintContract } from "../src/contract";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { getObjectData } from "../src/getters";
+import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import { splitContractStock } from "../src/splitContractStock";
 import { transferContractStock } from "../src/transferContractStock";
@@ -26,7 +26,8 @@ describe("transferContractStock", () => {
   let contractId: string;
   beforeEach(async () => {
     executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
-    contractId = await mintContract(client, mintContractOptions);
+    const res = await mintContract(executor, mintContractOptions);
+    contractId = res.contractId;
   });
 
   it("should mint a stock and then transfer it", async () => {

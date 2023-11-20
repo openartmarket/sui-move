@@ -1,10 +1,10 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import { mintContract } from "../src/contract";
 import { endRequestVoting } from "../src/end_request_voting";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
+import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import { vote } from "../src/vote";
 import { createVoteRequest } from "../src/vote_request";
@@ -28,8 +28,9 @@ describe("DAO Voting structure", () => {
   let contractId: string;
 
   beforeEach(async function () {
-    contractId = await mintContract(client, mintContractOptions);
     executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
+    const res = await mintContract(executor, mintContractOptions);
+    contractId = res.contractId;
 
     await mintContractStock(executor, [
       {

@@ -23,20 +23,6 @@ export type ContractStockDetails = {
   // owner: string;
 };
 
-// Mint Contract
-export type MintContractParams = BaseContractParams & {
-  adminCapId: string;
-  totalShareCount: number;
-  sharePrice: number;
-  outgoingPrice: number;
-  name: string;
-  artist: string;
-  creationTimestampMillis: number;
-  description: string;
-  currency: Currency;
-  image: string;
-};
-
 // End Vote Request
 export type EndVoteRequestParams = BaseContractParams & {
   adminCapId: string;

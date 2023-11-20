@@ -1,10 +1,10 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import { mintContract } from "../src/contract";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { getAvailableStock } from "../src/getAvailableStock";
+import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import {
   ADMIN_ADDRESS,
@@ -24,11 +24,12 @@ describe("mintContractStock", () => {
   let contractId: string;
   beforeEach(async () => {
     executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
-    contractId = await mintContract(client, mintContractOptions);
+    const res = await mintContract(executor, mintContractOptions);
+    contractId = res.contractId;
   });
 
   it("should issue new shares in batch", async () => {
-    const contractId2 = await mintContract(client, mintContractOptions);
+    const { contractId: contractId2 } = await mintContract(executor, mintContractOptions);
     await mintContractStock(executor, [
       {
         adminCapId: ADMIN_CAP_ID,

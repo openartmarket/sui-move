@@ -1,10 +1,10 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import { mintContract } from "../src/contract";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { mergeContractStock } from "../src/mergeContractStock";
+import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import {
   ADMIN_CAP_ID,
@@ -23,7 +23,8 @@ describe("mergeContractStock", () => {
   let contractId: string;
   beforeEach(async function () {
     executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
-    contractId = await mintContract(client, mintContractOptions);
+    const res = await mintContract(executor, mintContractOptions);
+    contractId = res.contractId;
   }, 20_000);
 
   it("should merge contract stocks", async () => {
