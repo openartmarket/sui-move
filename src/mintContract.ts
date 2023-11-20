@@ -1,5 +1,5 @@
 import type { Executor } from "./Executor";
-import { getCreatedObjects } from "./helpers";
+import { getCreatedObjects } from "./getters";
 import type { Currency } from "./types";
 
 export type MintContractParams = {

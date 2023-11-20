@@ -1,28 +1,38 @@
-import { createContractDisplay } from "../src/contract_display.js";
-import { createContractStockDisplay } from "../src/contract_stock_display.js";
-import {
-  ADMIN_PHRASE,
-  CONTRACT_STOCK_TYPE,
-  CONTRACT_TYPE,
-  getClient,
-  PUBLISHER_ID,
-} from "../test/test-helpers.js";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+
+import { ContractFields, ContractStockFields, createDisplay } from "../src/createDisplay.js";
+import { SuiExecutor } from "../src/Executor.js";
+import { ADMIN_PHRASE, getClient, PACKAGE_ID, PUBLISHER_ID } from "../test/test-helpers.js";
 
 async function main() {
   const client = getClient();
 
-  await createContractDisplay(client, {
-    adminPhrase: ADMIN_PHRASE,
-    contractType: CONTRACT_TYPE,
-    publisherId: PUBLISHER_ID,
+  const keypair = Ed25519Keypair.deriveKeypair(ADMIN_PHRASE);
+  const executor = new SuiExecutor({
+    suiClient: client,
+    keypair,
+    packageId: PACKAGE_ID,
   });
-  await createContractStockDisplay(client, {
-    adminPhrase: ADMIN_PHRASE,
-    contractStockType: CONTRACT_STOCK_TYPE,
+  const address = keypair.getPublicKey().toSuiAddress();
+
+  await createDisplay(executor, {
     publisherId: PUBLISHER_ID,
+    address,
+    fields: ContractFields,
+    type: "Contract",
+  });
+
+  await createDisplay(executor, {
+    publisherId: PUBLISHER_ID,
+    address,
+    fields: ContractStockFields,
+    type: "ContractStock",
   });
 
   console.log("✅ Displays created successfully!");
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -1,5 +1,7 @@
 export * from "./endMotion";
+export * from "./findObjectsWithOwnerAddress";
 export * from "./getAvailableStock";
+export * from "./helpers";
 export * from "./mergeContractStock";
 export * from "./mintContract";
 export * from "./mintContractStock";

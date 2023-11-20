@@ -1,0 +1,24 @@
+import type { PaginatedObjectsResponse, SuiObjectResponse } from "@mysten/sui.js/client";
+import { SuiClient } from "@mysten/sui.js/client";
+import type { MintContractParams } from "../src";
+import type { NetworkName } from "../src/types";
+export declare const PUBLISHER_ID: string;
+export declare const ADMIN_CAP_ID: string;
+export declare const ADMIN_PHRASE: string;
+export declare const USER1_PHRASE: string;
+export declare const USER2_PHRASE: string;
+export declare const USER3_PHRASE: string;
+export declare const ADMIN_ADDRESS: string;
+export declare const USER1_ADDRESS: string;
+export declare const USER2_ADDRESS: string;
+export declare const USER3_ADDRESS: string;
+export declare const SUI_NETWORK: NetworkName;
+export declare const PACKAGE_ID: string;
+export declare function getClient(): SuiClient;
+export declare function getObject(objectId: string): Promise<SuiObjectResponse>;
+/** @deprecated */
+export declare function getOwnedObjects(address: string): Promise<PaginatedObjectsResponse>;
+export declare function getProvider(SUI_NETWORK: NetworkName): SuiClient;
+export declare function getEnv(name: string): string;
+export declare const provider: SuiClient;
+export declare const mintContractOptions: MintContractParams;

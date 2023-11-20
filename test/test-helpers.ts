@@ -17,8 +17,6 @@ export const USER3_ADDRESS = getEnv("USER3_ADDRESS");
 
 export const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
-export const CONTRACT_TYPE = `${PACKAGE_ID}::open_art_market::Contract`;
-export const CONTRACT_STOCK_TYPE = `${PACKAGE_ID}::open_art_market::ContractStock`;
 
 export function getClient(): SuiClient {
   const url = getFullnodeUrl(SUI_NETWORK);
