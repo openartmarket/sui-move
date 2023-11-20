@@ -18,6 +18,7 @@ export type SplitMergeTransferParams = {
 };
 
 export type SplitMergeTransferResult = {
+  digest: string;
   fromContractStockId: string;
   toContractStockId: string;
 };
@@ -51,7 +52,7 @@ export async function splitTransferMerge({
     contractStockId: fromContractStocks[0].objectId,
     quantity,
   });
-  await transferContractStock(fromExecutor, {
+  const { digest } = await transferContractStock(fromExecutor, {
     contractId,
     contractStockId: splitContractStockId,
     toAddress,
@@ -69,6 +70,7 @@ export async function splitTransferMerge({
     await mergeContractStock(toExecutor, [{ fromContractStockId, toContractStockId }]);
   }
   return {
+    digest,
     fromContractStockId: fromContractStocks[0].objectId,
     toContractStockId: toContractStocks[0].objectId,
   };

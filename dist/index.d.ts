@@ -98,6 +98,7 @@ type SplitMergeTransferParams = {
     quantity: number;
 };
 type SplitMergeTransferResult = {
+    digest: string;
     fromContractStockId: string;
     toContractStockId: string;
 };
