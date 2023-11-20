@@ -20,7 +20,6 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  burnContractStock: () => burnContractStock,
   createVoteRequest: () => createVoteRequest,
   endRequestVoting: () => endRequestVoting,
   findObjectsWithOwnerAddress: () => findObjectsWithOwnerAddress,
@@ -34,12 +33,11 @@ __export(src_exports, {
   splitContractStock: () => splitContractStock,
   toContractStock: () => toContractStock,
   transferContractStock: () => transferContractStock,
-  updateOutgoingPrice: () => updateOutgoingPrice,
   vote: () => vote
 });
 module.exports = __toCommonJS(src_exports);
 
-// src/burn_contract_stock.ts
+// src/end_request_voting.ts
 var import_transactions = require("@mysten/sui.js/transactions");
 
 // src/helpers.ts
@@ -73,31 +71,10 @@ function getCreatedObjects(txRes) {
   );
 }
 
-// src/burn_contract_stock.ts
-async function burnContractStock(client, params) {
-  const { contractStockId, contractId, packageId, signerPhrase } = params;
-  const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions.TransactionBlock();
-  tx.moveCall({
-    target: `${packageId}::open_art_market::safe_burn_contract_stock`,
-    arguments: [tx.object(contractId), tx.object(contractStockId)]
-  });
-  const txRes = await client.signAndExecuteTransactionBlock({
-    signer: keypair,
-    transactionBlock: tx,
-    requestType: "WaitForLocalExecution",
-    options: {
-      showEffects: true
-    }
-  });
-  handleTransactionResponse(txRes);
-}
-
 // src/end_request_voting.ts
-var import_transactions2 = require("@mysten/sui.js/transactions");
 async function endRequestVoting(client, { voteRequest, packageId, signerPhrase, adminCapId }) {
   const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions2.TransactionBlock();
+  const tx = new import_transactions.TransactionBlock();
   tx.moveCall({
     target: `${packageId}::dao::end_vote`,
     arguments: [tx.object(adminCapId), tx.object(voteRequest)]
@@ -324,31 +301,11 @@ async function transferContractStock(executor, params) {
   return { digest };
 }
 
-// src/update_contract_outgoing_price.ts
-var import_transactions3 = require("@mysten/sui.js/transactions");
-async function updateOutgoingPrice(client, { contractId, newOutgoingPrice, packageId, adminCapId, signerPhrase }) {
-  const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions3.TransactionBlock();
-  tx.moveCall({
-    target: `${packageId}::open_art_market::update_outgoing_price`,
-    arguments: [tx.object(adminCapId), tx.object(contractId), tx.pure(newOutgoingPrice)]
-  });
-  const txRes = await client.signAndExecuteTransactionBlock({
-    signer: keypair,
-    transactionBlock: tx,
-    requestType: "WaitForLocalExecution",
-    options: {
-      showEffects: true
-    }
-  });
-  handleTransactionResponse(txRes);
-}
-
 // src/vote.ts
-var import_transactions4 = require("@mysten/sui.js/transactions");
+var import_transactions2 = require("@mysten/sui.js/transactions");
 async function vote(client, { contractId, voteRequest, voterAccount, choice, packageId }) {
   const { keypair } = getSigner(voterAccount);
-  const tx = new import_transactions4.TransactionBlock();
+  const tx = new import_transactions2.TransactionBlock();
   tx.moveCall({
     target: `${packageId}::dao::vote`,
     arguments: [tx.object(contractId), tx.object(voteRequest), tx.pure(choice)]
@@ -366,10 +323,10 @@ async function vote(client, { contractId, voteRequest, voterAccount, choice, pac
 }
 
 // src/vote_request.ts
-var import_transactions5 = require("@mysten/sui.js/transactions");
+var import_transactions3 = require("@mysten/sui.js/transactions");
 async function createVoteRequest(client, { contractId, request, adminCapId, packageId, signerPhrase }) {
   const { keypair } = getSigner(signerPhrase);
-  const tx = new import_transactions5.TransactionBlock();
+  const tx = new import_transactions3.TransactionBlock();
   tx.moveCall({
     target: `${packageId}::dao::start_vote`,
     arguments: [tx.object(adminCapId), tx.pure(contractId), tx.pure(request)]
@@ -391,7 +348,6 @@ async function createVoteRequest(client, { contractId, request, adminCapId, pack
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  burnContractStock,
   createVoteRequest,
   endRequestVoting,
   findObjectsWithOwnerAddress,
@@ -405,7 +361,6 @@ async function createVoteRequest(client, { contractId, request, adminCapId, pack
   splitContractStock,
   toContractStock,
   transferContractStock,
-  updateOutgoingPrice,
   vote
 });
 //# sourceMappingURL=index.cjs.map

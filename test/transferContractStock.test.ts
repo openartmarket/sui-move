@@ -1,3 +1,4 @@
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { getAvailableStock } from "../src";
@@ -25,7 +26,11 @@ describe("transferContractStock", () => {
   const client = getClient();
   let contractId: string;
   beforeEach(async () => {
-    executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
+    executor = new SuiExecutor({
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
+      packageId: PACKAGE_ID,
+    });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
   });
@@ -43,8 +48,8 @@ describe("transferContractStock", () => {
     ]);
 
     const user1Executor = new SuiExecutor({
-      client,
-      signerPhrase: USER1_PHRASE,
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
       packageId: PACKAGE_ID,
     });
     await transferContractStock(user1Executor, {
@@ -77,8 +82,8 @@ describe("transferContractStock", () => {
     ]);
 
     const user2Executor = new SuiExecutor({
-      client,
-      signerPhrase: USER2_PHRASE,
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(USER2_PHRASE),
       packageId: PACKAGE_ID,
     });
     const { splitContractStockId } = await splitContractStock(user2Executor, {

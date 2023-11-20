@@ -1,3 +1,4 @@
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
@@ -28,7 +29,8 @@ describe("DAO Voting structure", () => {
   let contractId: string;
 
   beforeEach(async function () {
-    executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
+    const keypair = Ed25519Keypair.deriveKeypair(ADMIN_PHRASE);
+    executor = new SuiExecutor({ suiClient: client, keypair, packageId: PACKAGE_ID });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
 

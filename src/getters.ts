@@ -5,7 +5,7 @@ import type {
   SuiObjectResponse,
   SuiParsedData,
   SuiTransactionBlockResponse,
-} from "@mysten/sui.js/dist/cjs/client";
+} from "@mysten/sui.js/client";
 
 export function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[] {
   return (txRes.objectChanges || []).filter(

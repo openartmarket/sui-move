@@ -1,3 +1,4 @@
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
@@ -23,7 +24,11 @@ describe("mintContractStock", () => {
   const client = getClient();
   let contractId: string;
   beforeEach(async () => {
-    executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
+    executor = new SuiExecutor({
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
+      packageId: PACKAGE_ID,
+    });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
   });

@@ -1,3 +1,4 @@
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
@@ -22,12 +23,16 @@ describe("splitContractStock", () => {
   const client = getClient();
   let contractId: string;
   beforeEach(async function () {
-    executor = new SuiExecutor({ client, signerPhrase: ADMIN_PHRASE, packageId: PACKAGE_ID });
+    executor = new SuiExecutor({
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
+      packageId: PACKAGE_ID,
+    });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
   }, 20_000);
 
-  it.only("should split an contract stock", async () => {
+  it("should split an contract stock", async () => {
     const {
       contractStockIds: [contractStockId],
     } = await mintContractStock(executor, [
@@ -40,8 +45,8 @@ describe("splitContractStock", () => {
     ]);
 
     const user1Executor = new SuiExecutor({
-      client,
-      signerPhrase: USER1_PHRASE,
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
       packageId: PACKAGE_ID,
     });
     const { splitContractStockId } = await splitContractStock(user1Executor, {
@@ -75,8 +80,8 @@ describe("splitContractStock", () => {
     ]);
 
     const user1Executor = new SuiExecutor({
-      client,
-      signerPhrase: USER1_PHRASE,
+      suiClient: client,
+      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
       packageId: PACKAGE_ID,
     });
 

@@ -1,4 +1,4 @@
-import type { SuiObjectResponse } from "@mysten/sui.js/dist/cjs/client";
+import type { SuiObjectResponse } from "@mysten/sui.js/client";
 
 import { getIntField, getObjectData, getParsedData, getStringField } from "./getters";
 
