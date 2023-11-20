@@ -1,5 +1,3 @@
-import type { TransactionBlock } from "@mysten/sui.js/transactions";
-
 export type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
 
 export type ContractMethod =
@@ -15,12 +13,6 @@ export type Currency = "USD" | "EUR" | "GBP" | "NOK";
 export type BaseContractParams = {
   packageId: string;
   signerPhrase: string;
-};
-
-// Common interface for contract stock details
-export type ContractStockDetails = {
-  contractStockId: string;
-  // owner: string;
 };
 
 // End Vote Request
@@ -59,31 +51,6 @@ export type VoteParams = {
   network?: NetworkName;
 };
 
-/**
- * @deprecated
- */
-export type OwnedObjectList = {
-  data: Daum[];
-  nextCursor: string;
-  hasNextPage: boolean;
-};
-
-/**
- * @deprecated
- */
-export type Daum = {
-  data: Data;
-};
-
-/**
- * @deprecated
- */
-export type Data = {
-  objectId: string;
-  version: string;
-  digest: string;
-};
-
 type BaseDisplayParams = {
   publisherId: string;
   adminPhrase: string;
@@ -92,11 +59,7 @@ type BaseDisplayParams = {
 export type CreateContractDisplayParams = BaseDisplayParams & {
   contractType: string;
 };
+
 export type CreateContractStockDisplayParams = BaseDisplayParams & {
   contractStockType: string;
-};
-
-export type MoveTransactionParams = {
-  tx: TransactionBlock;
-  packageId: string;
 };

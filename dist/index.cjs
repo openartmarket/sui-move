@@ -125,14 +125,6 @@ function findObjectsWithOwnerAddress(txRes, address) {
 }
 
 // src/getters.ts
-function getCreatedObjectsWithOwnerAddress(txRes, address) {
-  const objects = getCreatedObjects2(txRes);
-  return objects.filter((obj) => {
-    if (typeof obj.owner === "string")
-      return false;
-    return "AddressOwner" in obj.owner && obj.owner.AddressOwner === address;
-  });
-}
 function getCreatedObjects2(txRes) {
   return (txRes.objectChanges || []).filter(
     (change) => change.type === "created"
@@ -274,20 +266,10 @@ async function mintContractStock(executor, paramsArray) {
       });
     }
   });
-  const contractStockIds = [];
-  const receiverAddresses = new Set(paramsArray.map(({ receiverAddress }) => receiverAddress));
-  for (const receiverAddress of receiverAddresses) {
-    const objects = getCreatedObjectsWithOwnerAddress(response, receiverAddress);
-    for (const object of objects) {
-      const contractStock = await executor.client.getObject({
-        id: object.objectId,
-        options: { showContent: true }
-      });
-      const objectData = getObjectData(contractStock);
-      const contractStockId = objectData.objectId;
-      contractStockIds.push(contractStockId);
-    }
-  }
+  const addressOwnedObjects = getCreatedObjects2(response).filter(
+    (object) => typeof object.owner !== "string" && "AddressOwner" in object.owner
+  );
+  const contractStockIds = addressOwnedObjects.map((object) => object.objectId);
   if (contractStockIds.length !== paramsArray.length) {
     throw new Error(
       `Expected ${paramsArray.length} contract stock ids, got ${JSON.stringify(contractStockIds)}`
