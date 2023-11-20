@@ -11,18 +11,77 @@ async function endMotion(executor, params) {
   return { digest };
 }
 
-// src/mergeContractStock.ts
-async function mergeContractStock(executor, params) {
-  const response = await executor.execute(async (txb, packageId) => {
-    for (const { toContractStockId, fromContractStockId } of params) {
-      txb.moveCall({
-        target: `${packageId}::open_art_market::merge_contract_stocks`,
-        arguments: [txb.object(toContractStockId), txb.object(fromContractStockId)]
-      });
-    }
-  });
-  const { digest } = response;
-  return { digest };
+// src/Executor.ts
+import { fromB64 } from "@mysten/bcs";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
+import { buildGaslessTransactionBytes } from "@shinami/clients";
+var SuiExecutor = class {
+  constructor(params) {
+    this.params = params;
+    this.suiClient = params.suiClient;
+  }
+  suiClient;
+  async execute(build) {
+    const txb = new TransactionBlock();
+    const { suiClient, packageId, keypair } = this.params;
+    await build(txb, packageId);
+    const response = await suiClient.signAndExecuteTransactionBlock({
+      signer: keypair,
+      transactionBlock: txb,
+      requestType: "WaitForLocalExecution",
+      options: {
+        showObjectChanges: true,
+        showEffects: true
+      }
+    });
+    return checkResponse(response);
+  }
+};
+var SUI_GAS_FEE_LIMIT = 5e6;
+var ShinamiExecutor = class {
+  constructor(params) {
+    this.params = params;
+    this.suiClient = params.suiClient;
+  }
+  suiClient;
+  async execute(build) {
+    const { suiClient, gasClient, packageId, onBehalfOf, signer } = this.params;
+    const gaslessTx = await buildGaslessTransactionBytes({
+      sui: suiClient,
+      build: (txb) => build(txb, packageId)
+    });
+    const { txBytes, signature: gasSignature } = await gasClient.sponsorTransactionBlock(
+      gaslessTx,
+      onBehalfOf,
+      SUI_GAS_FEE_LIMIT
+    );
+    const { signature } = await signer.signTransactionBlock(fromB64(txBytes));
+    const signatures = [signature, gasSignature];
+    const response = await suiClient.executeTransactionBlock({
+      transactionBlock: txBytes,
+      signature: signatures,
+      requestType: "WaitForLocalExecution",
+      options: {
+        showObjectChanges: true,
+        showEffects: true
+      }
+    });
+    return checkResponse(response);
+  }
+};
+function checkResponse(response) {
+  const { effects } = response;
+  if (!effects) {
+    throw new Error("Failed to get execution effects");
+  }
+  const { status } = effects;
+  if (status.error) {
+    throw new Error(status.error);
+  }
+  if (status.status !== "success") {
+    throw new Error(`Transaction failed with status: ${status}`);
+  }
+  return response;
 }
 
 // src/getters.ts
@@ -47,6 +106,9 @@ function getParsedData(data) {
     throw new Error(`No content: ${JSON.stringify(data)}`);
   }
   return content;
+}
+function getType(data) {
+  return getMoveObject(data).type;
 }
 function getStringField(data, key) {
   const { fields } = getMoveObject(data);
@@ -90,6 +152,31 @@ function toInt(s) {
     throw new Error(`${s} is not a valid integer`);
   }
   return number;
+}
+
+// src/getContractStocks.ts
+async function getContractStocks(params) {
+  const { suiClient, owner, contractId, packageId, cursor } = params;
+  const type = `${packageId}::open_art_market::ContractStock`;
+  const response = await suiClient.getOwnedObjects({
+    owner,
+    options: {
+      showContent: true
+    },
+    cursor
+  });
+  const data = response.data.map(getObjectData).filter((object) => {
+    const parsedData = getParsedData(object);
+    return getType(parsedData) === type && getStringField(parsedData, "contract_id") === contractId;
+  });
+  if (response.hasNextPage && response.nextCursor) {
+    const nextData = await getContractStocks({
+      ...params,
+      cursor: response.nextCursor
+    });
+    return [...data, ...nextData];
+  }
+  return data;
 }
 
 // src/mintContract.ts
@@ -159,6 +246,20 @@ async function mintContractStock(executor, params) {
   return { contractStockIds, digest };
 }
 
+// src/mergeContractStock.ts
+async function mergeContractStock(executor, params) {
+  const response = await executor.execute(async (txb, packageId) => {
+    for (const { toContractStockId, fromContractStockId } of params) {
+      txb.moveCall({
+        target: `${packageId}::open_art_market::merge_contract_stocks`,
+        arguments: [txb.object(toContractStockId), txb.object(fromContractStockId)]
+      });
+    }
+  });
+  const { digest } = response;
+  return { digest };
+}
+
 // src/splitContractStock.ts
 async function splitContractStock(executor, params) {
   const response = await executor.execute(async (txb, packageId) => {
@@ -176,6 +277,73 @@ async function splitContractStock(executor, params) {
   const createdObject = createdObjects[0];
   const splitContractStockId = createdObject.objectId;
   return { digest, splitContractStockId };
+}
+
+// src/transferContractStock.ts
+async function transferContractStock(executor, params) {
+  const response = await executor.execute(async (txb, packageId) => {
+    const { contractId, contractStockId, toAddress } = params;
+    txb.moveCall({
+      target: `${packageId}::open_art_market::transfer_contract_stock`,
+      arguments: [txb.object(contractId), txb.pure(contractStockId), txb.pure(toAddress)]
+    });
+  });
+  const { digest } = response;
+  return { digest };
+}
+
+// src/splitTransferMerge.ts
+async function splitTransferMerge({
+  packageId,
+  fromExecutor,
+  toExecutor,
+  contractId,
+  fromAddress,
+  toAddress,
+  quantity
+}) {
+  const fromContractStocks = await getContractStocks({
+    suiClient: fromExecutor.suiClient,
+    owner: fromAddress,
+    contractId,
+    packageId
+  });
+  for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
+    fromContractStocks
+  )) {
+    await mergeContractStock(fromExecutor, [{ fromContractStockId, toContractStockId }]);
+  }
+  const { splitContractStockId } = await splitContractStock(fromExecutor, {
+    contractStockId: fromContractStocks[0].objectId,
+    quantity
+  });
+  await transferContractStock(fromExecutor, {
+    contractId,
+    contractStockId: splitContractStockId,
+    toAddress
+  });
+  const toContractStocks = await getContractStocks({
+    suiClient: toExecutor.suiClient,
+    owner: toAddress,
+    contractId,
+    packageId
+  });
+  for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
+    toContractStocks
+  )) {
+    await mergeContractStock(toExecutor, [{ fromContractStockId, toContractStockId }]);
+  }
+  return {
+    fromContractStockId: fromContractStocks[0].objectId,
+    toContractStockId: toContractStocks[0].objectId
+  };
+}
+function makeMergeContractStockParams(contractStocks) {
+  const stocksToMerge = contractStocks.slice(1);
+  return stocksToMerge.map((stock) => ({
+    fromContractStockId: stock.objectId,
+    toContractStockId: contractStocks[0].objectId
+  }));
 }
 
 // src/startMotion.ts
@@ -198,8 +366,7 @@ async function startMotion(executor, params) {
 }
 
 // src/toContractStock.ts
-function toContractStock(response) {
-  const objectData = getObjectData(response);
+function toContractStock(objectData) {
   const parsedData = getParsedData(objectData);
   return {
     contractStockId: objectData.objectId,
@@ -208,19 +375,6 @@ function toContractStock(response) {
     quantity: getIntField(parsedData, "shares"),
     productId: getStringField(parsedData, "reference")
   };
-}
-
-// src/transferContractStock.ts
-async function transferContractStock(executor, params) {
-  const response = await executor.execute(async (txb, packageId) => {
-    const { contractId, contractStockId, toAddress } = params;
-    txb.moveCall({
-      target: `${packageId}::open_art_market::transfer_contract_stock`,
-      arguments: [txb.object(contractId), txb.pure(contractStockId), txb.pure(toAddress)]
-    });
-  });
-  const { digest } = response;
-  return { digest };
 }
 
 // src/vote.ts
@@ -236,14 +390,15 @@ async function vote(executor, params) {
   return { digest };
 }
 export {
+  ShinamiExecutor,
+  SuiExecutor,
   endMotion,
-  mergeContractStock,
+  getContractStocks,
   mintContract,
   mintContractStock,
-  splitContractStock,
+  splitTransferMerge,
   startMotion,
   toContractStock,
-  transferContractStock,
   vote
 };
 //# sourceMappingURL=index.js.map

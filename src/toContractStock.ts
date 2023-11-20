@@ -1,6 +1,6 @@
-import type { SuiObjectResponse } from "@mysten/sui.js/client";
+import type { SuiObjectData } from "@mysten/sui.js/client";
 
-import { getIntField, getObjectData, getParsedData, getStringField } from "./getters";
+import { getIntField, getParsedData, getStringField } from "./getters";
 
 export type ContractStock = {
   contractStockId: string;
@@ -10,8 +10,7 @@ export type ContractStock = {
   productId: string;
 };
 
-export function toContractStock(response: SuiObjectResponse): ContractStock {
-  const objectData = getObjectData(response);
+export function toContractStock(objectData: SuiObjectData): ContractStock {
   const parsedData = getParsedData(objectData);
 
   return {

@@ -1,11 +1,37 @@
-import { SuiClient, SuiTransactionBlockResponse, SuiObjectResponse } from '@mysten/sui.js/client';
+import { SuiClient, SuiTransactionBlockResponse, SuiObjectData } from '@mysten/sui.js/client';
+import { Keypair } from '@mysten/sui.js/cryptography';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
+import { GasStationClient, ShinamiWalletSigner } from '@shinami/clients';
 
 interface Executor {
     readonly suiClient: SuiClient;
     execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
 }
 type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promise<void>;
+type SuiExecutorParams = {
+    suiClient: SuiClient;
+    packageId: string;
+    keypair: Keypair;
+};
+declare class SuiExecutor implements Executor {
+    private readonly params;
+    readonly suiClient: SuiClient;
+    constructor(params: SuiExecutorParams);
+    execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
+}
+type ShinamiExecutorParams = {
+    suiClient: SuiClient;
+    gasClient: GasStationClient;
+    packageId: string;
+    onBehalfOf: string;
+    signer: ShinamiWalletSigner;
+};
+declare class ShinamiExecutor implements Executor {
+    private readonly params;
+    readonly suiClient: SuiClient;
+    constructor(params: ShinamiExecutorParams);
+    execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
+}
 
 type EndMotionParams = {
     adminCapId: string;
@@ -16,14 +42,17 @@ type EndMotionResult = {
 };
 declare function endMotion(executor: Executor, params: EndMotionParams): Promise<EndMotionResult>;
 
-type MergeContractStockParam = {
-    toContractStockId: string;
-    fromContractStockId: string;
+type GetContractStocksParams = {
+    suiClient: SuiClient;
+    owner: string;
+    contractId: string;
+    packageId: string;
+    cursor?: string;
 };
-type MergeContractStockResult = {
-    digest: string;
-};
-declare function mergeContractStock(executor: Executor, params: readonly MergeContractStockParam[]): Promise<MergeContractStockResult>;
+/**
+ * Returns all contract stocks of a contract owned by an address.
+ */
+declare function getContractStocks(params: GetContractStocksParams): Promise<readonly SuiObjectData[]>;
 
 type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
 type Currency = "USD" | "EUR" | "GBP" | "NOK";
@@ -59,15 +88,25 @@ type MintContractStockResult = {
 };
 declare function mintContractStock(executor: Executor, params: MintContractStockParam[]): Promise<MintContractStockResult>;
 
-type SplitContractStockParams = {
-    contractStockId: string;
+type SplitMergeTransferParams = {
+    packageId: string;
+    fromExecutor: Executor;
+    toExecutor: Executor;
+    contractId: string;
+    fromAddress: string;
+    toAddress: string;
     quantity: number;
 };
-type SplitContractStockResult = {
-    digest: string;
-    splitContractStockId: string;
+type SplitMergeTransferResult = {
+    fromContractStockId: string;
+    toContractStockId: string;
 };
-declare function splitContractStock(executor: Executor, params: SplitContractStockParams): Promise<SplitContractStockResult>;
+/**
+ * Transfers a quantity of contract stock from one address to another.
+ * Takes care of splitting and merging so that aftet the transfer,
+ * both addresses have a single stock.
+ */
+declare function splitTransferMerge({ packageId, fromExecutor, toExecutor, contractId, fromAddress, toAddress, quantity, }: SplitMergeTransferParams): Promise<SplitMergeTransferResult>;
 
 type StartMotionParams = {
     adminCapId: string;
@@ -90,17 +129,7 @@ type ContractStock = {
     quantity: number;
     productId: string;
 };
-declare function toContractStock(response: SuiObjectResponse): ContractStock;
-
-type TransferContractStockParams = {
-    contractId: string;
-    contractStockId: string;
-    toAddress: string;
-};
-type TransferContractStockResult = {
-    digest: string;
-};
-declare function transferContractStock(executor: Executor, params: TransferContractStockParams): Promise<TransferContractStockResult>;
+declare function toContractStock(objectData: SuiObjectData): ContractStock;
 
 type VoteParams = {
     contractId: string;
@@ -112,4 +141,4 @@ type VoteResult = {
 };
 declare function vote(executor: Executor, params: VoteParams): Promise<VoteResult>;
 
-export { type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type MergeContractStockParam, type MergeContractStockResult, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, type SplitContractStockParams, type SplitContractStockResult, type StartMotionParams, type StartMotionResult, type Target, type TransferContractStockParams, type TransferContractStockResult, type VoteParams, type VoteResult, endMotion, mergeContractStock, mintContract, mintContractStock, splitContractStock, startMotion, toContractStock, transferContractStock, vote };
+export { type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type Executor, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, ShinamiExecutor, type ShinamiExecutorParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, SuiExecutor, type SuiExecutorParams, type Target, type VoteParams, type VoteResult, endMotion, getContractStocks, mintContract, mintContractStock, splitTransferMerge, startMotion, toContractStock, vote };
