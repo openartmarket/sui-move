@@ -6,7 +6,7 @@ export * from "./getAvailableStock";
 export * from "./helpers";
 export * from "./mergeContractStock";
 export * from "./mintContractStock";
-export * from "./split_contract_stock";
+export * from "./splitContractStock";
 export * from "./toContractStock";
 export * from "./transfer_contract_stock";
 export * from "./types";

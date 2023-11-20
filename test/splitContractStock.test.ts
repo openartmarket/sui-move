@@ -5,11 +5,10 @@ import { mintContract } from "../src/contract";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { mintContractStock } from "../src/mintContractStock";
-import { splitContractStock } from "../src/split_contract_stock";
+import { splitContractStock } from "../src/splitContractStock";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
-  baseOptions,
   getClient,
   mintContractOptions,
   PACKAGE_ID,
@@ -39,15 +38,18 @@ describe("splitContractStock", () => {
       },
     ]);
 
-    const splitStockId = await splitContractStock(client, {
-      ...baseOptions,
-      contractStockId,
+    const user1Executor = new SuiExecutor({
+      client,
       signerPhrase: USER1_PHRASE,
+      packageId: PACKAGE_ID,
+    });
+    const { splitContractStockId } = await splitContractStock(user1Executor, {
+      contractStockId,
       quantity: 2,
     });
 
     // Get the stock and check that it has 2 shares
-    const splitStock = await getObject(splitStockId.contractStockId);
+    const splitStock = await getObject(splitContractStockId);
     const oldStock = await getObject(contractStockId);
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -71,22 +73,27 @@ describe("splitContractStock", () => {
       },
     ]);
 
-    const splitStockId = await splitContractStock(client, {
-      ...baseOptions,
-      contractStockId,
+    const user1Executor = new SuiExecutor({
+      client,
       signerPhrase: USER1_PHRASE,
-      quantity: 5,
-    });
-    const splitAgainStockId = await splitContractStock(client, {
-      ...baseOptions,
-      contractStockId: splitStockId.contractStockId,
-      signerPhrase: USER1_PHRASE,
-      quantity: 3,
+      packageId: PACKAGE_ID,
     });
 
+    const { splitContractStockId } = await splitContractStock(user1Executor, {
+      contractStockId,
+      quantity: 5,
+    });
+    const { splitContractStockId: splitAgainContractStockId } = await splitContractStock(
+      user1Executor,
+      {
+        contractStockId: splitContractStockId,
+        quantity: 3,
+      },
+    );
+
     const oldStock = await getObject(contractStockId);
-    const splitStock = await getObject(splitStockId.contractStockId);
-    const splitAgainStock = await getObject(splitAgainStockId.contractStockId);
+    const splitStock = await getObject(splitContractStockId);
+    const splitAgainStock = await getObject(splitAgainContractStockId);
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

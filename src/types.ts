@@ -48,12 +48,6 @@ export type TransferContractStockResult = {
   digest: string;
 };
 
-// Split Contract Stock
-export type SplitContractStockParams = BaseContractParams & {
-  contractStockId: string;
-  quantity: number;
-};
-
 // End Vote Request
 export type EndVoteRequestParams = BaseContractParams & {
   adminCapId: string;

@@ -5,6 +5,8 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 export interface Executor {
   readonly client: SuiClient;
+  readonly address: string;
+
   execute(
     build: (txb: TransactionBlock, packageId: string) => void,
   ): Promise<SuiTransactionBlockResponse>;
@@ -18,9 +20,10 @@ export type SuiExecutorParams = {
 
 export class SuiExecutor implements Executor {
   public readonly client: SuiClient;
+  public readonly address: string;
+
   private readonly packageId: string;
   private readonly keypair: Keypair;
-  private readonly address: string;
 
   constructor({ client, packageId, signerPhrase }: SuiExecutorParams) {
     this.client = client;
