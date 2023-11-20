@@ -37,12 +37,6 @@ export type MintContractParams = BaseContractParams & {
   image: string;
 };
 
-// Merge Contract Stock
-export type MergeContractStockParams = BaseContractParams & {
-  toContractStockId: string;
-  fromContractStockId: string;
-};
-
 // Transfer Contract Stock
 export type TransferContractStockParams = BaseContractParams & {
   contractId: string;

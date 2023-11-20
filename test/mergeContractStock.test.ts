@@ -4,12 +4,11 @@ import { beforeEach, describe, it } from "vitest";
 import { mintContract } from "../src/contract";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
-import { mergeContractStock } from "../src/merge_contract_stock";
+import { mergeContractStock } from "../src/mergeContractStock";
 import { mintContractStock } from "../src/mintContractStock";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
-  baseOptions,
   getClient,
   getObject,
   mintContractOptions,
@@ -50,12 +49,16 @@ describe("mergeContractStock", () => {
       },
     ]);
 
-    await mergeContractStock(client, {
-      ...baseOptions,
+    const user1Executor = new SuiExecutor({
+      client,
+      signerPhrase: USER1_PHRASE,
+      packageId: PACKAGE_ID,
+    });
+    await mergeContractStock(user1Executor, {
       toContractStockId,
       fromContractStockId,
-      signerPhrase: USER1_PHRASE,
     });
+
     const burnedStock = await getObject(fromContractStockId);
     const newStock = await getObject(toContractStockId);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

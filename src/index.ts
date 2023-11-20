@@ -4,7 +4,7 @@ export * from "./end_request_voting";
 export * from "./findObjectsWithOwnerAddress";
 export * from "./getAvailableStock";
 export * from "./helpers";
-export * from "./merge_contract_stock";
+export * from "./mergeContractStock";
 export * from "./mintContractStock";
 export * from "./split_contract_stock";
 export * from "./toContractStock";
