@@ -1,5 +1,5 @@
 import type { Executor } from "./Executor";
-import { getCreatedObjectsWithOwnerAddress, getObjectData } from "./getters";
+import { getCreatedObjects } from "./getters";
 
 export type MintContractStockParams = {
   adminCapId: string;
@@ -31,20 +31,10 @@ export async function mintContractStock(
     }
   });
 
-  const contractStockIds: string[] = [];
-  const receiverAddresses = new Set(paramsArray.map(({ receiverAddress }) => receiverAddress));
-  for (const receiverAddress of receiverAddresses) {
-    const objects = getCreatedObjectsWithOwnerAddress(response, receiverAddress);
-    for (const object of objects) {
-      const contractStock = await executor.client.getObject({
-        id: object.objectId,
-        options: { showContent: true },
-      });
-      const objectData = getObjectData(contractStock);
-      const contractStockId = objectData.objectId;
-      contractStockIds.push(contractStockId);
-    }
-  }
+  const addressOwnedObjects = getCreatedObjects(response).filter(
+    (object) => typeof object.owner !== "string" && "AddressOwner" in object.owner,
+  );
+  const contractStockIds = addressOwnedObjects.map((object) => object.objectId);
 
   if (contractStockIds.length !== paramsArray.length) {
     throw new Error(
