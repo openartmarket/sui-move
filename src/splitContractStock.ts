@@ -1,5 +1,5 @@
 import type { Executor } from "./Executor";
-import { findObjectsWithOwnerAddress } from "./findObjectsWithOwnerAddress";
+import { getCreatedObjects } from "./getters";
 
 export type SplitContractStockParams = {
   contractStockId: string;
@@ -24,10 +24,12 @@ export async function splitContractStock(
   });
   const { digest } = response;
 
-  const contractStocks = findObjectsWithOwnerAddress(response, executor.address);
-  if (contractStocks.length !== 1)
-    throw new Error(`Expected 1 contract stock, got ${JSON.stringify(contractStocks)}`);
-  const splitContractStockId = contractStocks[0].objectId;
+  const createdObjects = getCreatedObjects(response);
+  if (createdObjects.length !== 1) {
+    throw new Error(`Expected 1 created object, got ${JSON.stringify(createdObjects)}`);
+  }
+  const createdObject = createdObjects[0];
+  const splitContractStockId = createdObject.objectId;
 
   return { digest, splitContractStockId };
 }

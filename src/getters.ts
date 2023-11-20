@@ -18,7 +18,7 @@ export function getCreatedObjectsWithOwnerAddress(
   });
 }
 
-function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[] {
+export function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[] {
   return (txRes.objectChanges || []).filter(
     (change) => change.type === "created",
   ) as SuiObjectChangeCreated[];

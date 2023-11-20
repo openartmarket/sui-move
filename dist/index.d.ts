@@ -96,9 +96,9 @@ declare function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjec
 
 interface Executor {
     readonly client: SuiClient$1;
-    readonly address: string;
-    execute(build: (txb: TransactionBlock, packageId: string) => void): Promise<SuiTransactionBlockResponse$1>;
+    execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse$1>;
 }
+type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => void;
 
 type MergeContractStockParams = {
     toContractStockId: string;

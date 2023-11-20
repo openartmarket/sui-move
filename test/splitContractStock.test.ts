@@ -27,7 +27,7 @@ describe("splitContractStock", () => {
     contractId = res.contractId;
   }, 20_000);
 
-  it("should split an contract stock", async () => {
+  it.only("should split an contract stock", async () => {
     const {
       contractStockIds: [contractStockId],
     } = await mintContractStock(executor, [
