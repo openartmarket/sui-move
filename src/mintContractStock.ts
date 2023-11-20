@@ -1,5 +1,3 @@
-import type { TransactionBlock } from "@mysten/sui.js/builder";
-
 import type { Executor } from "./Executor";
 import { getCreatedObjects } from "./getters";
 
@@ -20,7 +18,17 @@ export async function mintContractStock(
   params: MintContractStockParam[],
 ): Promise<MintContractStockResult> {
   const response = await executor.execute(async (txb, packageId) => {
-    mintContractStockCalls(txb, packageId, params);
+    for (const { adminCapId, contractId, quantity, receiverAddress } of params) {
+      txb.moveCall({
+        target: `${packageId}::open_art_market::mint_contract_stock`,
+        arguments: [
+          txb.object(adminCapId),
+          txb.object(contractId),
+          txb.pure(quantity),
+          txb.pure(receiverAddress),
+        ],
+      });
+    }
   });
 
   const addressOwnedObjects = getCreatedObjects(response).filter(
@@ -36,22 +44,4 @@ export async function mintContractStock(
 
   const { digest } = response;
   return { contractStockIds, digest };
-}
-
-export function mintContractStockCalls(
-  txb: TransactionBlock,
-  packageId: string,
-  params: MintContractStockParam[],
-) {
-  for (const { adminCapId, contractId, quantity, receiverAddress } of params) {
-    txb.moveCall({
-      target: `${packageId}::open_art_market::mint_contract_stock`,
-      arguments: [
-        txb.object(adminCapId),
-        txb.object(contractId),
-        txb.pure(quantity),
-        txb.pure(receiverAddress),
-      ],
-    });
-  }
 }
