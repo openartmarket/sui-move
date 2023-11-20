@@ -59,10 +59,12 @@ describe("mergeContractStock", () => {
       keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
       packageId: PACKAGE_ID,
     });
-    await mergeContractStock(user1Executor, {
-      toContractStockId,
-      fromContractStockId,
-    });
+    await mergeContractStock(user1Executor, [
+      {
+        toContractStockId,
+        fromContractStockId,
+      },
+    ]);
 
     expect(await getQuantity(client, toContractStockId)).toEqual(20);
     await expect(getQuantity(client, fromContractStockId)).rejects.toSatisfy((err) => {

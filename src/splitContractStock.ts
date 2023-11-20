@@ -1,3 +1,5 @@
+import type { TransactionBlock } from "@mysten/sui.js/dist/cjs/builder";
+
 import type { Executor } from "./Executor";
 import { getCreatedObjects } from "./getters";
 
@@ -15,12 +17,8 @@ export async function splitContractStock(
   executor: Executor,
   params: SplitContractStockParams,
 ): Promise<SplitContractStockResult> {
-  const { contractStockId, quantity } = params;
   const response = await executor.execute((txb, packageId) => {
-    txb.moveCall({
-      target: `${packageId}::open_art_market::split_contract_stock`,
-      arguments: [txb.object(contractStockId), txb.pure(quantity)],
-    });
+    splitContractStockCall(txb, packageId, params);
   });
   const { digest } = response;
 
@@ -32,4 +30,16 @@ export async function splitContractStock(
   const splitContractStockId = createdObject.objectId;
 
   return { digest, splitContractStockId };
+}
+
+export function splitContractStockCall(
+  txb: TransactionBlock,
+  packageId: string,
+  params: SplitContractStockParams,
+) {
+  const { contractStockId, quantity } = params;
+  txb.moveCall({
+    target: `${packageId}::open_art_market::split_contract_stock`,
+    arguments: [txb.object(contractStockId), txb.pure(quantity)],
+  });
 }

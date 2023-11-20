@@ -10,7 +10,7 @@ export interface Executor {
   execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
 }
 
-type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => void;
+type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promise<void>;
 
 export type SuiExecutorParams = {
   suiClient: SuiClient;
@@ -28,7 +28,7 @@ export class SuiExecutor implements Executor {
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
     const txb = new TransactionBlock();
     const { suiClient, packageId, keypair } = this.params;
-    build(txb, packageId);
+    await build(txb, packageId);
 
     const response = await suiClient.signAndExecuteTransactionBlock({
       signer: keypair,
@@ -65,7 +65,7 @@ export class ShinamiExecutor implements Executor {
     const { suiClient, gasClient, packageId, onBehalfOf, signer } = this.params;
     const gaslessTx = await buildGaslessTransactionBytes({
       sui: suiClient,
-      build: async (txb) => build(txb, packageId),
+      build: (txb) => build(txb, packageId),
     });
 
     const { txBytes, signature: gasSignature } = await gasClient.sponsorTransactionBlock(

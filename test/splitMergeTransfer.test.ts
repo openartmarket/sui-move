@@ -5,7 +5,7 @@ import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
-import { splitMergeTransfer } from "../src/splitMergeTransfer";
+import { splitTransferMerge } from "../src/splitTransferMerge";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
@@ -87,7 +87,7 @@ describe.skip("splitMergeTransfer", () => {
       packageId: PACKAGE_ID,
     });
 
-    await splitMergeTransfer({
+    await splitTransferMerge({
       fromExecutor: user1Executor,
       toExecutor: user2Executor,
       contractId,

@@ -1,6 +1,8 @@
+import type { TransactionBlock } from "@mysten/sui.js/dist/cjs/builder";
+
 import type { Executor } from "./Executor";
 
-export type MergeContractStockParams = {
+export type MergeContractStockParam = {
   toContractStockId: string;
   fromContractStockId: string;
 };
@@ -11,16 +13,25 @@ export type MergeContractStockResult = {
 
 export async function mergeContractStock(
   executor: Executor,
-  params: MergeContractStockParams,
+  params: readonly MergeContractStockParam[],
 ): Promise<MergeContractStockResult> {
-  const { toContractStockId, fromContractStockId } = params;
   const response = await executor.execute((txb, packageId) => {
-    txb.moveCall({
-      target: `${packageId}::open_art_market::merge_contract_stocks`,
-      arguments: [txb.object(toContractStockId), txb.object(fromContractStockId)],
-    });
+    mergeContractStockCalls(txb, packageId, params);
   });
 
   const { digest } = response;
   return { digest };
+}
+
+export function mergeContractStockCalls(
+  txb: TransactionBlock,
+  packageId: string,
+  params: readonly MergeContractStockParam[],
+) {
+  for (const { toContractStockId, fromContractStockId } of params) {
+    txb.moveCall({
+      target: `${packageId}::open_art_market::merge_contract_stocks`,
+      arguments: [txb.object(toContractStockId), txb.object(fromContractStockId)],
+    });
+  }
 }

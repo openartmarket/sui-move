@@ -1,7 +1,9 @@
+import type { TransactionBlock } from "@mysten/sui.js/dist/cjs/builder";
+
 import type { Executor } from "./Executor";
 import { getCreatedObjects } from "./getters";
 
-export type MintContractStockParams = {
+export type MintContractStockParam = {
   adminCapId: string;
   contractId: string;
   receiverAddress: string;
@@ -15,20 +17,10 @@ export type MintContractStockResult = {
 
 export async function mintContractStock(
   executor: Executor,
-  paramsArray: MintContractStockParams[],
+  params: MintContractStockParam[],
 ): Promise<MintContractStockResult> {
   const response = await executor.execute((txb, packageId) => {
-    for (const { adminCapId, contractId, quantity, receiverAddress } of paramsArray) {
-      txb.moveCall({
-        target: `${packageId}::open_art_market::mint_contract_stock`,
-        arguments: [
-          txb.object(adminCapId),
-          txb.object(contractId),
-          txb.pure(quantity),
-          txb.pure(receiverAddress),
-        ],
-      });
-    }
+    mintContractStockCalls(txb, packageId, params);
   });
 
   const addressOwnedObjects = getCreatedObjects(response).filter(
@@ -36,12 +28,30 @@ export async function mintContractStock(
   );
   const contractStockIds = addressOwnedObjects.map((object) => object.objectId);
 
-  if (contractStockIds.length !== paramsArray.length) {
+  if (contractStockIds.length !== params.length) {
     throw new Error(
-      `Expected ${paramsArray.length} contract stock ids, got ${JSON.stringify(contractStockIds)}`,
+      `Expected ${params.length} contract stock ids, got ${JSON.stringify(contractStockIds)}`,
     );
   }
 
   const { digest } = response;
   return { contractStockIds, digest };
+}
+
+export function mintContractStockCalls(
+  txb: TransactionBlock,
+  packageId: string,
+  params: MintContractStockParam[],
+) {
+  for (const { adminCapId, contractId, quantity, receiverAddress } of params) {
+    txb.moveCall({
+      target: `${packageId}::open_art_market::mint_contract_stock`,
+      arguments: [
+        txb.object(adminCapId),
+        txb.object(contractId),
+        txb.pure(quantity),
+        txb.pure(receiverAddress),
+      ],
+    });
+  }
 }

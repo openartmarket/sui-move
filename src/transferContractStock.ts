@@ -1,3 +1,5 @@
+import type { TransactionBlock } from "@mysten/sui.js/dist/cjs/builder";
+
 import type { Executor } from "./Executor";
 
 export type TransferContractStockParams = {
@@ -14,14 +16,22 @@ export async function transferContractStock(
   executor: Executor,
   params: TransferContractStockParams,
 ): Promise<TransferContractStockResult> {
-  const { contractId, contractStockId, toAddress } = params;
   const response = await executor.execute((txb, packageId) => {
-    txb.moveCall({
-      target: `${packageId}::open_art_market::transfer_contract_stock`,
-      arguments: [txb.object(contractId), txb.pure(contractStockId), txb.pure(toAddress)],
-    });
+    transferContractStockCall(txb, packageId, params);
   });
   const { digest } = response;
 
   return { digest };
+}
+
+export function transferContractStockCall(
+  txb: TransactionBlock,
+  packageId: string,
+  params: TransferContractStockParams,
+) {
+  const { contractId, contractStockId, toAddress } = params;
+  txb.moveCall({
+    target: `${packageId}::open_art_market::transfer_contract_stock`,
+    arguments: [txb.object(contractId), txb.pure(contractStockId), txb.pure(toAddress)],
+  });
 }
