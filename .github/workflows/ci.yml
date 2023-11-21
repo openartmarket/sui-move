@@ -46,7 +46,7 @@ jobs:
       with:
         node-version: "18"
     - run: npm ci
-    - run: direnv exec . npm test
+    - run: npm test
       env:
         SHINAMI_ENABLED: "1"
         ADMIN_CAP_ID: ${{secrets.ADMIN_CAP_ID}}
