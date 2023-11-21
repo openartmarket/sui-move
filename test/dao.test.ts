@@ -10,7 +10,7 @@ import type { Wallet } from "../src/wallet";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
-  adminExecutor,
+  adminWallet,
   makeWallet,
   mintContractOptions,
 } from "./test-helpers";
@@ -22,14 +22,14 @@ describe("DAO Voting structure", () => {
   let user3: Wallet;
 
   beforeEach(async function () {
-    const res = await mintContract(adminExecutor, mintContractOptions);
+    const res = await mintContract(adminWallet.executor, mintContractOptions);
     contractId = res.contractId;
 
     user1 = await makeWallet();
     user2 = await makeWallet();
     user3 = await makeWallet();
 
-    await mintContractStock(adminExecutor, [
+    await mintContractStock(adminWallet.executor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -37,7 +37,7 @@ describe("DAO Voting structure", () => {
         quantity: 151,
       },
     ]);
-    await mintContractStock(adminExecutor, [
+    await mintContractStock(adminWallet.executor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -45,7 +45,7 @@ describe("DAO Voting structure", () => {
         quantity: 249,
       },
     ]);
-    await mintContractStock(adminExecutor, [
+    await mintContractStock(adminWallet.executor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -56,7 +56,7 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("can start a motion", async () => {
-    const voteRequest = await startMotion(adminExecutor, {
+    const voteRequest = await startMotion(adminWallet.executor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
@@ -65,7 +65,7 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("can vote as a shareholder", async () => {
-    const { motionId } = await startMotion(adminExecutor, {
+    const { motionId } = await startMotion(adminWallet.executor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
@@ -79,7 +79,7 @@ describe("DAO Voting structure", () => {
   });
 
   it("cannot double vote as a shareholder", async () => {
-    const { motionId } = await startMotion(adminExecutor, {
+    const { motionId } = await startMotion(adminWallet.executor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
@@ -100,7 +100,7 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("cannot vote if not a shareholder", async () => {
-    const { motionId } = await startMotion(adminExecutor, {
+    const { motionId } = await startMotion(adminWallet.executor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
@@ -116,13 +116,13 @@ describe("DAO Voting structure", () => {
   });
 
   it("cannot vote if motion is closed", async () => {
-    const { motionId } = await startMotion(adminExecutor, {
+    const { motionId } = await startMotion(adminWallet.executor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
-    await endMotion(adminExecutor, {
+    await endMotion(adminWallet.executor, {
       adminCapId: ADMIN_CAP_ID,
       motionId,
     });

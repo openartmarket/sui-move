@@ -26,7 +26,7 @@ __export(src_exports, {
   getContractStocks: () => getContractStocks,
   mintContract: () => mintContract,
   mintContractStock: () => mintContractStock,
-  newAddress: () => newAddress,
+  newSuiAddress: () => newSuiAddress,
   splitTransferMerge: () => splitTransferMerge,
   startMotion: () => startMotion,
   toContractStock: () => toContractStock,
@@ -408,7 +408,7 @@ async function getSuiCoinObjectId() {
   const gas = await execSui("sui client gas --json");
   return gas[0].id.id;
 }
-async function newAddress(balance = 2e10) {
+async function newSuiAddress(balance = 2e10) {
   const [address, phrase] = await execSui(
     "sui client new-address ed25519 --json"
   );
@@ -474,7 +474,7 @@ async function vote(executor, params) {
   getContractStocks,
   mintContract,
   mintContractStock,
-  newAddress,
+  newSuiAddress,
   splitTransferMerge,
   startMotion,
   toContractStock,

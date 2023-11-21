@@ -1,5 +1,8 @@
-import type { Executor } from "./Executor";
-import { makeExecutor } from "./executors";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import { GasStationClient, KeyClient, ShinamiWalletSigner, WalletClient } from "@shinami/clients";
+
+import { type Executor, ShinamiExecutor, SuiExecutor } from "./Executor";
 import type { SuiAddress } from "./sui";
 import { newSuiAddress } from "./sui";
 import type { NetworkName } from "./types";
@@ -9,33 +12,77 @@ export interface Wallet {
   readonly executor: Executor;
 }
 
-export type NewWalletParams = {
+export type NewWalletParams = NewSuiWalletParams | NewShinamiWalletParams;
+
+export type NewSuiWalletParams = {
+  type: "sui";
   network: NetworkName;
   packageId: string;
+  suiAddress?: SuiAddress;
 };
 
-export async function newWallet({ packageId, network }: NewWalletParams): Promise<Wallet> {
-  const suiAddress = await newSuiAddress();
-  return new SuiWallet({ suiAddress, packageId, network });
+export type NewShinamiWalletParams = {
+  type: "shinami";
+  network: NetworkName;
+  packageId: string;
+  shinamiAccessKey: string;
+  walletId: string;
+  walletSecret: string;
+  address?: string;
+};
+
+export async function newWallet(params: NewWalletParams): Promise<Wallet> {
+  switch (params.type) {
+    case "sui": {
+      const { network, packageId } = params;
+      const url = getFullnodeUrl(network);
+      const suiClient = new SuiClient({ url });
+
+      let { suiAddress } = params;
+      if (!suiAddress) {
+        suiAddress = await newSuiAddress();
+      }
+
+      const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
+      const executor = new SuiExecutor({
+        packageId,
+        suiClient,
+        keypair,
+      });
+
+      return new WalletImpl(suiAddress.address, executor);
+    }
+    case "shinami": {
+      const { packageId, network, shinamiAccessKey, walletId, walletSecret } = params;
+      const url = getFullnodeUrl(network);
+      const suiClient = new SuiClient({ url });
+      const gasClient = new GasStationClient(shinamiAccessKey);
+      const walletClient = new WalletClient(shinamiAccessKey);
+      const keyClient = new KeyClient(shinamiAccessKey);
+
+      const signer = new ShinamiWalletSigner(walletId, walletClient, walletSecret, keyClient);
+
+      let { address } = params;
+      if (!address) {
+        const sessionToken = await keyClient.createSession(walletSecret);
+        address = await walletClient.createWallet(walletId, sessionToken);
+      }
+
+      const executor = new ShinamiExecutor({
+        suiClient,
+        gasClient,
+        packageId,
+        onBehalfOf: address,
+        signer,
+      });
+      return new WalletImpl(address, executor);
+    }
+  }
 }
 
-type SuiWalletParams = {
-  suiAddress: SuiAddress;
-  packageId: string;
-  network: NetworkName;
-};
-
-class SuiWallet implements Wallet {
-  readonly address: string;
-  readonly executor: Executor;
-
-  constructor({ suiAddress, packageId, network }: SuiWalletParams) {
-    this.address = suiAddress.address;
-    this.executor = makeExecutor({
-      type: "sui",
-      phrase: suiAddress.phrase,
-      network,
-      packageId,
-    });
-  }
+class WalletImpl implements Wallet {
+  constructor(
+    readonly address: string,
+    readonly executor: Executor,
+  ) {}
 }

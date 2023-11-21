@@ -6,7 +6,7 @@ import { mintContractStock } from "../src/mintContractStock";
 import type { Wallet } from "../src/wallet";
 import {
   ADMIN_CAP_ID,
-  adminExecutor,
+  adminWallet,
   getQuantity,
   makeWallet,
   mintContractOptions,
@@ -16,7 +16,7 @@ describe("mergeContractStock", () => {
   let contractId: string;
   let wallet: Wallet;
   beforeEach(async function () {
-    const res = await mintContract(adminExecutor, mintContractOptions);
+    const res = await mintContract(adminWallet.executor, mintContractOptions);
     contractId = res.contractId;
 
     wallet = await makeWallet();
@@ -25,7 +25,7 @@ describe("mergeContractStock", () => {
   it("should merge contract stocks", async () => {
     const {
       contractStockIds: [toContractStockId],
-    } = await mintContractStock(adminExecutor, [
+    } = await mintContractStock(adminWallet.executor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -36,7 +36,7 @@ describe("mergeContractStock", () => {
 
     const {
       contractStockIds: [fromContractStockId],
-    } = await mintContractStock(adminExecutor, [
+    } = await mintContractStock(adminWallet.executor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,

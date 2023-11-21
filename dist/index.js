@@ -372,7 +372,7 @@ async function getSuiCoinObjectId() {
   const gas = await execSui("sui client gas --json");
   return gas[0].id.id;
 }
-async function newAddress(balance = 2e10) {
+async function newSuiAddress(balance = 2e10) {
   const [address, phrase] = await execSui(
     "sui client new-address ed25519 --json"
   );
@@ -437,7 +437,7 @@ export {
   getContractStocks,
   mintContract,
   mintContractStock,
-  newAddress,
+  newSuiAddress,
   splitTransferMerge,
   startMotion,
   toContractStock,

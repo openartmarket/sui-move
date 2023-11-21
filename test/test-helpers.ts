@@ -1,10 +1,8 @@
-import type { MintContractParams } from "../src";
-import type { ExecutorParams } from "../src/executors";
-import { makeExecutor } from "../src/executors.js";
+import type { MintContractParams, SuiAddress } from "../src";
 import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { NetworkName } from "../src/types";
 import type { Wallet } from "../src/wallet";
-import { newWallet } from "../src/wallet";
+import { newWallet } from "../src/wallet.js";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
@@ -14,11 +12,30 @@ export const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
 const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
 
-export const adminExecutor = makeExecutor(makeExecutorOptions(ADMIN_PHRASE));
-
-export function makeWallet(): Promise<Wallet> {
-  return newWallet({ packageId: PACKAGE_ID, network: SUI_NETWORK });
+export function makeWallet(admin = false): Promise<Wallet> {
+  if (process.env.USE_SHINAMI) {
+    const address = admin ? ADMIN_ADDRESS : undefined;
+    return newWallet({
+      type: "shinami",
+      packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
+      shinamiAccessKey: getEnv("SHINAMI_ACCESS_KEY"),
+      walletId: getEnv("SHINAMI_WALLET_ID"),
+      walletSecret: getEnv("SHINAMI_WALLET_SECRET"),
+      address,
+    });
+  } else {
+    const suiAddress: SuiAddress | undefined = admin
+      ? {
+          address: ADMIN_ADDRESS,
+          phrase: ADMIN_PHRASE,
+        }
+      : undefined;
+    return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, suiAddress });
+  }
 }
+
+export const adminWallet = await makeWallet(true);
 
 export const mintContractOptions: MintContractParams = {
   adminCapId: ADMIN_CAP_ID,
@@ -51,25 +68,4 @@ function getEnv(name: string): string {
   const value = process.env[name];
   if (!value) throw new Error(`Missing env variable ${name}`);
   return value;
-}
-
-function makeExecutorOptions(phrase: string): ExecutorParams {
-  if (process.env.USE_SHINAMI) {
-    return {
-      type: "shinami",
-      packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
-      shinamiAccessKey: getEnv("SHINAMI_ACCESS_KEY"),
-      onBehalfOf: "FIXME",
-      walletId: getEnv("SHINAMI_WALLET_ID"),
-      secret: getEnv("SHINAMI_WALLET_SECRET"),
-    };
-  } else {
-    return {
-      type: "sui",
-      packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
-      phrase,
-    };
-  }
 }

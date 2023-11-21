@@ -22,7 +22,7 @@ export type ShinamiExecutorParams = {
   shinamiAccessKey: string;
   onBehalfOf: string;
   walletId: string;
-  secret: string;
+  walletSecret: string;
 };
 
 export function makeExecutor(params: ExecutorParams): Executor {
@@ -38,7 +38,14 @@ export function makeExecutor(params: ExecutorParams): Executor {
       });
     }
     case "shinami": {
-      const { packageId, network, shinamiAccessKey, onBehalfOf, walletId, secret } = params;
+      const {
+        packageId,
+        network,
+        shinamiAccessKey,
+        onBehalfOf,
+        walletId,
+        walletSecret: secret,
+      } = params;
       const url = getFullnodeUrl(network);
       const suiClient = new SuiClient({ url });
       const gasClient = new GasStationClient(shinamiAccessKey);

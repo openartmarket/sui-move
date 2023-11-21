@@ -6,7 +6,7 @@ import { splitContractStock } from "../src/splitContractStock";
 import type { Wallet } from "../src/wallet";
 import {
   ADMIN_CAP_ID,
-  adminExecutor,
+  adminWallet,
   getQuantity,
   makeWallet,
   mintContractOptions,
@@ -16,7 +16,7 @@ describe("splitContractStock", () => {
   let contractId: string;
   let wallet: Wallet;
   beforeEach(async function () {
-    const res = await mintContract(adminExecutor, mintContractOptions);
+    const res = await mintContract(adminWallet.executor, mintContractOptions);
     contractId = res.contractId;
 
     wallet = await makeWallet();
@@ -25,7 +25,7 @@ describe("splitContractStock", () => {
   it("should split an contract stock", async () => {
     const {
       contractStockIds: [contractStockId],
-    } = await mintContractStock(adminExecutor, [
+    } = await mintContractStock(adminWallet.executor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -46,7 +46,7 @@ describe("splitContractStock", () => {
   it("should split a split stock", async () => {
     const {
       contractStockIds: [contractStockId],
-    } = await mintContractStock(adminExecutor, [
+    } = await mintContractStock(adminWallet.executor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,

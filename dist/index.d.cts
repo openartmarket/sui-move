@@ -130,7 +130,7 @@ type SuiAddress = {
 /**
  * Creates a new address and transfers balance to it.
  */
-declare function newAddress(balance?: number): Promise<SuiAddress>;
+declare function newSuiAddress(balance?: number): Promise<SuiAddress>;
 
 type ContractStock = {
     contractStockId: string;
@@ -151,4 +151,4 @@ type VoteResult = {
 };
 declare function vote(executor: Executor, params: VoteParams): Promise<VoteResult>;
 
-export { type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type Executor, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, ShinamiExecutor, type ShinamiExecutorParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type SuiAddress, SuiExecutor, type SuiExecutorParams, type Target, type VoteParams, type VoteResult, endMotion, getContractStocks, mintContract, mintContractStock, newAddress, splitTransferMerge, startMotion, toContractStock, vote };
+export { type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type Executor, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, ShinamiExecutor, type ShinamiExecutorParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type SuiAddress, SuiExecutor, type SuiExecutorParams, type Target, type VoteParams, type VoteResult, endMotion, getContractStocks, mintContract, mintContractStock, newSuiAddress, splitTransferMerge, startMotion, toContractStock, vote };
