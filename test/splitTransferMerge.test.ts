@@ -6,6 +6,7 @@ import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import { splitTransferMerge } from "../src/splitTransferMerge";
+import { newAddress } from "../src/sui";
 import {
   ADMIN_CAP_ID,
   ADMIN_PHRASE,
@@ -13,10 +14,6 @@ import {
   getQuantity,
   mintContractOptions,
   PACKAGE_ID,
-  USER1_ADDRESS,
-  USER1_PHRASE,
-  USER2_ADDRESS,
-  USER2_PHRASE,
 } from "./test-helpers";
 
 describe("splitTransferMerge", () => {
@@ -34,55 +31,52 @@ describe("splitTransferMerge", () => {
   });
 
   it("should transfer stocks and make sure everything is merged", async () => {
-    // const suiCoinObjectId = await getSuiCoinObjectId();
-    // const user1 = await newAddress();
-    // await transferSui({ to: user1.address, suiCoinObjectId });
-    // const user2 = await newAddress();
-    // await transferSui({ to: user2.address, suiCoinObjectId });
+    const user1 = await newAddress(20_000_000_000);
+    const user2 = await newAddress(20_000_000_000);
 
     await mintContractStock(executor, [
       // User 1 has bought stocks in 3 batches. Total: 9
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 1,
       },
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 3,
       },
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 5,
       },
       // User 2 has bought stocks in 2 batches. Total: 16
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER2_ADDRESS,
+        receiverAddress: user2.address,
         quantity: 7,
       },
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER2_ADDRESS,
+        receiverAddress: user2.address,
         quantity: 9,
       },
     ]);
 
     const user1Executor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
       packageId: PACKAGE_ID,
     });
     const user2Executor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER2_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user2.phrase),
       packageId: PACKAGE_ID,
     });
 
@@ -91,8 +85,8 @@ describe("splitTransferMerge", () => {
       fromExecutor: user1Executor,
       toExecutor: user2Executor,
       contractId,
-      fromAddress: USER1_ADDRESS,
-      toAddress: USER2_ADDRESS,
+      fromAddress: user1.address,
+      toAddress: user2.address,
       quantity: 2,
     });
 

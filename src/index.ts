@@ -5,6 +5,7 @@ export * from "./mintContract";
 export * from "./mintContractStock";
 export * from "./splitTransferMerge";
 export * from "./startMotion";
+export * from "./sui";
 export * from "./toContractStock";
 export * from "./types";
 export * from "./vote";

@@ -26,6 +26,7 @@ __export(src_exports, {
   getContractStocks: () => getContractStocks,
   mintContract: () => mintContract,
   mintContractStock: () => mintContractStock,
+  newAddress: () => newAddress,
   splitTransferMerge: () => splitTransferMerge,
   startMotion: () => startMotion,
   toContractStock: () => toContractStock,
@@ -401,6 +402,44 @@ async function startMotion(executor, params) {
   return { digest, motionId };
 }
 
+// src/sui.ts
+var import_node_child_process = require("child_process");
+async function getSuiCoinObjectId() {
+  const gas = await execSui("sui client gas --json");
+  return gas[0].id.id;
+}
+async function newAddress(balance) {
+  const [address, phrase] = await execSui("sui client new-address ed25519 --json");
+  const suiCoinObjectId = await getSuiCoinObjectId();
+  await transferSui({ to: address, suiCoinObjectId, amount: balance });
+  return { address, phrase };
+}
+async function transferSui({
+  to,
+  suiCoinObjectId,
+  amount,
+  gasBudget = 2e8
+}) {
+  await execSui(
+    `sui client transfer-sui --amount ${amount} --to "${to}" --gas-budget ${gasBudget} --sui-coin-object-id "${suiCoinObjectId}" --json`
+  );
+}
+async function execSui(command) {
+  return new Promise((resolve, reject) => {
+    (0, import_node_child_process.exec)(command, (err, stdout, stderr) => {
+      if (err)
+        return reject(err);
+      if (stderr)
+        return reject(new Error(stderr));
+      try {
+        resolve(JSON.parse(stdout));
+      } catch (err2) {
+        reject(`Didn't get JSON output from sui: ${stdout}`);
+      }
+    });
+  });
+}
+
 // src/toContractStock.ts
 function toContractStock(objectData) {
   const parsedData = getParsedData(objectData);
@@ -433,6 +472,7 @@ async function vote(executor, params) {
   getContractStocks,
   mintContract,
   mintContractStock,
+  newAddress,
   splitTransferMerge,
   startMotion,
   toContractStock,
