@@ -78,7 +78,6 @@ export class ShinamiWallet implements Wallet {
         this.address,
         SUI_GAS_FEE_LIMIT,
       );
-      console.log("Transaction Digest:", sponsoredResponse.txDigest);
       const senderSig = await TransactionBlock.from(sponsoredResponse.txBytes).sign({
         signer: keypair,
       });
