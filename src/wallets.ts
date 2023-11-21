@@ -18,7 +18,7 @@ export class SuiWallet implements Wallet {
   constructor(private readonly params: SuiWalletParams) {}
 
   get address(): string {
-    throw new Error("Not implemented");
+    return this.params.address;
   }
 
   get suiClient(): SuiClient {

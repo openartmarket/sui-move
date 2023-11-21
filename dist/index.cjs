@@ -406,7 +406,7 @@ var SuiWallet = class {
     this.params = params;
   }
   get address() {
-    throw new Error("Not implemented");
+    return this.params.address;
   }
   get suiClient() {
     return this.params.suiClient;
