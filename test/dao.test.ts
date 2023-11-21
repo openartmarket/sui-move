@@ -1,33 +1,33 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import type { SuiAddress } from "../src";
-import { endMotion, newAddress } from "../src";
+import { endMotion } from "../src";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import { startMotion } from "../src/startMotion";
 import { vote } from "../src/vote";
+import type { Wallet } from "../src/wallet";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   adminExecutor,
+  makeWallet,
   mintContractOptions,
-  newUserExecutor,
 } from "./test-helpers";
 
 describe("DAO Voting structure", () => {
   let contractId: string;
-  let user1: SuiAddress;
-  let user2: SuiAddress;
-  let user3: SuiAddress;
+  let user1: Wallet;
+  let user2: Wallet;
+  let user3: Wallet;
 
   beforeEach(async function () {
     const res = await mintContract(adminExecutor, mintContractOptions);
     contractId = res.contractId;
 
-    user1 = await newAddress();
-    user2 = await newAddress();
-    user3 = await newAddress();
+    user1 = await makeWallet();
+    user2 = await makeWallet();
+    user3 = await makeWallet();
 
     await mintContractStock(adminExecutor, [
       {
@@ -71,8 +71,7 @@ describe("DAO Voting structure", () => {
       motion: "Request to sell artwork to Museum",
     });
 
-    const voterExecutor = newUserExecutor(user1);
-    await vote(voterExecutor, {
+    await vote(user1.executor, {
       contractId,
       motionId,
       choice: true,
@@ -86,14 +85,13 @@ describe("DAO Voting structure", () => {
       motion: "Request to sell artwork to Museum",
     });
 
-    const voterExecutor = newUserExecutor(user1);
-    await vote(voterExecutor, {
+    await vote(user1.executor, {
       contractId,
       motionId,
       choice: true,
     });
     await assert.rejects(
-      vote(voterExecutor, {
+      vote(user1.executor, {
         contractId,
         motionId,
         choice: true,
@@ -108,10 +106,8 @@ describe("DAO Voting structure", () => {
       motion: "Request to sell artwork to Museum",
     });
 
-    const voterExecutor = newUserExecutor(user3);
-
     await assert.rejects(
-      vote(voterExecutor, {
+      vote(user3.executor, {
         contractId,
         motionId,
         choice: true,
@@ -131,10 +127,8 @@ describe("DAO Voting structure", () => {
       motionId,
     });
 
-    const voterExecutor = newUserExecutor(user1);
-
     await assert.rejects(
-      vote(voterExecutor, {
+      vote(user1.executor, {
         contractId,
         motionId,
         choice: true,

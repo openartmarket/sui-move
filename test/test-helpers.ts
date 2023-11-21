@@ -1,10 +1,10 @@
-import type { SuiClient } from "@mysten/sui.js/client";
-
-import type { Executor, MintContractParams, SuiAddress } from "../src";
+import type { MintContractParams } from "../src";
 import type { ExecutorParams } from "../src/executors";
 import { makeExecutor } from "../src/executors.js";
 import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { NetworkName } from "../src/types";
+import type { Wallet } from "../src/wallet";
+import { newWallet } from "../src/wallet";
 
 export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
@@ -16,8 +16,8 @@ export const PACKAGE_ID = getEnv("PACKAGE_ID");
 
 export const adminExecutor = makeExecutor(makeExecutorOptions(ADMIN_PHRASE));
 
-export function newUserExecutor({ phrase }: SuiAddress): Executor {
-  return makeExecutor(makeExecutorOptions(phrase));
+export function makeWallet(): Promise<Wallet> {
+  return newWallet({ packageId: PACKAGE_ID, network: SUI_NETWORK });
 }
 
 export const mintContractOptions: MintContractParams = {
@@ -36,8 +36,9 @@ export const mintContractOptions: MintContractParams = {
 /**
  * Get the quantity of a contract or a contract stock.
  */
-export async function getQuantity(client: SuiClient, id: string): Promise<number> {
-  const response = await client.getObject({
+export async function getQuantity(wallet: Wallet, id: string): Promise<number> {
+  const { suiClient } = wallet.executor;
+  const response = await suiClient.getObject({
     id,
     options: { showContent: true },
   });

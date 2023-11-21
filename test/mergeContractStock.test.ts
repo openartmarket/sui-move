@@ -1,26 +1,25 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { SuiAddress } from "../src";
-import { newAddress } from "../src";
 import { mergeContractStock } from "../src/mergeContractStock";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
+import type { Wallet } from "../src/wallet";
 import {
   ADMIN_CAP_ID,
   adminExecutor,
   getQuantity,
+  makeWallet,
   mintContractOptions,
-  newUserExecutor,
 } from "./test-helpers";
 
 describe("mergeContractStock", () => {
   let contractId: string;
-  let user1: SuiAddress;
+  let wallet: Wallet;
   beforeEach(async function () {
     const res = await mintContract(adminExecutor, mintContractOptions);
     contractId = res.contractId;
 
-    user1 = await newAddress();
+    wallet = await makeWallet();
   }, 20_000);
 
   it("should merge contract stocks", async () => {
@@ -30,7 +29,7 @@ describe("mergeContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: user1.address,
+        receiverAddress: wallet.address,
         quantity: 10,
       },
     ]);
@@ -41,27 +40,24 @@ describe("mergeContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: user1.address,
+        receiverAddress: wallet.address,
         quantity: 10,
       },
     ]);
 
-    const user1Executor = newUserExecutor(user1);
-    await mergeContractStock(user1Executor, [
+    await mergeContractStock(wallet.executor, [
       {
         toContractStockId,
         fromContractStockId,
       },
     ]);
 
-    expect(await getQuantity(adminExecutor.suiClient, toContractStockId)).toEqual(20);
-    await expect(getQuantity(adminExecutor.suiClient, fromContractStockId)).rejects.toSatisfy(
-      (err) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        expect(err.code).toEqual("deleted");
-        return true;
-      },
-    );
+    expect(await getQuantity(wallet, toContractStockId)).toEqual(20);
+    await expect(getQuantity(wallet, fromContractStockId)).rejects.toSatisfy((err) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      expect(err.code).toEqual("deleted");
+      return true;
+    });
   }, 30_000);
 });

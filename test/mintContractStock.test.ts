@@ -2,31 +2,31 @@ import assert from "node:assert";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { SuiAddress } from "../src";
-import { newAddress } from "../src";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
+import type { Wallet } from "../src/wallet";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   adminExecutor,
   getQuantity,
+  makeWallet,
   mintContractOptions,
 } from "./test-helpers";
 
 describe("mintContractStock", () => {
   let contractId: string;
 
-  let user1: SuiAddress;
-  let user2: SuiAddress;
-  let user3: SuiAddress;
+  let wallet1: Wallet;
+  let wallet2: Wallet;
+  let wallet3: Wallet;
   beforeEach(async () => {
     const res = await mintContract(adminExecutor, mintContractOptions);
     contractId = res.contractId;
 
-    user1 = await newAddress();
-    user2 = await newAddress();
-    user3 = await newAddress();
+    wallet1 = await makeWallet();
+    wallet2 = await makeWallet();
+    wallet3 = await makeWallet();
   });
 
   it("should issue new shares in batch", async () => {
@@ -35,22 +35,22 @@ describe("mintContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId: contractId2,
-        receiverAddress: user1.address,
+        receiverAddress: wallet1.address,
         quantity: 20,
       },
       {
         adminCapId: ADMIN_CAP_ID,
         contractId: contractId2,
-        receiverAddress: user1.address,
+        receiverAddress: wallet1.address,
         quantity: 10,
       },
-      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: user1.address, quantity: 2 },
-      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: user2.address, quantity: 3 },
-      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: user3.address, quantity: 5 },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: wallet1.address, quantity: 2 },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: wallet2.address, quantity: 3 },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: wallet3.address, quantity: 5 },
     ]);
 
-    expect(await getQuantity(adminExecutor.suiClient, contractId)).toEqual(490);
-    expect(await getQuantity(adminExecutor.suiClient, contractId2)).toEqual(470);
+    expect(await getQuantity(wallet1, contractId)).toEqual(490);
+    expect(await getQuantity(wallet1, contractId2)).toEqual(470);
   });
 
   it("should not issue new shares, when asking for too much", async () => {
@@ -60,7 +60,7 @@ describe("mintContractStock", () => {
           adminCapId: ADMIN_CAP_ID,
           contractId,
           quantity: 501,
-          receiverAddress: user1.address,
+          receiverAddress: wallet1.address,
         },
       ]),
     );
@@ -72,7 +72,7 @@ describe("mintContractStock", () => {
         adminCapId: ADMIN_CAP_ID,
         contractId,
         quantity: 498,
-        receiverAddress: user1.address,
+        receiverAddress: wallet1.address,
       },
     ]);
 
@@ -81,11 +81,11 @@ describe("mintContractStock", () => {
         adminCapId: ADMIN_CAP_ID,
         contractId,
         quantity: 2,
-        receiverAddress: user1.address,
+        receiverAddress: wallet1.address,
       },
     ]);
 
-    const sharesLeft = await getQuantity(adminExecutor.suiClient, contractId);
+    const sharesLeft = await getQuantity(wallet1, contractId);
     assert.equal(sharesLeft, 0);
 
     await assert.rejects(
@@ -94,7 +94,7 @@ describe("mintContractStock", () => {
           adminCapId: ADMIN_CAP_ID,
           contractId,
           quantity: 1,
-          receiverAddress: user1.address,
+          receiverAddress: wallet1.address,
         },
       ]),
     );
@@ -106,14 +106,14 @@ describe("mintContractStock", () => {
         adminCapId: ADMIN_CAP_ID,
         contractId,
         quantity: 150,
-        receiverAddress: user1.address,
+        receiverAddress: wallet1.address,
       },
     ]);
     await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: user2.address,
+        receiverAddress: wallet2.address,
         quantity: 250,
       },
     ]);
@@ -121,19 +121,19 @@ describe("mintContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: user1.address,
+        receiverAddress: wallet1.address,
         quantity: 98,
       },
     ]);
 
-    expect(await getQuantity(adminExecutor.suiClient, contractId)).toEqual(2);
+    expect(await getQuantity(wallet1, contractId)).toEqual(2);
 
     await assert.rejects(
       mintContractStock(adminExecutor, [
         {
           adminCapId: ADMIN_CAP_ID,
           contractId,
-          receiverAddress: user2.address,
+          receiverAddress: wallet2.address,
           quantity: 3,
         },
       ]),
@@ -153,7 +153,7 @@ describe("mintContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: user1.address,
+        receiverAddress: wallet1.address,
         quantity: 50,
       },
     ]);
@@ -161,7 +161,7 @@ describe("mintContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: user2.address,
+        receiverAddress: wallet2.address,
         quantity: 1,
       },
     ]);
