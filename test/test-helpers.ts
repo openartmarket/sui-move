@@ -1,6 +1,4 @@
-import { randomUUID } from "node:crypto";
-
-import { KeyClient, WalletClient } from "@shinami/clients";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 
 import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { MintContractParams } from "../src/mintContract.js";
@@ -18,26 +16,26 @@ export const PACKAGE_ID = getEnv("PACKAGE_ID");
 export async function makeWallet(admin = false): Promise<Wallet> {
   if (process.env.SHINAMI_ENABLED) {
     const shinamiAccessKey = getEnv("SHINAMI_ACCESS_KEY");
+    const keypair = Ed25519Keypair.deriveKeypair(getEnv("ADMIN_PHRASE"));
 
-    let address: string;
+    // let address: string;
 
-    if (admin) {
-      address = ADMIN_ADDRESS;
-    } else {
-      const walletClient = new WalletClient(shinamiAccessKey);
-      const keyClient = new KeyClient(shinamiAccessKey);
-      const walletId = randomUUID();
-      const walletSecret = randomUUID();
-      const sessionToken = await keyClient.createSession(walletSecret);
-      address = await walletClient.createWallet(walletId, sessionToken);
-    }
+    // if (admin) {
+    //   address = ADMIN_ADDRESS;
+    // } else {
+    //   const walletClient = new WalletClient(shinamiAccessKey);
+    //   const keyClient = new KeyClient(shinamiAccessKey);
+    //   const walletId = randomUUID();
+    //   const walletSecret = randomUUID();
+    //   const sessionToken = await keyClient.createSession(walletSecret);
+    //   address = await walletClient.createWallet(walletId, sessionToken);
+    // }
 
     return newWallet({
       type: "shinami",
       packageId: PACKAGE_ID,
-      network: SUI_NETWORK,
       shinamiAccessKey,
-      address,
+      keypair,
     });
   } else {
     let suiAddress: SuiAddress;
@@ -49,7 +47,8 @@ export async function makeWallet(admin = false): Promise<Wallet> {
     } else {
       suiAddress = await newSuiAddress();
     }
-    return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, suiAddress });
+    const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
+    return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, keypair });
   }
 }
 

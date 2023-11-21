@@ -1,10 +1,6 @@
 import { SuiClient, SuiTransactionBlockResponse, SuiObjectData } from '@mysten/sui.js/client';
+import { Keypair } from '@mysten/sui.js/cryptography';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
-
-type SuiAddress = {
-    readonly address: string;
-    readonly phrase: string;
-};
 
 type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
 type Currency = "USD" | "EUR" | "GBP" | "NOK";
@@ -18,16 +14,15 @@ type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promi
 type NewWalletParams = NewSuiWalletParams | NewShinamiWalletParams;
 type NewSuiWalletParams = {
     type: "sui";
-    network: NetworkName;
     packageId: string;
-    suiAddress: SuiAddress;
+    keypair: Keypair;
+    network: NetworkName;
 };
 type NewShinamiWalletParams = {
     type: "shinami";
-    network: NetworkName;
     packageId: string;
+    keypair: Keypair;
     shinamiAccessKey: string;
-    address: string;
 };
 declare function newWallet(params: NewWalletParams): Promise<Wallet>;
 

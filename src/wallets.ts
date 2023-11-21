@@ -7,7 +7,6 @@ import { buildGaslessTransactionBytes } from "@shinami/clients";
 import type { BuildTransactionBlock, Wallet } from "./Wallet.js";
 
 export type SuiWalletParams = {
-  address: string;
   suiClient: SuiClient;
   packageId: string;
   keypair: Keypair;
@@ -17,7 +16,7 @@ export class SuiWallet implements Wallet {
   constructor(private readonly params: SuiWalletParams) {}
 
   get address(): string {
-    return this.params.address;
+    return this.params.keypair.toSuiAddress();
   }
 
   get suiClient(): SuiClient {
@@ -47,7 +46,6 @@ export type ShinamiWalletParams = {
   suiClient: SuiClient;
   gasStationClient: GasStationClient;
   packageId: string;
-  address: string;
   keypair: Keypair;
 };
 
@@ -61,11 +59,11 @@ export class ShinamiWallet implements Wallet {
   }
 
   get address(): string {
-    return this.params.address;
+    return this.params.keypair.toSuiAddress();
   }
 
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
-    const { suiClient, gasStationClient, packageId, address, keypair } = this.params;
+    const { suiClient, gasStationClient, packageId, keypair } = this.params;
     const gaslessPayloadBase64 = await buildGaslessTransactionBytes({
       sui: suiClient,
       build: (txb) => build(txb, packageId),
@@ -73,9 +71,17 @@ export class ShinamiWallet implements Wallet {
 
     const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
       gaslessPayloadBase64,
-      address,
+      this.address,
       SUI_GAS_FEE_LIMIT,
     );
+
+    const sponsoredStatus = await gasStationClient.getSponsoredTransactionBlockStatus(
+      sponsoredResponse.txDigest,
+    );
+    console.log("Transaction Digest:", sponsoredResponse.txDigest);
+    // For me this printed "Transaction Digest: GE6rWNfjVk7GiNSRHExaYnQB6TNKRpWBbQrAAK1Cqax5"
+    // which we'll see in the image below.
+    console.log("Sponsorship Status:", sponsoredStatus);
 
     const senderSig = await TransactionBlock.from(sponsoredResponse.txBytes).sign({
       signer: keypair,
