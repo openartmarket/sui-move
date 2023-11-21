@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-test:
+  test-sui-localnet:
     runs-on: oam-runners
     steps:
     - uses: actions/checkout@v3
@@ -32,6 +32,7 @@ jobs:
         ADMIN_ADDRESS: ${{secrets.ADMIN_ADDRESS}}
         ADMIN_PHRASE: ${{secrets.ADMIN_PHRASE}}
         SHINAMI_ACCESS_KEY: ${{secrets.SHINAMI_ACCESS_KEY}}
+        SUI_NETWORK: 'testnet'
     - run: npm run compile
     - run: ./scripts/fail-if-dirty
     - name: Print environment variables
@@ -46,6 +47,18 @@ jobs:
       run: |
         sudo kill -9 $(ps aux | grep sui | grep -v grep | awk '{print $2}')
       if: ${{ always() }}
-    
-
-    
+  test-shinami-testnet:
+    runs-on: oam-runners
+    steps:
+    - uses: actions/checkout@v3
+    - run: ./scripts/asdf-install.sh
+    - run: npm ci
+    - run: direnv exec . npm test
+      env:
+        SHINAMI_ENABLED: "1"
+        ADMIN_CAP_ID: ${{secrets.ADMIN_CAP_ID}}
+        PACKAGE_ID: ${{secrets.PACKAGE_ID}}
+        ADMIN_ADDRESS: ${{secrets.ADMIN_ADDRESS}}
+        ADMIN_PHRASE: ${{secrets.ADMIN_PHRASE}}
+        SHINAMI_ACCESS_KEY: ${{secrets.SHINAMI_ACCESS_KEY}}
+        SUI_NETWORK: 'testnet'
