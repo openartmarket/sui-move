@@ -3,19 +3,19 @@ import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { GasStationClient, KeyClient, ShinamiWalletSigner, WalletClient } from "@shinami/clients";
 
 import type { Executor } from "./Executor";
-import { ShinamiExecutor, SuiExecutor } from "./Executor";
+import { ShinamiExecutor, SuiExecutor } from "./Executor.js";
 import type { NetworkName } from "./types";
 
-export type ExecutorOptions = SuiExecutorOptions | ShinamiExecutorOptions;
+export type ExecutorParams = SuiExecutorParams | ShinamiExecutorParams;
 
-export type SuiExecutorOptions = {
+export type SuiExecutorParams = {
   type: "sui";
   packageId: string;
   network: NetworkName;
   phrase: string;
 };
 
-export type ShinamiExecutorOptions = {
+export type ShinamiExecutorParams = {
   type: "shinami";
   packageId: string;
   network: NetworkName;
@@ -25,7 +25,7 @@ export type ShinamiExecutorOptions = {
   secret: string;
 };
 
-export function makeExecutor(params: ExecutorOptions): Executor {
+export function makeExecutor(params: ExecutorParams): Executor {
   switch (params.type) {
     case "sui": {
       const { packageId, network, phrase } = params;

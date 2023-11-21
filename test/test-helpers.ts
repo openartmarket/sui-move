@@ -1,8 +1,8 @@
 import type { SuiClient } from "@mysten/sui.js/client";
 
 import type { Executor, MintContractParams, SuiAddress } from "../src";
-import type { ExecutorOptions } from "../src/executors";
-import { makeExecutor } from "../src/executors";
+import type { ExecutorParams } from "../src/executors";
+import { makeExecutor } from "../src/executors.js";
 import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { NetworkName } from "../src/types";
 
@@ -52,11 +52,23 @@ function getEnv(name: string): string {
   return value;
 }
 
-function makeExecutorOptions(phrase: string): ExecutorOptions {
-  return {
-    type: "sui",
-    packageId: PACKAGE_ID,
-    network: SUI_NETWORK,
-    phrase,
-  };
+function makeExecutorOptions(phrase: string): ExecutorParams {
+  if (process.env.USE_SHINAMI) {
+    return {
+      type: "shinami",
+      packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
+      shinamiAccessKey: getEnv("SHINAMI_ACCESS_KEY"),
+      onBehalfOf: "FIXME",
+      walletId: getEnv("SHINAMI_WALLET_ID"),
+      secret: getEnv("SHINAMI_WALLET_SECRET"),
+    };
+  } else {
+    return {
+      type: "sui",
+      packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
+      phrase,
+    };
+  }
 }
