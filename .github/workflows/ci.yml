@@ -48,10 +48,12 @@ jobs:
         sudo kill -9 $(ps aux | grep sui | grep -v grep | awk '{print $2}')
       if: ${{ always() }}
   test-shinami-testnet:
-    runs-on: oam-runners
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - run: ./scripts/asdf-install.sh
+    - uses: actions/setup-node@v3
+      with:
+        node-version: "18"
     - run: npm ci
     - run: direnv exec . npm test
       env:
