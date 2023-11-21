@@ -2,9 +2,9 @@ import assert from "node:assert";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { mintContract } from "../src/mintContract";
-import { mintContractStock } from "../src/mintContractStock";
-import type { Wallet } from "../src/wallet";
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import type { Wallet } from "../src/newWallet.js";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
@@ -21,7 +21,7 @@ describe("mintContractStock", () => {
   let wallet2: Wallet;
   let wallet3: Wallet;
   beforeEach(async () => {
-    const res = await mintContract(adminWallet.executor, mintContractOptions);
+    const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 
     wallet1 = await makeWallet();
@@ -30,11 +30,8 @@ describe("mintContractStock", () => {
   });
 
   it("should issue new shares in batch", async () => {
-    const { contractId: contractId2 } = await mintContract(
-      adminWallet.executor,
-      mintContractOptions,
-    );
-    await mintContractStock(adminWallet.executor, [
+    const { contractId: contractId2 } = await mintContract(adminWallet, mintContractOptions);
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId: contractId2,
@@ -58,7 +55,7 @@ describe("mintContractStock", () => {
 
   it("should not issue new shares, when asking for too much", async () => {
     await assert.rejects(
-      mintContractStock(adminWallet.executor, [
+      mintContractStock(adminWallet, [
         {
           adminCapId: ADMIN_CAP_ID,
           contractId,
@@ -70,7 +67,7 @@ describe("mintContractStock", () => {
   });
 
   it("should issue remaining shares", async () => {
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -79,7 +76,7 @@ describe("mintContractStock", () => {
       },
     ]);
 
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -92,7 +89,7 @@ describe("mintContractStock", () => {
     assert.equal(sharesLeft, 0);
 
     await assert.rejects(
-      mintContractStock(adminWallet.executor, [
+      mintContractStock(adminWallet, [
         {
           adminCapId: ADMIN_CAP_ID,
           contractId,
@@ -104,7 +101,7 @@ describe("mintContractStock", () => {
   });
 
   it("should not issue new shares, when sold out", async () => {
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -112,7 +109,7 @@ describe("mintContractStock", () => {
         receiverAddress: wallet1.address,
       },
     ]);
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -120,7 +117,7 @@ describe("mintContractStock", () => {
         quantity: 250,
       },
     ]);
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -132,7 +129,7 @@ describe("mintContractStock", () => {
     expect(await getQuantity(wallet1, contractId)).toEqual(2);
 
     await assert.rejects(
-      mintContractStock(adminWallet.executor, [
+      mintContractStock(adminWallet, [
         {
           adminCapId: ADMIN_CAP_ID,
           contractId,
@@ -144,7 +141,7 @@ describe("mintContractStock", () => {
   }, 30_000);
 
   it("can give shares to OAM and owner", async () => {
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -152,7 +149,7 @@ describe("mintContractStock", () => {
         quantity: 150,
       },
     ]);
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -160,7 +157,7 @@ describe("mintContractStock", () => {
         quantity: 50,
       },
     ]);
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,

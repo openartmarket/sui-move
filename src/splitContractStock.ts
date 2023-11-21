@@ -1,5 +1,5 @@
-import type { Executor } from "./Executor.js";
 import { getCreatedObjects } from "./getters.js";
+import type { Wallet } from "./newWallet.js";
 
 export type SplitContractStockParams = {
   contractStockId: string;
@@ -12,7 +12,7 @@ export type SplitContractStockResult = {
 };
 
 export async function splitContractStock(
-  executor: Executor,
+  executor: Wallet,
   params: SplitContractStockParams,
 ): Promise<SplitContractStockResult> {
   const response = await executor.execute(async (txb, packageId) => {

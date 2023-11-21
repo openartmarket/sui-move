@@ -1,11 +1,37 @@
 import { SuiClient, SuiTransactionBlockResponse, SuiObjectData } from '@mysten/sui.js/client';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 
-interface Executor {
+type SuiAddress = {
+    readonly address: string;
+    readonly phrase: string;
+};
+
+type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
+type Currency = "USD" | "EUR" | "GBP" | "NOK";
+
+interface Wallet {
+    readonly address: string;
     readonly suiClient: SuiClient;
     execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
 }
 type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promise<void>;
+type NewWalletParams = NewSuiWalletParams | NewShinamiWalletParams;
+type NewSuiWalletParams = {
+    type: "sui";
+    network: NetworkName;
+    packageId: string;
+    suiAddress?: SuiAddress;
+};
+type NewShinamiWalletParams = {
+    type: "shinami";
+    network: NetworkName;
+    packageId: string;
+    shinamiAccessKey: string;
+    walletId: string;
+    walletSecret: string;
+    address?: string;
+};
+declare function newWallet(params: NewWalletParams): Promise<Wallet>;
 
 type EndMotionParams = {
     adminCapId: string;
@@ -14,7 +40,7 @@ type EndMotionParams = {
 type EndMotionResult = {
     digest: string;
 };
-declare function endMotion(executor: Executor, params: EndMotionParams): Promise<EndMotionResult>;
+declare function endMotion(executor: Wallet, params: EndMotionParams): Promise<EndMotionResult>;
 
 type GetContractStocksParams = {
     suiClient: SuiClient;
@@ -27,10 +53,6 @@ type GetContractStocksParams = {
  * Returns all contract stocks of a contract owned by an address.
  */
 declare function getContractStocks(params: GetContractStocksParams): Promise<readonly SuiObjectData[]>;
-
-type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
-type Currency = "USD" | "EUR" | "GBP" | "NOK";
-type Target = `${string}::${string}::${string}`;
 
 type MintContractParams = {
     adminCapId: string;
@@ -48,7 +70,7 @@ type MintContractResult = {
     contractId: string;
     digest: string;
 };
-declare function mintContract(executor: Executor, params: MintContractParams): Promise<MintContractResult>;
+declare function mintContract(executor: Wallet, params: MintContractParams): Promise<MintContractResult>;
 
 type MintContractStockParam = {
     adminCapId: string;
@@ -60,12 +82,12 @@ type MintContractStockResult = {
     contractStockIds: readonly string[];
     digest: string;
 };
-declare function mintContractStock(executor: Executor, params: MintContractStockParam[]): Promise<MintContractStockResult>;
+declare function mintContractStock(executor: Wallet, params: MintContractStockParam[]): Promise<MintContractStockResult>;
 
 type SplitMergeTransferParams = {
     packageId: string;
-    fromExecutor: Executor;
-    toExecutor: Executor;
+    fromExecutor: Wallet;
+    toExecutor: Wallet;
     contractId: string;
     fromAddress: string;
     toAddress: string;
@@ -95,16 +117,7 @@ type StartMotionResult = {
     digest: string;
     motionId: string;
 };
-declare function startMotion(executor: Executor, params: StartMotionParams): Promise<StartMotionResult>;
-
-type SuiAddress = {
-    readonly address: string;
-    readonly phrase: string;
-};
-/**
- * Creates a new address and transfers balance to it.
- */
-declare function newSuiAddress(balance?: number): Promise<SuiAddress>;
+declare function startMotion(executor: Wallet, params: StartMotionParams): Promise<StartMotionResult>;
 
 type ContractStock = {
     contractStockId: string;
@@ -123,28 +136,6 @@ type VoteParams = {
 type VoteResult = {
     digest: string;
 };
-declare function vote(executor: Executor, params: VoteParams): Promise<VoteResult>;
+declare function vote(executor: Wallet, params: VoteParams): Promise<VoteResult>;
 
-interface Wallet {
-    readonly address: string;
-    readonly executor: Executor;
-}
-type NewWalletParams = NewSuiWalletParams | NewShinamiWalletParams;
-type NewSuiWalletParams = {
-    type: "sui";
-    network: NetworkName;
-    packageId: string;
-    suiAddress?: SuiAddress;
-};
-type NewShinamiWalletParams = {
-    type: "shinami";
-    network: NetworkName;
-    packageId: string;
-    shinamiAccessKey: string;
-    walletId: string;
-    walletSecret: string;
-    address?: string;
-};
-declare function newWallet(params: NewWalletParams): Promise<Wallet>;
-
-export { type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type SuiAddress, type Target, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newSuiAddress, newWallet, splitTransferMerge, startMotion, toContractStock, vote };
+export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newWallet, splitTransferMerge, startMotion, toContractStock, vote };

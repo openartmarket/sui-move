@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { mintContract } from "../src/mintContract";
-import { mintContractStock } from "../src/mintContractStock";
-import { splitContractStock } from "../src/splitContractStock";
-import type { Wallet } from "../src/wallet";
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import type { Wallet } from "../src/newWallet.js";
+import { splitContractStock } from "../src/splitContractStock.js";
 import {
   ADMIN_CAP_ID,
   adminWallet,
@@ -16,7 +16,7 @@ describe("splitContractStock", () => {
   let contractId: string;
   let wallet: Wallet;
   beforeEach(async function () {
-    const res = await mintContract(adminWallet.executor, mintContractOptions);
+    const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 
     wallet = await makeWallet();
@@ -25,7 +25,7 @@ describe("splitContractStock", () => {
   it("should split an contract stock", async () => {
     const {
       contractStockIds: [contractStockId],
-    } = await mintContractStock(adminWallet.executor, [
+    } = await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -34,7 +34,7 @@ describe("splitContractStock", () => {
       },
     ]);
 
-    const { splitContractStockId } = await splitContractStock(wallet.executor, {
+    const { splitContractStockId } = await splitContractStock(wallet, {
       contractStockId,
       quantity: 2,
     });
@@ -46,7 +46,7 @@ describe("splitContractStock", () => {
   it("should split a split stock", async () => {
     const {
       contractStockIds: [contractStockId],
-    } = await mintContractStock(adminWallet.executor, [
+    } = await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -55,17 +55,14 @@ describe("splitContractStock", () => {
       },
     ]);
 
-    const { splitContractStockId } = await splitContractStock(wallet.executor, {
+    const { splitContractStockId } = await splitContractStock(wallet, {
       contractStockId,
       quantity: 5,
     });
-    const { splitContractStockId: splitAgainContractStockId } = await splitContractStock(
-      wallet.executor,
-      {
-        contractStockId: splitContractStockId,
-        quantity: 3,
-      },
-    );
+    const { splitContractStockId: splitAgainContractStockId } = await splitContractStock(wallet, {
+      contractStockId: splitContractStockId,
+      quantity: 3,
+    });
 
     expect(await getQuantity(wallet, contractStockId)).toEqual(7);
     expect(await getQuantity(wallet, splitContractStockId)).toEqual(2);

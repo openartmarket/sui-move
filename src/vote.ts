@@ -1,4 +1,4 @@
-import type { Executor } from "./Executor.js";
+import type { Wallet } from "./newWallet.js";
 
 export type VoteParams = {
   contractId: string;
@@ -10,7 +10,7 @@ export type VoteResult = {
   digest: string;
 };
 
-export async function vote(executor: Executor, params: VoteParams): Promise<VoteResult> {
+export async function vote(executor: Wallet, params: VoteParams): Promise<VoteResult> {
   const { contractId, motionId, choice } = params;
   const response = await executor.execute(async (txb, packageId) => {
     txb.moveCall({

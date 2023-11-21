@@ -1,4 +1,4 @@
-import type { Executor } from "./Executor.js";
+import type { Wallet } from "./newWallet.js";
 
 export type MergeContractStockParam = {
   toContractStockId: string;
@@ -10,7 +10,7 @@ export type MergeContractStockResult = {
 };
 
 export async function mergeContractStock(
-  executor: Executor,
+  executor: Wallet,
   params: readonly MergeContractStockParam[],
 ): Promise<MergeContractStockResult> {
   const response = await executor.execute(async (txb, packageId) => {

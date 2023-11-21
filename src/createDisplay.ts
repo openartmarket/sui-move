@@ -1,4 +1,4 @@
-import type { Executor } from "./Executor.js";
+import type { Wallet } from "./newWallet.js";
 
 export type CreateDisplayParams = {
   publisherId: string;
@@ -31,7 +31,7 @@ export const ContractStockFields = {
 };
 
 export async function createDisplay(
-  executor: Executor,
+  executor: Wallet,
   params: CreateDisplayParams,
 ): Promise<CreateDisplayResult> {
   const { publisherId, fields, type, address } = params;

@@ -1,5 +1,5 @@
-import type { Executor } from "./Executor.js";
 import { getCreatedObjects } from "./getters.js";
+import type { Wallet } from "./newWallet.js";
 
 export type StartMotionParams = {
   adminCapId: string;
@@ -16,7 +16,7 @@ export type StartMotionResult = {
 };
 
 export async function startMotion(
-  executor: Executor,
+  executor: Wallet,
   params: StartMotionParams,
 ): Promise<StartMotionResult> {
   const { adminCapId, contractId, motion } = params;

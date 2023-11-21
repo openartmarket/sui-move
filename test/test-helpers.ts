@@ -1,12 +1,14 @@
-import type { MintContractParams, SuiAddress } from "../src";
+import { randomUUID } from "node:crypto";
+
 import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
-import type { NetworkName } from "../src/types";
-import type { Wallet } from "../src/wallet";
-import { newWallet } from "../src/wallet.js";
+import type { MintContractParams } from "../src/mintContract.js";
+import type { Wallet } from "../src/newWallet.js";
+import { newWallet } from "../src/newWallet.js";
+import type { SuiAddress } from "../src/sui.js";
+import type { NetworkName } from "../src/types.js";
 
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
 export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
-export const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
 
 const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
@@ -19,15 +21,15 @@ export function makeWallet(admin = false): Promise<Wallet> {
       packageId: PACKAGE_ID,
       network: SUI_NETWORK,
       shinamiAccessKey: getEnv("SHINAMI_ACCESS_KEY"),
-      walletId: getEnv("SHINAMI_WALLET_ID"),
-      walletSecret: getEnv("SHINAMI_WALLET_SECRET"),
+      walletId: randomUUID(),
+      walletSecret: randomUUID(),
       address,
     });
   } else {
     const suiAddress: SuiAddress | undefined = admin
       ? {
           address: ADMIN_ADDRESS,
-          phrase: ADMIN_PHRASE,
+          phrase: getEnv("ADMIN_PHRASE"),
         }
       : undefined;
     return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, suiAddress });
@@ -53,7 +55,7 @@ export const mintContractOptions: MintContractParams = {
  * Get the quantity of a contract or a contract stock.
  */
 export async function getQuantity(wallet: Wallet, id: string): Promise<number> {
-  const { suiClient } = wallet.executor;
+  const { suiClient } = wallet;
   const response = await suiClient.getObject({
     id,
     options: { showContent: true },

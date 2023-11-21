@@ -1,19 +1,19 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import { endMotion } from "../src";
-import { mintContract } from "../src/mintContract";
-import { mintContractStock } from "../src/mintContractStock";
-import { startMotion } from "../src/startMotion";
-import { vote } from "../src/vote";
-import type { Wallet } from "../src/wallet";
+import { endMotion } from "../src/endMotion.js";
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import type { Wallet } from "../src/newWallet.js";
+import { startMotion } from "../src/startMotion.js";
+import { vote } from "../src/vote.js";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   adminWallet,
   makeWallet,
   mintContractOptions,
-} from "./test-helpers";
+} from "./test-helpers.js";
 
 describe("DAO Voting structure", () => {
   let contractId: string;
@@ -22,14 +22,14 @@ describe("DAO Voting structure", () => {
   let user3: Wallet;
 
   beforeEach(async function () {
-    const res = await mintContract(adminWallet.executor, mintContractOptions);
+    const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 
     user1 = await makeWallet();
     user2 = await makeWallet();
     user3 = await makeWallet();
 
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -37,7 +37,7 @@ describe("DAO Voting structure", () => {
         quantity: 151,
       },
     ]);
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -45,7 +45,7 @@ describe("DAO Voting structure", () => {
         quantity: 249,
       },
     ]);
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -56,7 +56,7 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("can start a motion", async () => {
-    const voteRequest = await startMotion(adminWallet.executor, {
+    const voteRequest = await startMotion(adminWallet, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
@@ -65,13 +65,13 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("can vote as a shareholder", async () => {
-    const { motionId } = await startMotion(adminWallet.executor, {
+    const { motionId } = await startMotion(adminWallet, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
-    await vote(user1.executor, {
+    await vote(user1, {
       contractId,
       motionId,
       choice: true,
@@ -79,19 +79,19 @@ describe("DAO Voting structure", () => {
   });
 
   it("cannot double vote as a shareholder", async () => {
-    const { motionId } = await startMotion(adminWallet.executor, {
+    const { motionId } = await startMotion(adminWallet, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
-    await vote(user1.executor, {
+    await vote(user1, {
       contractId,
       motionId,
       choice: true,
     });
     await assert.rejects(
-      vote(user1.executor, {
+      vote(user1, {
         contractId,
         motionId,
         choice: true,
@@ -100,14 +100,14 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("cannot vote if not a shareholder", async () => {
-    const { motionId } = await startMotion(adminWallet.executor, {
+    const { motionId } = await startMotion(adminWallet, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
     await assert.rejects(
-      vote(user3.executor, {
+      vote(user3, {
         contractId,
         motionId,
         choice: true,
@@ -116,19 +116,19 @@ describe("DAO Voting structure", () => {
   });
 
   it("cannot vote if motion is closed", async () => {
-    const { motionId } = await startMotion(adminWallet.executor, {
+    const { motionId } = await startMotion(adminWallet, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
-    await endMotion(adminWallet.executor, {
+    await endMotion(adminWallet, {
       adminCapId: ADMIN_CAP_ID,
       motionId,
     });
 
     await assert.rejects(
-      vote(user1.executor, {
+      vote(user1, {
         contractId,
         motionId,
         choice: true,

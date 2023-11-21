@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { getContractStocks } from "../src/getContractStocks";
-import { mintContract } from "../src/mintContract";
-import { mintContractStock } from "../src/mintContractStock";
-import { transferContractStock } from "../src/transferContractStock";
-import type { Wallet } from "../src/wallet";
+import { getContractStocks } from "../src/getContractStocks.js";
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import type { Wallet } from "../src/newWallet.js";
+import { transferContractStock } from "../src/transferContractStock.js";
 import {
   ADMIN_CAP_ID,
   adminWallet,
@@ -18,7 +18,7 @@ describe("transferContractStock", () => {
   let fromWallet: Wallet;
   let toWallet: Wallet;
   beforeEach(async () => {
-    const res = await mintContract(adminWallet.executor, mintContractOptions);
+    const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 
     fromWallet = await makeWallet();
@@ -28,7 +28,7 @@ describe("transferContractStock", () => {
   it("should transfer ownership", async () => {
     const {
       contractStockIds: [contractStockId],
-    } = await mintContractStock(adminWallet.executor, [
+    } = await mintContractStock(adminWallet, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -37,14 +37,14 @@ describe("transferContractStock", () => {
       },
     ]);
 
-    await transferContractStock(fromWallet.executor, {
+    await transferContractStock(fromWallet, {
       contractId,
       contractStockId,
       toAddress: toWallet.address,
     });
 
     const contractStocks = await getContractStocks({
-      suiClient: fromWallet.executor.suiClient,
+      suiClient: fromWallet.suiClient,
       owner: toWallet.address,
       contractId,
       packageId: PACKAGE_ID,

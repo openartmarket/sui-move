@@ -1,4 +1,4 @@
-import type { Executor } from "./Executor.js";
+import type { Wallet } from "./newWallet.js";
 
 export type EndMotionParams = {
   adminCapId: string;
@@ -10,7 +10,7 @@ export type EndMotionResult = {
 };
 
 export async function endMotion(
-  executor: Executor,
+  executor: Wallet,
   params: EndMotionParams,
 ): Promise<EndMotionResult> {
   const { adminCapId, motionId } = params;

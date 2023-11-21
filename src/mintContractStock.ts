@@ -1,5 +1,5 @@
-import type { Executor } from "./Executor.js";
 import { getCreatedObjects } from "./getters.js";
+import type { Wallet } from "./newWallet.js";
 
 export type MintContractStockParam = {
   adminCapId: string;
@@ -14,7 +14,7 @@ export type MintContractStockResult = {
 };
 
 export async function mintContractStock(
-  executor: Executor,
+  executor: Wallet,
   params: MintContractStockParam[],
 ): Promise<MintContractStockResult> {
   const response = await executor.execute(async (txb, packageId) => {

@@ -1,17 +1,21 @@
+import type { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import type { TransactionBlock } from "@mysten/sui.js/transactions";
 import { GasStationClient, KeyClient, ShinamiWalletSigner, WalletClient } from "@shinami/clients";
 
-import type { Executor } from "./Executor.js";
-import { ShinamiExecutor, SuiExecutor } from "./executors.js";
 import type { SuiAddress } from "./sui.js";
 import { newSuiAddress } from "./sui.js";
 import type { NetworkName } from "./types.js";
+import { ShinamiWallet, SuiWallet } from "./wallets.js";
 
 export interface Wallet {
   readonly address: string;
-  readonly executor: Executor;
+  readonly suiClient: SuiClient;
+  execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
 }
+
+export type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promise<void>;
 
 export type NewWalletParams = NewSuiWalletParams | NewShinamiWalletParams;
 
@@ -44,14 +48,14 @@ export async function newWallet(params: NewWalletParams): Promise<Wallet> {
         suiAddress = await newSuiAddress();
       }
 
-      const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
-      const executor = new SuiExecutor({
+      const { address, phrase } = suiAddress;
+      const keypair = Ed25519Keypair.deriveKeypair(phrase);
+      return new SuiWallet({
+        address,
         packageId,
         suiClient,
         keypair,
       });
-
-      return new WalletImpl(suiAddress.address, executor);
     }
     case "shinami": {
       const { packageId, network, shinamiAccessKey, walletId, walletSecret } = params;
@@ -69,21 +73,13 @@ export async function newWallet(params: NewWalletParams): Promise<Wallet> {
         address = await walletClient.createWallet(walletId, sessionToken);
       }
 
-      const executor = new ShinamiExecutor({
+      return new ShinamiWallet({
         suiClient,
         gasClient,
         packageId,
-        onBehalfOf: address,
+        address: address,
         signer,
       });
-      return new WalletImpl(address, executor);
     }
   }
-}
-
-class WalletImpl implements Wallet {
-  constructor(
-    readonly address: string,
-    readonly executor: Executor,
-  ) {}
 }

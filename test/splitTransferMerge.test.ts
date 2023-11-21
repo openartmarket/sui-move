@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { mintContract } from "../src/mintContract";
-import { mintContractStock } from "../src/mintContractStock";
-import { splitTransferMerge } from "../src/splitTransferMerge";
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import { splitTransferMerge } from "../src/splitTransferMerge.js";
 import {
   ADMIN_CAP_ID,
   adminWallet,
@@ -10,12 +10,12 @@ import {
   makeWallet,
   mintContractOptions,
   PACKAGE_ID,
-} from "./test-helpers";
+} from "./test-helpers.js";
 
 describe("splitTransferMerge", () => {
   let contractId: string;
   beforeEach(async () => {
-    const res = await mintContract(adminWallet.executor, mintContractOptions);
+    const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
   });
 
@@ -23,7 +23,7 @@ describe("splitTransferMerge", () => {
     const fromWallet = await makeWallet();
     const toWallet = await makeWallet();
 
-    await mintContractStock(adminWallet.executor, [
+    await mintContractStock(adminWallet, [
       // User 1 has bought stocks in 3 batches. Total: 9
       {
         adminCapId: ADMIN_CAP_ID,
@@ -60,8 +60,8 @@ describe("splitTransferMerge", () => {
 
     const { fromContractStockId, toContractStockId } = await splitTransferMerge({
       packageId: PACKAGE_ID,
-      fromExecutor: fromWallet.executor,
-      toExecutor: toWallet.executor,
+      fromExecutor: fromWallet,
+      toExecutor: toWallet,
       contractId,
       fromAddress: fromWallet.address,
       toAddress: toWallet.address,

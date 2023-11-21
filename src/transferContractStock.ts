@@ -1,4 +1,4 @@
-import type { Executor } from "./Executor.js";
+import type { Wallet } from "./newWallet.js";
 
 export type TransferContractStockParams = {
   contractId: string;
@@ -11,7 +11,7 @@ export type TransferContractStockResult = {
 };
 
 export async function transferContractStock(
-  executor: Executor,
+  executor: Wallet,
   params: TransferContractStockParams,
 ): Promise<TransferContractStockResult> {
   const response = await executor.execute(async (txb, packageId) => {

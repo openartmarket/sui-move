@@ -5,19 +5,24 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import type { GasStationClient, ShinamiWalletSigner } from "@shinami/clients";
 import { buildGaslessTransactionBytes } from "@shinami/clients";
 
-import type { BuildTransactionBlock, Executor } from "./Executor.js";
+import type { BuildTransactionBlock, Wallet } from "./newWallet.js";
 
-export type SuiExecutorParams = {
+export type SuiWalletParams = {
+  address: string;
   suiClient: SuiClient;
   packageId: string;
   keypair: Keypair;
 };
 
-export class SuiExecutor implements Executor {
-  readonly suiClient: SuiClient;
+export class SuiWallet implements Wallet {
+  constructor(private readonly params: SuiWalletParams) {}
 
-  constructor(private readonly params: SuiExecutorParams) {
-    this.suiClient = params.suiClient;
+  get address(): string {
+    throw new Error("Not implemented");
+  }
+
+  get suiClient(): SuiClient {
+    return this.params.suiClient;
   }
 
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
@@ -39,25 +44,29 @@ export class SuiExecutor implements Executor {
   }
 }
 
-export type ShinamiExecutorParams = {
+export type ShinamiWalletParams = {
   suiClient: SuiClient;
   gasClient: GasStationClient;
   packageId: string;
-  onBehalfOf: string;
+  address: string;
   signer: ShinamiWalletSigner;
 };
 
 const SUI_GAS_FEE_LIMIT = 5_000_000;
 
-export class ShinamiExecutor implements Executor {
-  readonly suiClient: SuiClient;
+export class ShinamiWallet implements Wallet {
+  constructor(private readonly params: ShinamiWalletParams) {}
 
-  constructor(private readonly params: ShinamiExecutorParams) {
-    this.suiClient = params.suiClient;
+  get suiClient(): SuiClient {
+    return this.params.suiClient;
+  }
+
+  get address(): string {
+    return this.params.address;
   }
 
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
-    const { suiClient, gasClient, packageId, onBehalfOf, signer } = this.params;
+    const { suiClient, gasClient, packageId, address, signer } = this.params;
     const gaslessTx = await buildGaslessTransactionBytes({
       sui: suiClient,
       build: (txb) => build(txb, packageId),
@@ -65,12 +74,13 @@ export class ShinamiExecutor implements Executor {
 
     const { txBytes, signature: gasSignature } = await gasClient.sponsorTransactionBlock(
       gaslessTx,
-      onBehalfOf,
+      address,
       SUI_GAS_FEE_LIMIT,
     );
 
     // Sign the sponsored tx.
     const { signature } = await signer.signTransactionBlock(fromB64(txBytes));
+
     const signatures = [signature, gasSignature];
     // Execute the sponsored & signed tx.
     const response = await suiClient.executeTransactionBlock({
