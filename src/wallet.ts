@@ -2,9 +2,9 @@ import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { GasStationClient, KeyClient, ShinamiWalletSigner, WalletClient } from "@shinami/clients";
 
-import { type Executor, ShinamiExecutor, SuiExecutor } from "./Executor";
+import { type Executor, ShinamiExecutor, SuiExecutor } from "./Executor.js";
 import type { SuiAddress } from "./sui";
-import { newSuiAddress } from "./sui";
+import { newSuiAddress } from "./sui.js";
 import type { NetworkName } from "./types";
 
 export interface Wallet {

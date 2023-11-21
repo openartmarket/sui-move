@@ -1,7 +1,9 @@
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 
 import { ContractFields, ContractStockFields, createDisplay } from "../src/createDisplay.js";
-import { ADMIN_PHRASE, adminWallet, PUBLISHER_ID } from "../test/test-helpers.js";
+import { ADMIN_PHRASE, adminWallet, getEnv } from "../test/test-helpers.js";
+
+const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 
 async function main() {
   const keypair = Ed25519Keypair.deriveKeypair(ADMIN_PHRASE);

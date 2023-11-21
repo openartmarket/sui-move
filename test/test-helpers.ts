@@ -4,7 +4,6 @@ import type { NetworkName } from "../src/types";
 import type { Wallet } from "../src/wallet";
 import { newWallet } from "../src/wallet.js";
 
-export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
 export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
 export const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
@@ -64,7 +63,7 @@ export async function getQuantity(wallet: Wallet, id: string): Promise<number> {
   return getIntField(parsedData, "shares");
 }
 
-function getEnv(name: string): string {
+export function getEnv(name: string): string {
   const value = process.env[name];
   if (!value) throw new Error(`Missing env variable ${name}`);
   return value;
