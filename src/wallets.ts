@@ -47,6 +47,7 @@ export type ShinamiWalletParams = {
   gasStationClient: GasStationClient;
   packageId: string;
   keypair: Keypair;
+  isAdmin: boolean;
 };
 
 const SUI_GAS_FEE_LIMIT = 5_000_000;
@@ -63,39 +64,46 @@ export class ShinamiWallet implements Wallet {
   }
 
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
-    const { suiClient, gasStationClient, packageId, keypair } = this.params;
-    const gaslessPayloadBase64 = await buildGaslessTransactionBytes({
-      sui: suiClient,
-      build: (txb) => build(txb, packageId),
-    });
+    const { suiClient, gasStationClient, packageId, keypair, isAdmin } = this.params;
+    let response: SuiTransactionBlockResponse;
 
-    const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
-      gaslessPayloadBase64,
-      this.address,
-      SUI_GAS_FEE_LIMIT,
-    );
+    if (!isAdmin) {
+      const gaslessPayloadBase64 = await buildGaslessTransactionBytes({
+        sui: suiClient,
+        build: (txb) => build(txb, packageId),
+      });
 
-    const sponsoredStatus = await gasStationClient.getSponsoredTransactionBlockStatus(
-      sponsoredResponse.txDigest,
-    );
-    console.log("Transaction Digest:", sponsoredResponse.txDigest);
-    // For me this printed "Transaction Digest: GE6rWNfjVk7GiNSRHExaYnQB6TNKRpWBbQrAAK1Cqax5"
-    // which we'll see in the image below.
-    console.log("Sponsorship Status:", sponsoredStatus);
-
-    const senderSig = await TransactionBlock.from(sponsoredResponse.txBytes).sign({
-      signer: keypair,
-    });
-
-    const response = await suiClient.executeTransactionBlock({
-      transactionBlock: sponsoredResponse.txBytes,
-      signature: [senderSig.signature, sponsoredResponse.signature],
-      requestType: "WaitForLocalExecution",
-      options: {
-        showObjectChanges: true,
-        showEffects: true,
-      },
-    });
+      const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
+        gaslessPayloadBase64,
+        this.address,
+        SUI_GAS_FEE_LIMIT,
+      );
+      console.log("Transaction Digest:", sponsoredResponse.txDigest);
+      const senderSig = await TransactionBlock.from(sponsoredResponse.txBytes).sign({
+        signer: keypair,
+      });
+      response = await suiClient.executeTransactionBlock({
+        transactionBlock: sponsoredResponse.txBytes,
+        signature: [senderSig.signature, sponsoredResponse.signature],
+        requestType: "WaitForLocalExecution",
+        options: {
+          showObjectChanges: true,
+          showEffects: true,
+        },
+      });
+    } else {
+      const tx = new TransactionBlock();
+      await build(tx, packageId);
+      response = await suiClient.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+        signer: keypair,
+        requestType: "WaitForLocalExecution",
+        options: {
+          showObjectChanges: true,
+          showEffects: true,
+        },
+      });
+    }
     return checkResponse(response);
   }
 }
@@ -112,5 +120,6 @@ function checkResponse(response: SuiTransactionBlockResponse): SuiTransactionBlo
   if (status.status !== "success") {
     throw new Error(`Transaction failed with status: ${status}`);
   }
+  console.log("Transaction successful!", { response });
   return response;
 }

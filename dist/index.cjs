@@ -354,7 +354,6 @@ async function vote(executor, params) {
 
 // src/Wallet.ts
 var import_client = require("@mysten/sui.js/client");
-var import_ed25519 = require("@mysten/sui.js/keypairs/ed25519");
 var import_clients2 = require("@shinami/clients");
 
 // src/wallets.ts
@@ -398,33 +397,44 @@ var ShinamiWallet = class {
     return this.params.keypair.toSuiAddress();
   }
   async execute(build) {
-    const { suiClient, gasStationClient, packageId, keypair } = this.params;
-    const gaslessPayloadBase64 = await (0, import_clients.buildGaslessTransactionBytes)({
-      sui: suiClient,
-      build: (txb) => build(txb, packageId)
-    });
-    const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
-      gaslessPayloadBase64,
-      this.address,
-      SUI_GAS_FEE_LIMIT
-    );
-    const sponsoredStatus = await gasStationClient.getSponsoredTransactionBlockStatus(
-      sponsoredResponse.txDigest
-    );
-    console.log("Transaction Digest:", sponsoredResponse.txDigest);
-    console.log("Sponsorship Status:", sponsoredStatus);
-    const senderSig = await import_transactions.TransactionBlock.from(sponsoredResponse.txBytes).sign({
-      signer: keypair
-    });
-    const response = await suiClient.executeTransactionBlock({
-      transactionBlock: sponsoredResponse.txBytes,
-      signature: [senderSig.signature, sponsoredResponse.signature],
-      requestType: "WaitForLocalExecution",
-      options: {
-        showObjectChanges: true,
-        showEffects: true
-      }
-    });
+    const { suiClient, gasStationClient, packageId, keypair, isAdmin } = this.params;
+    let response;
+    if (!isAdmin) {
+      const gaslessPayloadBase64 = await (0, import_clients.buildGaslessTransactionBytes)({
+        sui: suiClient,
+        build: (txb) => build(txb, packageId)
+      });
+      const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
+        gaslessPayloadBase64,
+        this.address,
+        SUI_GAS_FEE_LIMIT
+      );
+      console.log("Transaction Digest:", sponsoredResponse.txDigest);
+      const senderSig = await import_transactions.TransactionBlock.from(sponsoredResponse.txBytes).sign({
+        signer: keypair
+      });
+      response = await suiClient.executeTransactionBlock({
+        transactionBlock: sponsoredResponse.txBytes,
+        signature: [senderSig.signature, sponsoredResponse.signature],
+        requestType: "WaitForLocalExecution",
+        options: {
+          showObjectChanges: true,
+          showEffects: true
+        }
+      });
+    } else {
+      const tx = new import_transactions.TransactionBlock();
+      await build(tx, packageId);
+      response = await suiClient.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+        signer: keypair,
+        requestType: "WaitForLocalExecution",
+        options: {
+          showObjectChanges: true,
+          showEffects: true
+        }
+      });
+    }
     return checkResponse(response);
   }
 };
@@ -440,6 +450,7 @@ function checkResponse(response) {
   if (status.status !== "success") {
     throw new Error(`Transaction failed with status: ${status}`);
   }
+  console.log("Transaction successful!", { response });
   return response;
 }
 
@@ -457,15 +468,15 @@ async function newWallet(params) {
       });
     }
     case "shinami": {
-      const { packageId, shinamiAccessKey } = params;
+      const { packageId, shinamiAccessKey, keypair, isAdmin } = params;
       const suiClient = (0, import_clients2.createSuiClient)(shinamiAccessKey);
       const gasClient = new import_clients2.GasStationClient(shinamiAccessKey);
-      const keypair = new import_ed25519.Ed25519Keypair();
       return new ShinamiWallet({
         suiClient,
         gasStationClient: gasClient,
         packageId,
-        keypair
+        keypair,
+        isAdmin
       });
     }
   }

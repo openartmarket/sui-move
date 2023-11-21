@@ -13,33 +13,23 @@ export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
 const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
 
-export async function makeWallet(admin = false): Promise<Wallet> {
+export async function makeWallet(isAdmin = false): Promise<Wallet> {
   if (process.env.SHINAMI_ENABLED) {
     const shinamiAccessKey = getEnv("SHINAMI_ACCESS_KEY");
-    const keypair = Ed25519Keypair.deriveKeypair(getEnv("ADMIN_PHRASE"));
-
-    // let address: string;
-
-    // if (admin) {
-    //   address = ADMIN_ADDRESS;
-    // } else {
-    //   const walletClient = new WalletClient(shinamiAccessKey);
-    //   const keyClient = new KeyClient(shinamiAccessKey);
-    //   const walletId = randomUUID();
-    //   const walletSecret = randomUUID();
-    //   const sessionToken = await keyClient.createSession(walletSecret);
-    //   address = await walletClient.createWallet(walletId, sessionToken);
-    // }
+    const keypair = isAdmin
+      ? Ed25519Keypair.deriveKeypair(getEnv("ADMIN_PHRASE"))
+      : new Ed25519Keypair();
 
     return newWallet({
       type: "shinami",
       packageId: PACKAGE_ID,
       shinamiAccessKey,
       keypair,
+      isAdmin,
     });
   } else {
     let suiAddress: SuiAddress;
-    if (admin) {
+    if (isAdmin) {
       suiAddress = {
         address: ADMIN_ADDRESS,
         phrase: getEnv("ADMIN_PHRASE"),

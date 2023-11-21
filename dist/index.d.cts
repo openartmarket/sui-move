@@ -23,6 +23,7 @@ type NewShinamiWalletParams = {
     packageId: string;
     keypair: Keypair;
     shinamiAccessKey: string;
+    isAdmin: boolean;
 };
 declare function newWallet(params: NewWalletParams): Promise<Wallet>;
 
