@@ -12,7 +12,7 @@ const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
 
 export function makeWallet(admin = false): Promise<Wallet> {
-  if (process.env.USE_SHINAMI) {
+  if (process.env.SHINAMI_ENABLED) {
     const address = admin ? ADMIN_ADDRESS : undefined;
     return newWallet({
       type: "shinami",

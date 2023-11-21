@@ -32,11 +32,23 @@ It should print `localnet`.
 
 ## Start a local sui node
 
-    npm run clean
+    rm -rf ~/.sui
     sui start
 
 This will start a local sui node.
 Start a new shell for the following commands.
+
+## (Optional) - run against Shinami
+
+By default, the tests run against a local sui node, but if you define the environment variables below, the tests will run against the Shinami testnet.
+
+```bash
+export SHINAMI_ENABLED=1
+# Find the "SUI Testnet" access key at https://app.shinami.com/access-keys
+export SHINAMI_ACCESS_KEY="..."
+export SHINAMI_WALLET_ID="..."
+export SHINAMI_WALLET_SECRET="..."
+```
 
 ## Create sui addresses (accounts)
 
@@ -75,20 +87,6 @@ Go to [SUI Explorer](https://suiexplorer.com/?network=local)
 1. We use tests to verify the code works as expected.
 2. We use prettier to format the code.
 3. We use eslint to check for common errors.
-
-### Formatting
-
-The code is autoformatted when running this command
-Configuration for the formatter is in the `.prettierrc` file
-
-    npm run format
-
-### Linting
-
-The code is linted for warnings and errors when running this command
-Configuration for the linter is in the `.eslintrc.json` file
-
-    npm run lint
 
 ### Compile
 
