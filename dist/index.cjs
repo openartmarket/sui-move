@@ -357,46 +357,6 @@ var import_client = require("@mysten/sui.js/client");
 var import_ed25519 = require("@mysten/sui.js/keypairs/ed25519");
 var import_clients2 = require("@shinami/clients");
 
-// src/sui.ts
-var import_node_child_process = require("child_process");
-async function getSuiCoinObjectId() {
-  const gas = await execSui("sui client gas --json");
-  return gas[0].id.id;
-}
-async function newSuiAddress(balance = 2e10) {
-  const [address, phrase] = await execSui(
-    "sui client new-address ed25519 --json"
-  );
-  const suiCoinObjectId = await getSuiCoinObjectId();
-  await transferSui({ to: address, suiCoinObjectId, amount: balance });
-  return { address, phrase };
-}
-async function transferSui({
-  to,
-  suiCoinObjectId,
-  amount,
-  gasBudget = 2e8
-}) {
-  await execSui(
-    `sui client transfer-sui --amount ${amount} --to "${to}" --gas-budget ${gasBudget} --sui-coin-object-id "${suiCoinObjectId}" --json`
-  );
-}
-async function execSui(command) {
-  return new Promise((resolve, reject) => {
-    (0, import_node_child_process.exec)(command, (err, stdout, stderr) => {
-      if (err)
-        return reject(err);
-      if (stderr)
-        return reject(new Error(stderr));
-      try {
-        resolve(JSON.parse(stdout));
-      } catch (err2) {
-        reject(`Didn't get JSON output from sui: ${stdout}`);
-      }
-    });
-  });
-}
-
 // src/wallets.ts
 var import_bcs = require("@mysten/bcs");
 var import_transactions = require("@mysten/sui.js/transactions");
@@ -482,13 +442,9 @@ function checkResponse(response) {
 async function newWallet(params) {
   switch (params.type) {
     case "sui": {
-      const { network, packageId } = params;
+      const { network, packageId, suiAddress } = params;
       const url = (0, import_client.getFullnodeUrl)(network);
       const suiClient = new import_client.SuiClient({ url });
-      let { suiAddress } = params;
-      if (!suiAddress) {
-        suiAddress = await newSuiAddress();
-      }
       const { address, phrase } = suiAddress;
       const keypair = import_ed25519.Ed25519Keypair.deriveKeypair(phrase);
       return new SuiWallet({
@@ -499,18 +455,12 @@ async function newWallet(params) {
       });
     }
     case "shinami": {
-      const { packageId, network, shinamiAccessKey, walletId, walletSecret } = params;
-      const url = (0, import_client.getFullnodeUrl)(network);
-      const suiClient = new import_client.SuiClient({ url });
+      const { packageId, shinamiAccessKey, address } = params;
+      const suiClient = (0, import_clients2.createSuiClient)(shinamiAccessKey);
       const gasClient = new import_clients2.GasStationClient(shinamiAccessKey);
       const walletClient = new import_clients2.WalletClient(shinamiAccessKey);
       const keyClient = new import_clients2.KeyClient(shinamiAccessKey);
-      const signer = new import_clients2.ShinamiWalletSigner(walletId, walletClient, walletSecret, keyClient);
-      let { address } = params;
-      if (!address) {
-        const sessionToken = await keyClient.createSession(walletSecret);
-        address = await walletClient.createWallet(walletId, sessionToken);
-      }
+      const signer = new import_clients2.ShinamiWalletSigner("FIXME", walletClient, "FIXME", keyClient);
       return new ShinamiWallet({
         suiClient,
         gasClient,

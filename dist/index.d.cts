@@ -20,16 +20,14 @@ type NewSuiWalletParams = {
     type: "sui";
     network: NetworkName;
     packageId: string;
-    suiAddress?: SuiAddress;
+    suiAddress: SuiAddress;
 };
 type NewShinamiWalletParams = {
     type: "shinami";
     network: NetworkName;
     packageId: string;
     shinamiAccessKey: string;
-    walletId: string;
-    walletSecret: string;
-    address?: string;
+    address: string;
 };
 declare function newWallet(params: NewWalletParams): Promise<Wallet>;
 

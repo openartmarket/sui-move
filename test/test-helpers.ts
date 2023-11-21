@@ -1,8 +1,10 @@
 import { randomUUID } from "node:crypto";
 
+import { KeyClient, WalletClient } from "@shinami/clients";
+
 import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { MintContractParams } from "../src/mintContract.js";
-import type { SuiAddress } from "../src/sui.js";
+import { newSuiAddress, type SuiAddress } from "../src/sui.js";
 import type { NetworkName } from "../src/types.js";
 import type { Wallet } from "../src/Wallet.js";
 import { newWallet } from "../src/Wallet.js";
@@ -13,25 +15,40 @@ export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
 const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
 
-export function makeWallet(admin = false): Promise<Wallet> {
+export async function makeWallet(admin = false): Promise<Wallet> {
   if (process.env.SHINAMI_ENABLED) {
-    const address = admin ? ADMIN_ADDRESS : undefined;
+    const shinamiAccessKey = getEnv("SHINAMI_ACCESS_KEY");
+
+    let address: string;
+
+    if (admin) {
+      address = ADMIN_ADDRESS;
+    } else {
+      const walletClient = new WalletClient(shinamiAccessKey);
+      const keyClient = new KeyClient(shinamiAccessKey);
+      const walletId = randomUUID();
+      const walletSecret = randomUUID();
+      const sessionToken = await keyClient.createSession(walletSecret);
+      address = await walletClient.createWallet(walletId, sessionToken);
+    }
+
     return newWallet({
       type: "shinami",
       packageId: PACKAGE_ID,
       network: SUI_NETWORK,
-      shinamiAccessKey: getEnv("SHINAMI_ACCESS_KEY"),
-      walletId: randomUUID(),
-      walletSecret: randomUUID(),
+      shinamiAccessKey,
       address,
     });
   } else {
-    const suiAddress: SuiAddress | undefined = admin
-      ? {
-          address: ADMIN_ADDRESS,
-          phrase: getEnv("ADMIN_PHRASE"),
-        }
-      : undefined;
+    let suiAddress: SuiAddress;
+    if (admin) {
+      suiAddress = {
+        address: ADMIN_ADDRESS,
+        phrase: getEnv("ADMIN_PHRASE"),
+      };
+    } else {
+      suiAddress = await newSuiAddress();
+    }
     return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, suiAddress });
   }
 }
