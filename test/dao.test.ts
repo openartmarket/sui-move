@@ -1,11 +1,8 @@
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
 import type { SuiAddress } from "../src";
 import { endMotion, newAddress } from "../src";
-import type { Executor } from "../src/Executor";
-import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import { startMotion } from "../src/startMotion";
@@ -13,34 +10,26 @@ import { vote } from "../src/vote";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
-  ADMIN_PHRASE,
-  getClient,
+  adminExecutor,
   mintContractOptions,
-  PACKAGE_ID,
+  newUserExecutor,
 } from "./test-helpers";
 
 describe("DAO Voting structure", () => {
-  let executor: Executor;
-  const client = getClient();
   let contractId: string;
   let user1: SuiAddress;
   let user2: SuiAddress;
   let user3: SuiAddress;
 
   beforeEach(async function () {
-    executor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
-      packageId: PACKAGE_ID,
-    });
-    const res = await mintContract(executor, mintContractOptions);
+    const res = await mintContract(adminExecutor, mintContractOptions);
     contractId = res.contractId;
 
     user1 = await newAddress();
     user2 = await newAddress();
     user3 = await newAddress();
 
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -48,7 +37,7 @@ describe("DAO Voting structure", () => {
         quantity: 151,
       },
     ]);
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -56,7 +45,7 @@ describe("DAO Voting structure", () => {
         quantity: 249,
       },
     ]);
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -67,7 +56,7 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("can start a motion", async () => {
-    const voteRequest = await startMotion(executor, {
+    const voteRequest = await startMotion(adminExecutor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
@@ -76,17 +65,13 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("can vote as a shareholder", async () => {
-    const { motionId } = await startMotion(executor, {
+    const { motionId } = await startMotion(adminExecutor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
-    const voterExecutor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
-      packageId: PACKAGE_ID,
-    });
+    const voterExecutor = newUserExecutor(user1);
     await vote(voterExecutor, {
       contractId,
       motionId,
@@ -95,17 +80,13 @@ describe("DAO Voting structure", () => {
   });
 
   it("cannot double vote as a shareholder", async () => {
-    const { motionId } = await startMotion(executor, {
+    const { motionId } = await startMotion(adminExecutor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
-    const voterExecutor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
-      packageId: PACKAGE_ID,
-    });
+    const voterExecutor = newUserExecutor(user1);
     await vote(voterExecutor, {
       contractId,
       motionId,
@@ -121,17 +102,13 @@ describe("DAO Voting structure", () => {
   }, 30_000);
 
   it("cannot vote if not a shareholder", async () => {
-    const { motionId } = await startMotion(executor, {
+    const { motionId } = await startMotion(adminExecutor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
-    const voterExecutor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(user3.phrase),
-      packageId: PACKAGE_ID,
-    });
+    const voterExecutor = newUserExecutor(user3);
 
     await assert.rejects(
       vote(voterExecutor, {
@@ -143,22 +120,18 @@ describe("DAO Voting structure", () => {
   });
 
   it("cannot vote if motion is closed", async () => {
-    const { motionId } = await startMotion(executor, {
+    const { motionId } = await startMotion(adminExecutor, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       motion: "Request to sell artwork to Museum",
     });
 
-    await endMotion(executor, {
+    await endMotion(adminExecutor, {
       adminCapId: ADMIN_CAP_ID,
       motionId,
     });
 
-    const voterExecutor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
-      packageId: PACKAGE_ID,
-    });
+    const voterExecutor = newUserExecutor(user1);
 
     await assert.rejects(
       vote(voterExecutor, {

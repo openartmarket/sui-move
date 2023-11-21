@@ -1,34 +1,23 @@
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import type { SuiAddress } from "../src";
 import { newAddress } from "../src";
-import type { Executor } from "../src/Executor";
-import { SuiExecutor } from "../src/Executor";
 import { mergeContractStock } from "../src/mergeContractStock";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import {
   ADMIN_CAP_ID,
-  ADMIN_PHRASE,
-  getClient,
+  adminExecutor,
   getQuantity,
   mintContractOptions,
-  PACKAGE_ID,
+  newUserExecutor,
 } from "./test-helpers";
 
 describe("mergeContractStock", () => {
-  let executor: Executor;
-  const client = getClient();
   let contractId: string;
   let user1: SuiAddress;
   beforeEach(async function () {
-    executor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
-      packageId: PACKAGE_ID,
-    });
-    const res = await mintContract(executor, mintContractOptions);
+    const res = await mintContract(adminExecutor, mintContractOptions);
     contractId = res.contractId;
 
     user1 = await newAddress();
@@ -37,7 +26,7 @@ describe("mergeContractStock", () => {
   it("should merge contract stocks", async () => {
     const {
       contractStockIds: [toContractStockId],
-    } = await mintContractStock(executor, [
+    } = await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -48,7 +37,7 @@ describe("mergeContractStock", () => {
 
     const {
       contractStockIds: [fromContractStockId],
-    } = await mintContractStock(executor, [
+    } = await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -57,11 +46,7 @@ describe("mergeContractStock", () => {
       },
     ]);
 
-    const user1Executor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
-      packageId: PACKAGE_ID,
-    });
+    const user1Executor = newUserExecutor(user1);
     await mergeContractStock(user1Executor, [
       {
         toContractStockId,
@@ -69,12 +54,14 @@ describe("mergeContractStock", () => {
       },
     ]);
 
-    expect(await getQuantity(client, toContractStockId)).toEqual(20);
-    await expect(getQuantity(client, fromContractStockId)).rejects.toSatisfy((err) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      expect(err.code).toEqual("deleted");
-      return true;
-    });
+    expect(await getQuantity(adminExecutor.suiClient, toContractStockId)).toEqual(20);
+    await expect(getQuantity(adminExecutor.suiClient, fromContractStockId)).rejects.toSatisfy(
+      (err) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        expect(err.code).toEqual("deleted");
+        return true;
+      },
+    );
   }, 30_000);
 });

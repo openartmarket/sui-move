@@ -1,6 +1,8 @@
-import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
+import type { SuiClient } from "@mysten/sui.js/client";
 
-import type { MintContractParams } from "../src";
+import type { Executor, MintContractParams, SuiAddress } from "../src";
+import type { ExecutorOptions } from "../src/executors";
+import { makeExecutor } from "../src/executors";
 import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { NetworkName } from "../src/types";
 
@@ -9,18 +11,13 @@ export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
 export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
 export const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
 
-export const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
+const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
 
-export function getClient(): SuiClient {
-  const url = getFullnodeUrl(SUI_NETWORK);
-  return new SuiClient({ url });
-}
+export const adminExecutor = makeExecutor(makeExecutorOptions(ADMIN_PHRASE));
 
-export function getEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing env variable ${name}`);
-  return value;
+export function newUserExecutor({ phrase }: SuiAddress): Executor {
+  return makeExecutor(makeExecutorOptions(phrase));
 }
 
 export const mintContractOptions: MintContractParams = {
@@ -47,4 +44,19 @@ export async function getQuantity(client: SuiClient, id: string): Promise<number
   const objectData = getObjectData(response);
   const parsedData = getParsedData(objectData);
   return getIntField(parsedData, "shares");
+}
+
+function getEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing env variable ${name}`);
+  return value;
+}
+
+function makeExecutorOptions(phrase: string): ExecutorOptions {
+  return {
+    type: "sui",
+    packageId: PACKAGE_ID,
+    network: SUI_NETWORK,
+    phrase,
+  };
 }

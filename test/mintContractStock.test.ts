@@ -1,39 +1,27 @@
 import assert from "node:assert";
 
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import type { SuiAddress } from "../src";
 import { newAddress } from "../src";
-import type { Executor } from "../src/Executor";
-import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
-  ADMIN_PHRASE,
-  getClient,
+  adminExecutor,
   getQuantity,
   mintContractOptions,
-  PACKAGE_ID,
 } from "./test-helpers";
 
 describe("mintContractStock", () => {
-  let executor: Executor;
-  const client = getClient();
   let contractId: string;
 
   let user1: SuiAddress;
   let user2: SuiAddress;
   let user3: SuiAddress;
   beforeEach(async () => {
-    executor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
-      packageId: PACKAGE_ID,
-    });
-    const res = await mintContract(executor, mintContractOptions);
+    const res = await mintContract(adminExecutor, mintContractOptions);
     contractId = res.contractId;
 
     user1 = await newAddress();
@@ -42,8 +30,8 @@ describe("mintContractStock", () => {
   });
 
   it("should issue new shares in batch", async () => {
-    const { contractId: contractId2 } = await mintContract(executor, mintContractOptions);
-    await mintContractStock(executor, [
+    const { contractId: contractId2 } = await mintContract(adminExecutor, mintContractOptions);
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId: contractId2,
@@ -61,13 +49,13 @@ describe("mintContractStock", () => {
       { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: user3.address, quantity: 5 },
     ]);
 
-    expect(await getQuantity(client, contractId)).toEqual(490);
-    expect(await getQuantity(client, contractId2)).toEqual(470);
+    expect(await getQuantity(adminExecutor.suiClient, contractId)).toEqual(490);
+    expect(await getQuantity(adminExecutor.suiClient, contractId2)).toEqual(470);
   });
 
   it("should not issue new shares, when asking for too much", async () => {
     await assert.rejects(
-      mintContractStock(executor, [
+      mintContractStock(adminExecutor, [
         {
           adminCapId: ADMIN_CAP_ID,
           contractId,
@@ -79,7 +67,7 @@ describe("mintContractStock", () => {
   });
 
   it("should issue remaining shares", async () => {
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -88,7 +76,7 @@ describe("mintContractStock", () => {
       },
     ]);
 
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -97,11 +85,11 @@ describe("mintContractStock", () => {
       },
     ]);
 
-    const sharesLeft = await getQuantity(client, contractId);
+    const sharesLeft = await getQuantity(adminExecutor.suiClient, contractId);
     assert.equal(sharesLeft, 0);
 
     await assert.rejects(
-      mintContractStock(executor, [
+      mintContractStock(adminExecutor, [
         {
           adminCapId: ADMIN_CAP_ID,
           contractId,
@@ -113,7 +101,7 @@ describe("mintContractStock", () => {
   });
 
   it("should not issue new shares, when sold out", async () => {
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -121,7 +109,7 @@ describe("mintContractStock", () => {
         receiverAddress: user1.address,
       },
     ]);
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -129,7 +117,7 @@ describe("mintContractStock", () => {
         quantity: 250,
       },
     ]);
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -138,10 +126,10 @@ describe("mintContractStock", () => {
       },
     ]);
 
-    expect(await getQuantity(client, contractId)).toEqual(2);
+    expect(await getQuantity(adminExecutor.suiClient, contractId)).toEqual(2);
 
     await assert.rejects(
-      mintContractStock(executor, [
+      mintContractStock(adminExecutor, [
         {
           adminCapId: ADMIN_CAP_ID,
           contractId,
@@ -153,7 +141,7 @@ describe("mintContractStock", () => {
   }, 30_000);
 
   it("can give shares to OAM and owner", async () => {
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -161,7 +149,7 @@ describe("mintContractStock", () => {
         quantity: 150,
       },
     ]);
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
@@ -169,7 +157,7 @@ describe("mintContractStock", () => {
         quantity: 50,
       },
     ]);
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,

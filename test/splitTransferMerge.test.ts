@@ -1,32 +1,22 @@
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { Executor } from "../src/Executor";
-import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
 import { mintContractStock } from "../src/mintContractStock";
 import { splitTransferMerge } from "../src/splitTransferMerge";
 import { newAddress } from "../src/sui";
 import {
   ADMIN_CAP_ID,
-  ADMIN_PHRASE,
-  getClient,
+  adminExecutor,
   getQuantity,
   mintContractOptions,
+  newUserExecutor,
   PACKAGE_ID,
 } from "./test-helpers";
 
 describe("splitTransferMerge", () => {
-  let executor: Executor;
-  const client = getClient();
   let contractId: string;
   beforeEach(async () => {
-    executor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
-      packageId: PACKAGE_ID,
-    });
-    const res = await mintContract(executor, mintContractOptions);
+    const res = await mintContract(adminExecutor, mintContractOptions);
     contractId = res.contractId;
   });
 
@@ -34,7 +24,7 @@ describe("splitTransferMerge", () => {
     const user1 = await newAddress();
     const user2 = await newAddress();
 
-    await mintContractStock(executor, [
+    await mintContractStock(adminExecutor, [
       // User 1 has bought stocks in 3 batches. Total: 9
       {
         adminCapId: ADMIN_CAP_ID,
@@ -69,16 +59,8 @@ describe("splitTransferMerge", () => {
       },
     ]);
 
-    const user1Executor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
-      packageId: PACKAGE_ID,
-    });
-    const user2Executor = new SuiExecutor({
-      suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(user2.phrase),
-      packageId: PACKAGE_ID,
-    });
+    const user1Executor = newUserExecutor(user1);
+    const user2Executor = newUserExecutor(user2);
 
     const { fromContractStockId, toContractStockId } = await splitTransferMerge({
       packageId: PACKAGE_ID,
@@ -90,8 +72,8 @@ describe("splitTransferMerge", () => {
       quantity: 2,
     });
 
-    expect(await getQuantity(client, fromContractStockId)).toEqual(7);
-    expect(await getQuantity(client, toContractStockId)).toEqual(18);
+    expect(await getQuantity(user1Executor.suiClient, fromContractStockId)).toEqual(7);
+    expect(await getQuantity(user2Executor.suiClient, toContractStockId)).toEqual(18);
 
     // TODO: verify that user1 has one stock with 7 and user2 has one stock with 18
   }, 30_000);
