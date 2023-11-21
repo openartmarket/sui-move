@@ -47,15 +47,13 @@ Add the following to your `.sui.env` file:
 ```bash
 export SUI_NETWORK="testnet"
 export SHINAMI_ENABLED=1
-# Find the "SUI Testnet" access key at https://app.shinami.com/access-keys
+# Copy the "SUI Testnet" access key from https://app.shinami.com/access-keys
 export SHINAMI_ACCESS_KEY="..."
-# Find SUI_TESTNET_OAM_ADMIN_CAP_ID in openartmarket/server/.envrc
+# Copy the SUI_TESTNET_* values from openartmarket/server/.envrc
 export ADMIN_CAP_ID="..."
-# Find SUI_TESTNET_OAM_PACKAGE_ID in openartmarket/server/.envrc
 export PACKAGE_ID="..."
-# Find SUI_TESTNET_ADMIN_ADDRESS in openartmarket/server/.envrc
 export ADMIN_ADDRESS="..."
-
+export ADMIN_PHRASE="..."
 ```
 
 ## Create sui addresses (accounts)
