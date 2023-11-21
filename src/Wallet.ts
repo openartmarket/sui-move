@@ -2,13 +2,7 @@ import type { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import type { TransactionBlock } from "@mysten/sui.js/transactions";
-import {
-  createSuiClient,
-  GasStationClient,
-  KeyClient,
-  ShinamiWalletSigner,
-  WalletClient,
-} from "@shinami/clients";
+import { createSuiClient, GasStationClient } from "@shinami/clients";
 
 import type { SuiAddress } from "./sui.js";
 import type { NetworkName } from "./types.js";
@@ -58,16 +52,14 @@ export async function newWallet(params: NewWalletParams): Promise<Wallet> {
       const { packageId, shinamiAccessKey, address } = params;
       const suiClient = createSuiClient(shinamiAccessKey);
       const gasClient = new GasStationClient(shinamiAccessKey);
-      const walletClient = new WalletClient(shinamiAccessKey);
-      const keyClient = new KeyClient(shinamiAccessKey);
-      const signer = new ShinamiWalletSigner("FIXME", walletClient, "FIXME", keyClient);
+      const keypair = new Ed25519Keypair();
 
       return new ShinamiWallet({
         suiClient,
-        gasClient,
+        gasStationClient: gasClient,
         packageId,
         address,
-        signer,
+        keypair,
       });
     }
   }

@@ -1,8 +1,7 @@
-import { fromB64 } from "@mysten/bcs";
 import type { SuiClient, SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import type { Keypair } from "@mysten/sui.js/cryptography";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import type { GasStationClient, ShinamiWalletSigner } from "@shinami/clients";
+import type { GasStationClient } from "@shinami/clients";
 import { buildGaslessTransactionBytes } from "@shinami/clients";
 
 import type { BuildTransactionBlock, Wallet } from "./Wallet.js";
@@ -46,10 +45,10 @@ export class SuiWallet implements Wallet {
 
 export type ShinamiWalletParams = {
   suiClient: SuiClient;
-  gasClient: GasStationClient;
+  gasStationClient: GasStationClient;
   packageId: string;
   address: string;
-  signer: ShinamiWalletSigner;
+  keypair: Keypair;
 };
 
 const SUI_GAS_FEE_LIMIT = 5_000_000;
@@ -66,26 +65,25 @@ export class ShinamiWallet implements Wallet {
   }
 
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
-    const { suiClient, gasClient, packageId, address, signer } = this.params;
-    const gaslessTx = await buildGaslessTransactionBytes({
+    const { suiClient, gasStationClient, packageId, address, keypair } = this.params;
+    const gaslessPayloadBase64 = await buildGaslessTransactionBytes({
       sui: suiClient,
       build: (txb) => build(txb, packageId),
     });
 
-    const { txBytes, signature: gasSignature } = await gasClient.sponsorTransactionBlock(
-      gaslessTx,
+    const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
+      gaslessPayloadBase64,
       address,
       SUI_GAS_FEE_LIMIT,
     );
 
-    // Sign the sponsored tx.
-    const { signature } = await signer.signTransactionBlock(fromB64(txBytes));
+    const senderSig = await TransactionBlock.from(sponsoredResponse.txBytes).sign({
+      signer: keypair,
+    });
 
-    const signatures = [signature, gasSignature];
-    // Execute the sponsored & signed tx.
     const response = await suiClient.executeTransactionBlock({
-      transactionBlock: txBytes,
-      signature: signatures,
+      transactionBlock: sponsoredResponse.txBytes,
+      signature: [senderSig.signature, sponsoredResponse.signature],
       requestType: "WaitForLocalExecution",
       options: {
         showObjectChanges: true,
