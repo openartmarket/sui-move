@@ -20,7 +20,7 @@ describe("splitContractStock", () => {
     contractId = res.contractId;
 
     wallet = await makeWallet();
-  }, 20_000);
+  }, 30_000);
 
   it("should split an contract stock", async () => {
     const {

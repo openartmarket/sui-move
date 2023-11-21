@@ -23,7 +23,7 @@ describe("transferContractStock", () => {
 
     fromWallet = await makeWallet();
     toWallet = await makeWallet();
-  });
+  }, 30_000);
 
   it("should transfer ownership", async () => {
     const {

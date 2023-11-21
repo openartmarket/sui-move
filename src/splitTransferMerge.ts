@@ -9,8 +9,8 @@ import type { Wallet } from "./Wallet.js";
 
 export type SplitMergeTransferParams = {
   packageId: string;
-  fromExecutor: Wallet;
-  toExecutor: Wallet;
+  fromWallet: Wallet;
+  toWallet: Wallet;
   contractId: string;
   fromAddress: string;
   toAddress: string;
@@ -30,15 +30,15 @@ export type SplitMergeTransferResult = {
  */
 export async function splitTransferMerge({
   packageId,
-  fromExecutor,
-  toExecutor,
+  fromWallet,
+  toWallet,
   contractId,
   fromAddress,
   toAddress,
   quantity,
 }: SplitMergeTransferParams): Promise<SplitMergeTransferResult> {
   const fromContractStocks = await getContractStocks({
-    suiClient: fromExecutor.suiClient,
+    suiClient: fromWallet.suiClient,
     owner: fromAddress,
     contractId,
     packageId,
@@ -46,20 +46,20 @@ export async function splitTransferMerge({
   for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
     fromContractStocks,
   )) {
-    await mergeContractStock(fromExecutor, [{ fromContractStockId, toContractStockId }]);
+    await mergeContractStock(fromWallet, [{ fromContractStockId, toContractStockId }]);
   }
-  const { splitContractStockId } = await splitContractStock(fromExecutor, {
+  const { splitContractStockId } = await splitContractStock(fromWallet, {
     contractStockId: fromContractStocks[0].objectId,
     quantity,
   });
-  const { digest } = await transferContractStock(fromExecutor, {
+  const { digest } = await transferContractStock(fromWallet, {
     contractId,
     contractStockId: splitContractStockId,
     toAddress,
   });
 
   const toContractStocks = await getContractStocks({
-    suiClient: toExecutor.suiClient,
+    suiClient: toWallet.suiClient,
     owner: toAddress,
     contractId,
     packageId,
@@ -67,7 +67,7 @@ export async function splitTransferMerge({
   for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
     toContractStocks,
   )) {
-    await mergeContractStock(toExecutor, [{ fromContractStockId, toContractStockId }]);
+    await mergeContractStock(toWallet, [{ fromContractStockId, toContractStockId }]);
   }
   return {
     digest,

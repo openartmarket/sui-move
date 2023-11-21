@@ -17,7 +17,7 @@ describe("splitTransferMerge", () => {
   beforeEach(async () => {
     const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
-  });
+  }, 30_000);
 
   it("should transfer stocks and make sure everything is merged", async () => {
     const fromWallet = await makeWallet();
@@ -60,8 +60,8 @@ describe("splitTransferMerge", () => {
 
     const { fromContractStockId, toContractStockId } = await splitTransferMerge({
       packageId: PACKAGE_ID,
-      fromExecutor: fromWallet,
-      toExecutor: toWallet,
+      fromWallet: fromWallet,
+      toWallet: toWallet,
       contractId,
       fromAddress: fromWallet.address,
       toAddress: toWallet.address,

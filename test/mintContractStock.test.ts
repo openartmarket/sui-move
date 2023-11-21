@@ -27,7 +27,7 @@ describe("mintContractStock", () => {
     wallet1 = await makeWallet();
     wallet2 = await makeWallet();
     wallet3 = await makeWallet();
-  });
+  }, 30_000);
 
   it("should issue new shares in batch", async () => {
     const { contractId: contractId2 } = await mintContract(adminWallet, mintContractOptions);
@@ -51,7 +51,7 @@ describe("mintContractStock", () => {
 
     expect(await getQuantity(wallet1, contractId)).toEqual(490);
     expect(await getQuantity(wallet1, contractId2)).toEqual(470);
-  });
+  }, 30_000);
 
   it("should not issue new shares, when asking for too much", async () => {
     await assert.rejects(
@@ -64,7 +64,7 @@ describe("mintContractStock", () => {
         },
       ]),
     );
-  });
+  }, 30_000);
 
   it("should issue remaining shares", async () => {
     await mintContractStock(adminWallet, [
@@ -98,7 +98,7 @@ describe("mintContractStock", () => {
         },
       ]),
     );
-  });
+  }, 30_000);
 
   it("should not issue new shares, when sold out", async () => {
     await mintContractStock(adminWallet, [

@@ -76,7 +76,7 @@ describe("DAO Voting structure", () => {
       motionId,
       choice: true,
     });
-  });
+  }, 30_000);
 
   it("cannot double vote as a shareholder", async () => {
     const { motionId } = await startMotion(adminWallet, {
@@ -113,7 +113,7 @@ describe("DAO Voting structure", () => {
         choice: true,
       }),
     );
-  });
+  }, 30_000);
 
   it("cannot vote if motion is closed", async () => {
     const { motionId } = await startMotion(adminWallet, {

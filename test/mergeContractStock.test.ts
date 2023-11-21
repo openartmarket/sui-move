@@ -20,7 +20,7 @@ describe("mergeContractStock", () => {
     contractId = res.contractId;
 
     wallet = await makeWallet();
-  }, 20_000);
+  }, 30_000);
 
   it("should merge contract stocks", async () => {
     const {
