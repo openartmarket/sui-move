@@ -130,7 +130,7 @@ type SuiAddress = {
 /**
  * Creates a new address and transfers balance to it.
  */
-declare function newAddress(balance: number): Promise<SuiAddress>;
+declare function newAddress(balance?: number): Promise<SuiAddress>;
 
 type ContractStock = {
     contractStockId: string;

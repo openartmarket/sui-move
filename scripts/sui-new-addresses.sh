@@ -27,8 +27,5 @@ function new_address() {
 }
 
 new_address ADMIN 20000000000000
-new_address USER1 20000000000
-new_address USER2 20000000000
-new_address USER3 20000000000
 
 direnv allow

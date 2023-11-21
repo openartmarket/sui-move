@@ -1,6 +1,8 @@
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import type { SuiAddress } from "../src";
+import { newAddress } from "../src";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { mergeContractStock } from "../src/mergeContractStock";
@@ -13,14 +15,13 @@ import {
   getQuantity,
   mintContractOptions,
   PACKAGE_ID,
-  USER1_ADDRESS,
-  USER1_PHRASE,
 } from "./test-helpers";
 
 describe("mergeContractStock", () => {
   let executor: Executor;
   const client = getClient();
   let contractId: string;
+  let user1: SuiAddress;
   beforeEach(async function () {
     executor = new SuiExecutor({
       suiClient: client,
@@ -29,6 +30,8 @@ describe("mergeContractStock", () => {
     });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
+
+    user1 = await newAddress();
   }, 20_000);
 
   it("should merge contract stocks", async () => {
@@ -38,7 +41,7 @@ describe("mergeContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 10,
       },
     ]);
@@ -49,14 +52,14 @@ describe("mergeContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 10,
       },
     ]);
 
     const user1Executor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
       packageId: PACKAGE_ID,
     });
     await mergeContractStock(user1Executor, [

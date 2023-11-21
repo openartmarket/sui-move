@@ -31,8 +31,8 @@ describe("splitTransferMerge", () => {
   });
 
   it("should transfer stocks and make sure everything is merged", async () => {
-    const user1 = await newAddress(20_000_000_000);
-    const user2 = await newAddress(20_000_000_000);
+    const user1 = await newAddress();
+    const user2 = await newAddress();
 
     await mintContractStock(executor, [
       // User 1 has bought stocks in 3 batches. Total: 9

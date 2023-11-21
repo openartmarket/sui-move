@@ -3,6 +3,8 @@ import assert from "node:assert";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import type { SuiAddress } from "../src";
+import { newAddress } from "../src";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
@@ -15,15 +17,16 @@ import {
   getQuantity,
   mintContractOptions,
   PACKAGE_ID,
-  USER1_ADDRESS,
-  USER2_ADDRESS,
-  USER3_ADDRESS,
 } from "./test-helpers";
 
 describe("mintContractStock", () => {
   let executor: Executor;
   const client = getClient();
   let contractId: string;
+
+  let user1: SuiAddress;
+  let user2: SuiAddress;
+  let user3: SuiAddress;
   beforeEach(async () => {
     executor = new SuiExecutor({
       suiClient: client,
@@ -32,6 +35,10 @@ describe("mintContractStock", () => {
     });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
+
+    user1 = await newAddress();
+    user2 = await newAddress();
+    user3 = await newAddress();
   });
 
   it("should issue new shares in batch", async () => {
@@ -40,18 +47,18 @@ describe("mintContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId: contractId2,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 20,
       },
       {
         adminCapId: ADMIN_CAP_ID,
         contractId: contractId2,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 10,
       },
-      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: USER1_ADDRESS, quantity: 2 },
-      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: USER2_ADDRESS, quantity: 3 },
-      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: USER3_ADDRESS, quantity: 5 },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: user1.address, quantity: 2 },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: user2.address, quantity: 3 },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: user3.address, quantity: 5 },
     ]);
 
     expect(await getQuantity(client, contractId)).toEqual(490);
@@ -65,7 +72,7 @@ describe("mintContractStock", () => {
           adminCapId: ADMIN_CAP_ID,
           contractId,
           quantity: 501,
-          receiverAddress: USER1_ADDRESS,
+          receiverAddress: user1.address,
         },
       ]),
     );
@@ -77,7 +84,7 @@ describe("mintContractStock", () => {
         adminCapId: ADMIN_CAP_ID,
         contractId,
         quantity: 498,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
       },
     ]);
 
@@ -86,7 +93,7 @@ describe("mintContractStock", () => {
         adminCapId: ADMIN_CAP_ID,
         contractId,
         quantity: 2,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
       },
     ]);
 
@@ -99,7 +106,7 @@ describe("mintContractStock", () => {
           adminCapId: ADMIN_CAP_ID,
           contractId,
           quantity: 1,
-          receiverAddress: USER1_ADDRESS,
+          receiverAddress: user1.address,
         },
       ]),
     );
@@ -111,14 +118,14 @@ describe("mintContractStock", () => {
         adminCapId: ADMIN_CAP_ID,
         contractId,
         quantity: 150,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
       },
     ]);
     await mintContractStock(executor, [
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER2_ADDRESS,
+        receiverAddress: user2.address,
         quantity: 250,
       },
     ]);
@@ -126,7 +133,7 @@ describe("mintContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 98,
       },
     ]);
@@ -138,7 +145,7 @@ describe("mintContractStock", () => {
         {
           adminCapId: ADMIN_CAP_ID,
           contractId,
-          receiverAddress: USER2_ADDRESS,
+          receiverAddress: user2.address,
           quantity: 3,
         },
       ]),
@@ -158,7 +165,7 @@ describe("mintContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 50,
       },
     ]);
@@ -166,7 +173,7 @@ describe("mintContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER2_ADDRESS,
+        receiverAddress: user2.address,
         quantity: 1,
       },
     ]);

@@ -15,7 +15,7 @@ export type SuiAddress = {
 /**
  * Creates a new address and transfers balance to it.
  */
-export async function newAddress(balance: number): Promise<SuiAddress> {
+export async function newAddress(balance = 20_000_000_000): Promise<SuiAddress> {
   const [address, phrase] = await execSui<[string, string, string]>(
     "sui client new-address ed25519 --json",
   );

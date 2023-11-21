@@ -2,7 +2,8 @@ import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
-import { endMotion } from "../src";
+import type { SuiAddress } from "../src";
+import { endMotion, newAddress } from "../src";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
@@ -16,16 +17,15 @@ import {
   getClient,
   mintContractOptions,
   PACKAGE_ID,
-  USER1_ADDRESS,
-  USER1_PHRASE,
-  USER2_ADDRESS,
-  USER3_PHRASE,
 } from "./test-helpers";
 
 describe("DAO Voting structure", () => {
   let executor: Executor;
   const client = getClient();
   let contractId: string;
+  let user1: SuiAddress;
+  let user2: SuiAddress;
+  let user3: SuiAddress;
 
   beforeEach(async function () {
     executor = new SuiExecutor({
@@ -35,6 +35,10 @@ describe("DAO Voting structure", () => {
     });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
+
+    user1 = await newAddress();
+    user2 = await newAddress();
+    user3 = await newAddress();
 
     await mintContractStock(executor, [
       {
@@ -48,7 +52,7 @@ describe("DAO Voting structure", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 249,
       },
     ]);
@@ -56,7 +60,7 @@ describe("DAO Voting structure", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER2_ADDRESS,
+        receiverAddress: user2.address,
         quantity: 100,
       },
     ]);
@@ -80,7 +84,7 @@ describe("DAO Voting structure", () => {
 
     const voterExecutor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
       packageId: PACKAGE_ID,
     });
     await vote(voterExecutor, {
@@ -99,7 +103,7 @@ describe("DAO Voting structure", () => {
 
     const voterExecutor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
       packageId: PACKAGE_ID,
     });
     await vote(voterExecutor, {
@@ -125,7 +129,7 @@ describe("DAO Voting structure", () => {
 
     const voterExecutor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER3_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user3.phrase),
       packageId: PACKAGE_ID,
     });
 
@@ -152,7 +156,7 @@ describe("DAO Voting structure", () => {
 
     const voterExecutor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
       packageId: PACKAGE_ID,
     });
 

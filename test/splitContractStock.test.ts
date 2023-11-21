@@ -1,6 +1,8 @@
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import type { SuiAddress } from "../src";
+import { newAddress } from "../src";
 import type { Executor } from "../src/Executor";
 import { SuiExecutor } from "../src/Executor";
 import { mintContract } from "../src/mintContract";
@@ -13,14 +15,13 @@ import {
   getQuantity,
   mintContractOptions,
   PACKAGE_ID,
-  USER1_ADDRESS,
-  USER1_PHRASE,
 } from "./test-helpers";
 
 describe("splitContractStock", () => {
   let executor: Executor;
   const client = getClient();
   let contractId: string;
+  let user1: SuiAddress;
   beforeEach(async function () {
     executor = new SuiExecutor({
       suiClient: client,
@@ -29,6 +30,8 @@ describe("splitContractStock", () => {
     });
     const res = await mintContract(executor, mintContractOptions);
     contractId = res.contractId;
+
+    user1 = await newAddress();
   }, 20_000);
 
   it("should split an contract stock", async () => {
@@ -38,14 +41,14 @@ describe("splitContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 10,
       },
     ]);
 
     const user1Executor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
       packageId: PACKAGE_ID,
     });
     const { splitContractStockId } = await splitContractStock(user1Executor, {
@@ -64,14 +67,14 @@ describe("splitContractStock", () => {
       {
         adminCapId: ADMIN_CAP_ID,
         contractId,
-        receiverAddress: USER1_ADDRESS,
+        receiverAddress: user1.address,
         quantity: 12,
       },
     ]);
 
     const user1Executor = new SuiExecutor({
       suiClient: client,
-      keypair: Ed25519Keypair.deriveKeypair(USER1_PHRASE),
+      keypair: Ed25519Keypair.deriveKeypair(user1.phrase),
       packageId: PACKAGE_ID,
     });
 

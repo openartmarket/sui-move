@@ -408,8 +408,10 @@ async function getSuiCoinObjectId() {
   const gas = await execSui("sui client gas --json");
   return gas[0].id.id;
 }
-async function newAddress(balance) {
-  const [address, phrase] = await execSui("sui client new-address ed25519 --json");
+async function newAddress(balance = 2e10) {
+  const [address, phrase] = await execSui(
+    "sui client new-address ed25519 --json"
+  );
   const suiCoinObjectId = await getSuiCoinObjectId();
   await transferSui({ to: address, suiCoinObjectId, amount: balance });
   return { address, phrase };
