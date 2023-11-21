@@ -1,6 +1,6 @@
 import { getCreatedObjects } from "./getters.js";
-import type { Wallet } from "./newWallet.js";
 import type { Currency } from "./types.js";
+import type { Wallet } from "./Wallet.js";
 
 export type MintContractParams = {
   adminCapId: string;

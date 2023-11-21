@@ -5,7 +5,7 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import type { GasStationClient, ShinamiWalletSigner } from "@shinami/clients";
 import { buildGaslessTransactionBytes } from "@shinami/clients";
 
-import type { BuildTransactionBlock, Wallet } from "./newWallet.js";
+import type { BuildTransactionBlock, Wallet } from "./Wallet.js";
 
 export type SuiWalletParams = {
   address: string;

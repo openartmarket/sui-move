@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
-import type { Wallet } from "../src/newWallet.js";
+import type { Wallet } from "../src/Wallet.js";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,

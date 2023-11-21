@@ -3,9 +3,9 @@ import type { SuiObjectData } from "@mysten/sui.js/client";
 import { getContractStocks } from "./getContractStocks.js";
 import type { MergeContractStockParam } from "./mergeContractStock.js";
 import { mergeContractStock } from "./mergeContractStock.js";
-import type { Wallet } from "./newWallet.js";
 import { splitContractStock } from "./splitContractStock.js";
 import { transferContractStock } from "./transferContractStock.js";
+import type { Wallet } from "./Wallet.js";
 
 export type SplitMergeTransferParams = {
   packageId: string;

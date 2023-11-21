@@ -1,4 +1,4 @@
-import type { Wallet } from "./newWallet.js";
+import type { Wallet } from "./Wallet.js";
 
 export type MergeContractStockParam = {
   toContractStockId: string;
