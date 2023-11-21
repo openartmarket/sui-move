@@ -80,8 +80,8 @@ declare function mintContractStock(executor: Wallet, params: MintContractStockPa
 
 type SplitMergeTransferParams = {
     packageId: string;
-    fromExecutor: Wallet;
-    toExecutor: Wallet;
+    fromWallet: Wallet;
+    toWallet: Wallet;
     contractId: string;
     fromAddress: string;
     toAddress: string;
@@ -97,7 +97,7 @@ type SplitMergeTransferResult = {
  * Takes care of splitting and merging so that aftet the transfer,
  * both addresses have a single stock.
  */
-declare function splitTransferMerge({ packageId, fromExecutor, toExecutor, contractId, fromAddress, toAddress, quantity, }: SplitMergeTransferParams): Promise<SplitMergeTransferResult>;
+declare function splitTransferMerge({ packageId, fromWallet, toWallet, contractId, fromAddress, toAddress, quantity, }: SplitMergeTransferParams): Promise<SplitMergeTransferResult>;
 
 type StartMotionParams = {
     adminCapId: string;

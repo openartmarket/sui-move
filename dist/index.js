@@ -222,15 +222,15 @@ async function transferContractStock(executor, params) {
 // src/splitTransferMerge.ts
 async function splitTransferMerge({
   packageId,
-  fromExecutor,
-  toExecutor,
+  fromWallet,
+  toWallet,
   contractId,
   fromAddress,
   toAddress,
   quantity
 }) {
   const fromContractStocks = await getContractStocks({
-    suiClient: fromExecutor.suiClient,
+    suiClient: fromWallet.suiClient,
     owner: fromAddress,
     contractId,
     packageId
@@ -238,19 +238,19 @@ async function splitTransferMerge({
   for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
     fromContractStocks
   )) {
-    await mergeContractStock(fromExecutor, [{ fromContractStockId, toContractStockId }]);
+    await mergeContractStock(fromWallet, [{ fromContractStockId, toContractStockId }]);
   }
-  const { splitContractStockId } = await splitContractStock(fromExecutor, {
+  const { splitContractStockId } = await splitContractStock(fromWallet, {
     contractStockId: fromContractStocks[0].objectId,
     quantity
   });
-  const { digest } = await transferContractStock(fromExecutor, {
+  const { digest } = await transferContractStock(fromWallet, {
     contractId,
     contractStockId: splitContractStockId,
     toAddress
   });
   const toContractStocks = await getContractStocks({
-    suiClient: toExecutor.suiClient,
+    suiClient: toWallet.suiClient,
     owner: toAddress,
     contractId,
     packageId
@@ -258,7 +258,7 @@ async function splitTransferMerge({
   for (const { fromContractStockId, toContractStockId } of makeMergeContractStockParams(
     toContractStocks
   )) {
-    await mergeContractStock(toExecutor, [{ fromContractStockId, toContractStockId }]);
+    await mergeContractStock(toWallet, [{ fromContractStockId, toContractStockId }]);
   }
   return {
     digest,
@@ -416,7 +416,6 @@ function checkResponse(response) {
   if (status.status !== "success") {
     throw new Error(`Transaction failed with status: ${status}`);
   }
-  console.log("Transaction successful!", { response });
   return response;
 }
 
