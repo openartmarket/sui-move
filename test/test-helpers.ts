@@ -10,7 +10,6 @@ import { newWallet } from "../src/Wallet.js";
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
 export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
 
-const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
 
 export async function makeWallet(isAdmin = false): Promise<Wallet> {
@@ -38,6 +37,7 @@ export async function makeWallet(isAdmin = false): Promise<Wallet> {
       suiAddress = await newSuiAddress();
     }
     const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
+    const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
     return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, keypair });
   }
 }

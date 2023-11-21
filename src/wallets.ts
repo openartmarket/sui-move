@@ -120,6 +120,5 @@ function checkResponse(response: SuiTransactionBlockResponse): SuiTransactionBlo
   if (status.status !== "success") {
     throw new Error(`Transaction failed with status: ${status}`);
   }
-  console.log("Transaction successful!", { response });
   return response;
 }
