@@ -20,13 +20,12 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  ShinamiExecutor: () => ShinamiExecutor,
-  SuiExecutor: () => SuiExecutor,
   endMotion: () => endMotion,
   getContractStocks: () => getContractStocks,
   mintContract: () => mintContract,
   mintContractStock: () => mintContractStock,
   newSuiAddress: () => newSuiAddress,
+  newWallet: () => newWallet,
   splitTransferMerge: () => splitTransferMerge,
   startMotion: () => startMotion,
   toContractStock: () => toContractStock,
@@ -45,79 +44,6 @@ async function endMotion(executor, params) {
   });
   const { digest } = response;
   return { digest };
-}
-
-// src/Executor.ts
-var import_bcs = require("@mysten/bcs");
-var import_transactions = require("@mysten/sui.js/transactions");
-var import_clients = require("@shinami/clients");
-var SuiExecutor = class {
-  constructor(params) {
-    this.params = params;
-    this.suiClient = params.suiClient;
-  }
-  suiClient;
-  async execute(build) {
-    const txb = new import_transactions.TransactionBlock();
-    const { suiClient, packageId, keypair } = this.params;
-    await build(txb, packageId);
-    const response = await suiClient.signAndExecuteTransactionBlock({
-      signer: keypair,
-      transactionBlock: txb,
-      requestType: "WaitForLocalExecution",
-      options: {
-        showObjectChanges: true,
-        showEffects: true
-      }
-    });
-    return checkResponse(response);
-  }
-};
-var SUI_GAS_FEE_LIMIT = 5e6;
-var ShinamiExecutor = class {
-  constructor(params) {
-    this.params = params;
-    this.suiClient = params.suiClient;
-  }
-  suiClient;
-  async execute(build) {
-    const { suiClient, gasClient, packageId, onBehalfOf, signer } = this.params;
-    const gaslessTx = await (0, import_clients.buildGaslessTransactionBytes)({
-      sui: suiClient,
-      build: (txb) => build(txb, packageId)
-    });
-    const { txBytes, signature: gasSignature } = await gasClient.sponsorTransactionBlock(
-      gaslessTx,
-      onBehalfOf,
-      SUI_GAS_FEE_LIMIT
-    );
-    const { signature } = await signer.signTransactionBlock((0, import_bcs.fromB64)(txBytes));
-    const signatures = [signature, gasSignature];
-    const response = await suiClient.executeTransactionBlock({
-      transactionBlock: txBytes,
-      signature: signatures,
-      requestType: "WaitForLocalExecution",
-      options: {
-        showObjectChanges: true,
-        showEffects: true
-      }
-    });
-    return checkResponse(response);
-  }
-};
-function checkResponse(response) {
-  const { effects } = response;
-  if (!effects) {
-    throw new Error("Failed to get execution effects");
-  }
-  const { status } = effects;
-  if (status.error) {
-    throw new Error(status.error);
-  }
-  if (status.status !== "success") {
-    throw new Error(`Transaction failed with status: ${status}`);
-  }
-  return response;
 }
 
 // src/getters.ts
@@ -466,15 +392,142 @@ async function vote(executor, params) {
   const { digest } = response;
   return { digest };
 }
+
+// src/wallet.ts
+var import_client = require("@mysten/sui.js/client");
+var import_ed25519 = require("@mysten/sui.js/keypairs/ed25519");
+var import_clients2 = require("@shinami/clients");
+
+// src/executors.ts
+var import_bcs = require("@mysten/bcs");
+var import_transactions = require("@mysten/sui.js/transactions");
+var import_clients = require("@shinami/clients");
+var SuiExecutor = class {
+  constructor(params) {
+    this.params = params;
+    this.suiClient = params.suiClient;
+  }
+  suiClient;
+  async execute(build) {
+    const txb = new import_transactions.TransactionBlock();
+    const { suiClient, packageId, keypair } = this.params;
+    await build(txb, packageId);
+    const response = await suiClient.signAndExecuteTransactionBlock({
+      signer: keypair,
+      transactionBlock: txb,
+      requestType: "WaitForLocalExecution",
+      options: {
+        showObjectChanges: true,
+        showEffects: true
+      }
+    });
+    return checkResponse(response);
+  }
+};
+var SUI_GAS_FEE_LIMIT = 5e6;
+var ShinamiExecutor = class {
+  constructor(params) {
+    this.params = params;
+    this.suiClient = params.suiClient;
+  }
+  suiClient;
+  async execute(build) {
+    const { suiClient, gasClient, packageId, onBehalfOf, signer } = this.params;
+    const gaslessTx = await (0, import_clients.buildGaslessTransactionBytes)({
+      sui: suiClient,
+      build: (txb) => build(txb, packageId)
+    });
+    const { txBytes, signature: gasSignature } = await gasClient.sponsorTransactionBlock(
+      gaslessTx,
+      onBehalfOf,
+      SUI_GAS_FEE_LIMIT
+    );
+    const { signature } = await signer.signTransactionBlock((0, import_bcs.fromB64)(txBytes));
+    const signatures = [signature, gasSignature];
+    const response = await suiClient.executeTransactionBlock({
+      transactionBlock: txBytes,
+      signature: signatures,
+      requestType: "WaitForLocalExecution",
+      options: {
+        showObjectChanges: true,
+        showEffects: true
+      }
+    });
+    return checkResponse(response);
+  }
+};
+function checkResponse(response) {
+  const { effects } = response;
+  if (!effects) {
+    throw new Error("Failed to get execution effects");
+  }
+  const { status } = effects;
+  if (status.error) {
+    throw new Error(status.error);
+  }
+  if (status.status !== "success") {
+    throw new Error(`Transaction failed with status: ${status}`);
+  }
+  return response;
+}
+
+// src/wallet.ts
+async function newWallet(params) {
+  switch (params.type) {
+    case "sui": {
+      const { network, packageId } = params;
+      const url = (0, import_client.getFullnodeUrl)(network);
+      const suiClient = new import_client.SuiClient({ url });
+      let { suiAddress } = params;
+      if (!suiAddress) {
+        suiAddress = await newSuiAddress();
+      }
+      const keypair = import_ed25519.Ed25519Keypair.deriveKeypair(suiAddress.phrase);
+      const executor = new SuiExecutor({
+        packageId,
+        suiClient,
+        keypair
+      });
+      return new WalletImpl(suiAddress.address, executor);
+    }
+    case "shinami": {
+      const { packageId, network, shinamiAccessKey, walletId, walletSecret } = params;
+      const url = (0, import_client.getFullnodeUrl)(network);
+      const suiClient = new import_client.SuiClient({ url });
+      const gasClient = new import_clients2.GasStationClient(shinamiAccessKey);
+      const walletClient = new import_clients2.WalletClient(shinamiAccessKey);
+      const keyClient = new import_clients2.KeyClient(shinamiAccessKey);
+      const signer = new import_clients2.ShinamiWalletSigner(walletId, walletClient, walletSecret, keyClient);
+      let { address } = params;
+      if (!address) {
+        const sessionToken = await keyClient.createSession(walletSecret);
+        address = await walletClient.createWallet(walletId, sessionToken);
+      }
+      const executor = new ShinamiExecutor({
+        suiClient,
+        gasClient,
+        packageId,
+        onBehalfOf: address,
+        signer
+      });
+      return new WalletImpl(address, executor);
+    }
+  }
+}
+var WalletImpl = class {
+  constructor(address, executor) {
+    this.address = address;
+    this.executor = executor;
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  ShinamiExecutor,
-  SuiExecutor,
   endMotion,
   getContractStocks,
   mintContract,
   mintContractStock,
   newSuiAddress,
+  newWallet,
   splitTransferMerge,
   startMotion,
   toContractStock,

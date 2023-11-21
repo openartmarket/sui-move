@@ -1,4 +1,4 @@
-import type { Executor } from "./Executor";
+import type { Executor } from "./Executor.js";
 
 export type TransferContractStockParams = {
   contractId: string;

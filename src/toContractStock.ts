@@ -1,6 +1,6 @@
 import type { SuiObjectData } from "@mysten/sui.js/client";
 
-import { getIntField, getParsedData, getStringField } from "./getters";
+import { getIntField, getParsedData, getStringField } from "./getters.js";
 
 export type ContractStock = {
   contractStockId: string;

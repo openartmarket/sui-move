@@ -1,6 +1,6 @@
-import type { Executor } from "./Executor";
-import { getCreatedObjects } from "./getters";
-import type { Currency } from "./types";
+import type { Executor } from "./Executor.js";
+import { getCreatedObjects } from "./getters.js";
+import type { Currency } from "./types.js";
 
 export type MintContractParams = {
   adminCapId: string;

@@ -1,11 +1,11 @@
 import type { SuiObjectData } from "@mysten/sui.js/client";
 
-import type { Executor } from "./Executor";
-import { getContractStocks } from "./getContractStocks";
-import type { MergeContractStockParam } from "./mergeContractStock";
-import { mergeContractStock } from "./mergeContractStock";
-import { splitContractStock } from "./splitContractStock";
-import { transferContractStock } from "./transferContractStock";
+import type { Executor } from "./Executor.js";
+import { getContractStocks } from "./getContractStocks.js";
+import type { MergeContractStockParam } from "./mergeContractStock.js";
+import { mergeContractStock } from "./mergeContractStock.js";
+import { splitContractStock } from "./splitContractStock.js";
+import { transferContractStock } from "./transferContractStock.js";
 
 export type SplitMergeTransferParams = {
   packageId: string;

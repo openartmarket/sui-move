@@ -1,5 +1,5 @@
-import type { Executor } from "./Executor";
-import { getCreatedObjects } from "./getters";
+import type { Executor } from "./Executor.js";
+import { getCreatedObjects } from "./getters.js";
 
 export type StartMotionParams = {
   adminCapId: string;
