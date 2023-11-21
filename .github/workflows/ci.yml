@@ -54,4 +54,3 @@ jobs:
         ADMIN_ADDRESS: ${{secrets.ADMIN_ADDRESS}}
         ADMIN_PHRASE: ${{secrets.ADMIN_PHRASE}}
         SHINAMI_ACCESS_KEY: ${{secrets.SHINAMI_ACCESS_KEY}}
-        SUI_NETWORK: 'testnet'
