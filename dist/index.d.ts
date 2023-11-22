@@ -36,7 +36,7 @@ type EndMotionParams = {
 type EndMotionResult = {
     digest: string;
 };
-declare function endMotion(executor: Wallet, params: EndMotionParams): Promise<EndMotionResult>;
+declare function endMotion(wallet: Wallet, params: EndMotionParams): Promise<EndMotionResult>;
 
 type GetContractStocksParams = {
     suiClient: SuiClient;
@@ -66,7 +66,7 @@ type MintContractResult = {
     contractId: string;
     digest: string;
 };
-declare function mintContract(executor: Wallet, params: MintContractParams): Promise<MintContractResult>;
+declare function mintContract(wallet: Wallet, params: MintContractParams): Promise<MintContractResult>;
 
 type MintContractStockParam = {
     adminCapId: string;
@@ -78,15 +78,13 @@ type MintContractStockResult = {
     contractStockIds: readonly string[];
     digest: string;
 };
-declare function mintContractStock(executor: Wallet, params: MintContractStockParam[]): Promise<MintContractStockResult>;
+declare function mintContractStock(wallet: Wallet, params: MintContractStockParam[]): Promise<MintContractStockResult>;
 
 type SplitMergeTransferParams = {
     packageId: string;
     fromWallet: Wallet;
     toWallet: Wallet;
     contractId: string;
-    fromAddress: string;
-    toAddress: string;
     quantity: number;
 };
 type SplitMergeTransferResult = {
@@ -99,7 +97,7 @@ type SplitMergeTransferResult = {
  * Takes care of splitting and merging so that aftet the transfer,
  * both addresses have a single stock.
  */
-declare function splitTransferMerge({ packageId, fromWallet, toWallet, contractId, fromAddress, toAddress, quantity, }: SplitMergeTransferParams): Promise<SplitMergeTransferResult>;
+declare function splitTransferMerge({ packageId, fromWallet, toWallet, contractId, quantity, }: SplitMergeTransferParams): Promise<SplitMergeTransferResult>;
 
 type StartMotionParams = {
     adminCapId: string;
@@ -113,7 +111,7 @@ type StartMotionResult = {
     digest: string;
     motionId: string;
 };
-declare function startMotion(executor: Wallet, params: StartMotionParams): Promise<StartMotionResult>;
+declare function startMotion(wallet: Wallet, params: StartMotionParams): Promise<StartMotionResult>;
 
 type ContractStock = {
     contractStockId: string;
@@ -132,6 +130,6 @@ type VoteParams = {
 type VoteResult = {
     digest: string;
 };
-declare function vote(executor: Wallet, params: VoteParams): Promise<VoteResult>;
+declare function vote(wallet: Wallet, params: VoteParams): Promise<VoteResult>;
 
 export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newWallet, splitTransferMerge, startMotion, toContractStock, vote };

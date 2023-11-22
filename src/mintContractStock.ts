@@ -14,10 +14,10 @@ export type MintContractStockResult = {
 };
 
 export async function mintContractStock(
-  executor: Wallet,
+  wallet: Wallet,
   params: MintContractStockParam[],
 ): Promise<MintContractStockResult> {
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     for (const { adminCapId, contractId, quantity, receiverAddress } of params) {
       txb.moveCall({
         target: `${packageId}::open_art_market::mint_contract_stock`,

@@ -9,12 +9,9 @@ export type EndMotionResult = {
   digest: string;
 };
 
-export async function endMotion(
-  executor: Wallet,
-  params: EndMotionParams,
-): Promise<EndMotionResult> {
+export async function endMotion(wallet: Wallet, params: EndMotionParams): Promise<EndMotionResult> {
   const { adminCapId, motionId } = params;
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::end_vote`,
       arguments: [txb.object(adminCapId), txb.object(motionId)],

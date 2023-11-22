@@ -12,8 +12,6 @@ export type SplitMergeTransferParams = {
   fromWallet: Wallet;
   toWallet: Wallet;
   contractId: string;
-  fromAddress: string;
-  toAddress: string;
   quantity: number;
 };
 
@@ -33,13 +31,11 @@ export async function splitTransferMerge({
   fromWallet,
   toWallet,
   contractId,
-  fromAddress,
-  toAddress,
   quantity,
 }: SplitMergeTransferParams): Promise<SplitMergeTransferResult> {
   const fromContractStocks = await getContractStocks({
     suiClient: fromWallet.suiClient,
-    owner: fromAddress,
+    owner: fromWallet.address,
     contractId,
     packageId,
   });
@@ -55,12 +51,12 @@ export async function splitTransferMerge({
   const { digest } = await transferContractStock(fromWallet, {
     contractId,
     contractStockId: splitContractStockId,
-    toAddress,
+    toAddress: toWallet.address,
   });
 
   const toContractStocks = await getContractStocks({
     suiClient: toWallet.suiClient,
-    owner: toAddress,
+    owner: toWallet.address,
     contractId,
     packageId,
   });

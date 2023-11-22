@@ -16,11 +16,11 @@ export type StartMotionResult = {
 };
 
 export async function startMotion(
-  executor: Wallet,
+  wallet: Wallet,
   params: StartMotionParams,
 ): Promise<StartMotionResult> {
   const { adminCapId, contractId, motion } = params;
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::start_vote`,
       arguments: [txb.object(adminCapId), txb.pure(contractId), txb.pure(motion)],

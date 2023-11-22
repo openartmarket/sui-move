@@ -12,10 +12,10 @@ export type SplitContractStockResult = {
 };
 
 export async function splitContractStock(
-  executor: Wallet,
+  wallet: Wallet,
   params: SplitContractStockParams,
 ): Promise<SplitContractStockResult> {
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     const { contractStockId, quantity } = params;
     txb.moveCall({
       target: `${packageId}::open_art_market::split_contract_stock`,

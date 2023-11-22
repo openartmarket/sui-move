@@ -63,8 +63,6 @@ describe("splitTransferMerge", () => {
       fromWallet: fromWallet,
       toWallet: toWallet,
       contractId,
-      fromAddress: fromWallet.address,
-      toAddress: toWallet.address,
       quantity: 2,
     });
 

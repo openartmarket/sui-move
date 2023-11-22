@@ -11,10 +11,10 @@ export type TransferContractStockResult = {
 };
 
 export async function transferContractStock(
-  executor: Wallet,
+  wallet: Wallet,
   params: TransferContractStockParams,
 ): Promise<TransferContractStockResult> {
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     const { contractId, contractStockId, toAddress } = params;
     txb.moveCall({
       target: `${packageId}::open_art_market::transfer_contract_stock`,

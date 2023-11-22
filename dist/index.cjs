@@ -33,9 +33,9 @@ __export(src_exports, {
 module.exports = __toCommonJS(src_exports);
 
 // src/endMotion.ts
-async function endMotion(executor, params) {
+async function endMotion(wallet, params) {
   const { adminCapId, motionId } = params;
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::end_vote`,
       arguments: [txb.object(adminCapId), txb.object(motionId)]
@@ -141,7 +141,7 @@ async function getContractStocks(params) {
 }
 
 // src/mintContract.ts
-async function mintContract(executor, params) {
+async function mintContract(wallet, params) {
   const {
     adminCapId,
     totalShareCount,
@@ -154,7 +154,7 @@ async function mintContract(executor, params) {
     currency,
     image
   } = params;
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::open_art_market::mint_contract`,
       arguments: [
@@ -180,8 +180,8 @@ async function mintContract(executor, params) {
 }
 
 // src/mintContractStock.ts
-async function mintContractStock(executor, params) {
-  const response = await executor.execute(async (txb, packageId) => {
+async function mintContractStock(wallet, params) {
+  const response = await wallet.execute(async (txb, packageId) => {
     for (const { adminCapId, contractId, quantity, receiverAddress } of params) {
       txb.moveCall({
         target: `${packageId}::open_art_market::mint_contract_stock`,
@@ -208,8 +208,8 @@ async function mintContractStock(executor, params) {
 }
 
 // src/mergeContractStock.ts
-async function mergeContractStock(executor, params) {
-  const response = await executor.execute(async (txb, packageId) => {
+async function mergeContractStock(wallet, params) {
+  const response = await wallet.execute(async (txb, packageId) => {
     for (const { toContractStockId, fromContractStockId } of params) {
       txb.moveCall({
         target: `${packageId}::open_art_market::merge_contract_stocks`,
@@ -222,8 +222,8 @@ async function mergeContractStock(executor, params) {
 }
 
 // src/splitContractStock.ts
-async function splitContractStock(executor, params) {
-  const response = await executor.execute(async (txb, packageId) => {
+async function splitContractStock(wallet, params) {
+  const response = await wallet.execute(async (txb, packageId) => {
     const { contractStockId, quantity } = params;
     txb.moveCall({
       target: `${packageId}::open_art_market::split_contract_stock`,
@@ -241,8 +241,8 @@ async function splitContractStock(executor, params) {
 }
 
 // src/transferContractStock.ts
-async function transferContractStock(executor, params) {
-  const response = await executor.execute(async (txb, packageId) => {
+async function transferContractStock(wallet, params) {
+  const response = await wallet.execute(async (txb, packageId) => {
     const { contractId, contractStockId, toAddress } = params;
     txb.moveCall({
       target: `${packageId}::open_art_market::transfer_contract_stock`,
@@ -259,13 +259,11 @@ async function splitTransferMerge({
   fromWallet,
   toWallet,
   contractId,
-  fromAddress,
-  toAddress,
   quantity
 }) {
   const fromContractStocks = await getContractStocks({
     suiClient: fromWallet.suiClient,
-    owner: fromAddress,
+    owner: fromWallet.address,
     contractId,
     packageId
   });
@@ -281,11 +279,11 @@ async function splitTransferMerge({
   const { digest } = await transferContractStock(fromWallet, {
     contractId,
     contractStockId: splitContractStockId,
-    toAddress
+    toAddress: toWallet.address
   });
   const toContractStocks = await getContractStocks({
     suiClient: toWallet.suiClient,
-    owner: toAddress,
+    owner: toWallet.address,
     contractId,
     packageId
   });
@@ -309,9 +307,9 @@ function makeMergeContractStockParams(contractStocks) {
 }
 
 // src/startMotion.ts
-async function startMotion(executor, params) {
+async function startMotion(wallet, params) {
   const { adminCapId, contractId, motion } = params;
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::start_vote`,
       arguments: [txb.object(adminCapId), txb.pure(contractId), txb.pure(motion)]
@@ -340,9 +338,9 @@ function toContractStock(objectData) {
 }
 
 // src/vote.ts
-async function vote(executor, params) {
+async function vote(wallet, params) {
   const { contractId, motionId, choice } = params;
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::vote`,
       arguments: [txb.object(contractId), txb.object(motionId), txb.pure(choice)]

@@ -10,9 +10,9 @@ export type VoteResult = {
   digest: string;
 };
 
-export async function vote(executor: Wallet, params: VoteParams): Promise<VoteResult> {
+export async function vote(wallet: Wallet, params: VoteParams): Promise<VoteResult> {
   const { contractId, motionId, choice } = params;
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::vote`,
       arguments: [txb.object(contractId), txb.object(motionId), txb.pure(choice)],

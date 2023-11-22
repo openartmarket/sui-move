@@ -10,10 +10,10 @@ export type MergeContractStockResult = {
 };
 
 export async function mergeContractStock(
-  executor: Wallet,
+  wallet: Wallet,
   params: readonly MergeContractStockParam[],
 ): Promise<MergeContractStockResult> {
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     for (const { toContractStockId, fromContractStockId } of params) {
       txb.moveCall({
         target: `${packageId}::open_art_market::merge_contract_stocks`,

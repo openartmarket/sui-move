@@ -31,12 +31,12 @@ export const ContractStockFields = {
 };
 
 export async function createDisplay(
-  executor: Wallet,
+  wallet: Wallet,
   params: CreateDisplayParams,
 ): Promise<CreateDisplayResult> {
   const { publisherId, fields, type, address } = params;
 
-  const response = await executor.execute(async (txb, packageId) => {
+  const response = await wallet.execute(async (txb, packageId) => {
     const typeArgument = `${packageId}::open_art_market::${type}`;
 
     const keys = Object.keys(fields);
