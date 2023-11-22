@@ -1,35 +1,33 @@
-import { createContractDisplay } from "../src/contract_display";
-import { createContractStockDisplay } from "../src/contract_stock_display";
-import { NetworkName } from "../src/types";
-import {
-  ADMIN_PHRASE,
-  CONTRACT_STOCK_TYPE,
-  CONTRACT_TYPE,
-  getClient,
-  getEnv,
-  PUBLISHER_ID,
-} from "../test/test-helpers";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 
-const SUI_NETWORK_NAME = getEnv("SUI_NETWORK");
+import { ContractFields, ContractStockFields, createDisplay } from "../src/createDisplay.js";
+import { adminWallet, getEnv } from "../test/test-helpers.js";
+
+const PUBLISHER_ID = getEnv("PUBLISHER_ID");
+const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
 
 async function main() {
-  console.log("👉 Creating contract and stock display on", SUI_NETWORK_NAME);
-  const client = getClient();
+  const keypair = Ed25519Keypair.deriveKeypair(ADMIN_PHRASE);
+  const address = keypair.getPublicKey().toSuiAddress();
 
-  await createContractDisplay(client, {
-    adminPhrase: ADMIN_PHRASE,
-    contractType: CONTRACT_TYPE,
+  await createDisplay(adminWallet, {
     publisherId: PUBLISHER_ID,
-    SUI_NETWORK: SUI_NETWORK_NAME as NetworkName,
+    address,
+    fields: ContractFields,
+    type: "Contract",
   });
-  await createContractStockDisplay(client, {
-    adminPhrase: ADMIN_PHRASE,
-    contractStockType: CONTRACT_STOCK_TYPE,
+
+  await createDisplay(adminWallet, {
     publisherId: PUBLISHER_ID,
-    SUI_NETWORK: SUI_NETWORK_NAME as NetworkName,
+    address,
+    fields: ContractStockFields,
+    type: "ContractStock",
   });
 
   console.log("✅ Displays created successfully!");
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -14,7 +14,7 @@ sui client switch --address "$ADMIN_ADDRESS"
 rm -rf tmp
 mkdir -p tmp
 # Publish the contracts
-sui client publish --gas-budget 200000000 --json ./move/open_art_market > tmp/publish.res.json
+sui client publish --gas-budget 200000000 --json --skip-fetch-latest-git-deps ./move/open_art_market > tmp/publish.res.json
 
 # Collect the relevant data from the response
 cat tmp/publish.res.json | jq -r '.objectChanges[] | select(.type == "created")' > tmp/changes.res.json

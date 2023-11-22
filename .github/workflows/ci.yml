@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-test:
+  test-sui-localnet:
     runs-on: oam-runners
     steps:
     - uses: actions/checkout@v3
@@ -24,8 +24,6 @@ jobs:
     - run: npm ci
     - run: direnv exec . ./scripts/publish-contracts.sh
     - run: direnv exec . npm test
-    - run: npm run format
-    - run: npm run lint
     - run: npm run compile
     - run: ./scripts/fail-if-dirty
     - name: Print environment variables
@@ -40,6 +38,19 @@ jobs:
       run: |
         sudo kill -9 $(ps aux | grep sui | grep -v grep | awk '{print $2}')
       if: ${{ always() }}
-    
-
-    
+  test-shinami-testnet:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: "18"
+    - run: npm ci
+    - run: npm test
+      env:
+        SHINAMI_ENABLED: "1"
+        ADMIN_CAP_ID: ${{secrets.ADMIN_CAP_ID}}
+        PACKAGE_ID: ${{secrets.PACKAGE_ID}}
+        ADMIN_ADDRESS: ${{secrets.ADMIN_ADDRESS}}
+        ADMIN_PHRASE: ${{secrets.ADMIN_PHRASE}}
+        SHINAMI_ACCESS_KEY: ${{secrets.SHINAMI_ACCESS_KEY}}

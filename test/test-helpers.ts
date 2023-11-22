@@ -1,66 +1,67 @@
-import {
-  getFullnodeUrl,
-  PaginatedObjectsResponse,
-  SuiClient,
-  SuiObjectResponse,
-} from "@mysten/sui.js/client";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import { KeyClient, WalletClient } from "@shinami/clients";
+import { randomUUID } from "crypto";
 
-import { MintContractParams, NetworkName } from "../src/types";
+import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
+import type { MintContractParams } from "../src/mintContract.js";
+import { newSuiAddress, type SuiAddress } from "../src/sui.js";
+import type { NetworkName } from "../src/types.js";
+import type { Wallet } from "../src/Wallet.js";
+import { newWallet } from "../src/Wallet.js";
 
-export const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
-export const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
-export const USER1_PHRASE = getEnv("USER1_PHRASE");
-export const USER2_PHRASE = getEnv("USER2_PHRASE");
-export const USER3_PHRASE = getEnv("USER3_PHRASE");
 export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
-export const USER1_ADDRESS = getEnv("USER1_ADDRESS");
-export const USER2_ADDRESS = getEnv("USER2_ADDRESS");
-export const USER3_ADDRESS = getEnv("USER3_ADDRESS");
+export const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
 
-export const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
-export const CONTRACT_TYPE = `${PACKAGE_ID}::open_art_market::Contract`;
-export const CONTRACT_STOCK_TYPE = `${PACKAGE_ID}::open_art_market::ContractStock`;
 
-export function getClient(): SuiClient {
-  const url = getFullnodeUrl(SUI_NETWORK);
-  return new SuiClient({ url });
+export async function makeWallet(isAdmin = false): Promise<Wallet> {
+  if (process.env.SHINAMI_ENABLED) {
+    const shinamiAccessKey = getEnv("SHINAMI_ACCESS_KEY");
+
+    const walletClient = new WalletClient(shinamiAccessKey);
+    if (isAdmin) {
+      return newWallet({
+        type: "shinami",
+        packageId: PACKAGE_ID,
+        shinamiAccessKey,
+        keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
+      });
+    } else {
+      const secret = randomUUID();
+      const walletId = randomUUID();
+      const keyClient = new KeyClient(shinamiAccessKey);
+      const sessionToken = await keyClient.createSession(secret);
+      const address = await walletClient.createWallet(walletId, sessionToken);
+      return newWallet({
+        type: "shinami-sponsored",
+        packageId: PACKAGE_ID,
+        shinamiAccessKey,
+        address,
+        secret,
+        walletId,
+      });
+    }
+  } else {
+    let suiAddress: SuiAddress;
+    if (isAdmin) {
+      suiAddress = {
+        address: ADMIN_ADDRESS,
+        phrase: ADMIN_PHRASE,
+      };
+    } else {
+      suiAddress = await newSuiAddress();
+    }
+    const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
+    const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
+    return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, keypair });
+  }
 }
 
-export async function getObject(objectId: string): Promise<SuiObjectResponse> {
-  return await getClient().getObject({
-    id: objectId,
-    options: { showContent: true },
-  });
-}
-
-export async function getOwnedObjects(address: string): Promise<PaginatedObjectsResponse> {
-  return await getClient().getOwnedObjects({
-    owner: address,
-  });
-}
-
-export function getProvider(SUI_NETWORK: NetworkName) {
-  return new SuiClient({ url: getFullnodeUrl(SUI_NETWORK) });
-}
-
-export function getEnv(name: string): string {
-  const value = process.env[name];
-  if (!value && name.match(/^USER/)) return "";
-  if (!value) throw new Error(`Missing env variable ${name}`);
-  return value;
-}
-export const provider = getProvider(SUI_NETWORK as NetworkName);
-
-export const baseOptions = {
-  signerPhrase: ADMIN_PHRASE,
-  packageId: PACKAGE_ID,
-  adminCapId: ADMIN_CAP_ID,
-};
+export const adminWallet = await makeWallet(true);
 
 export const mintContractOptions: MintContractParams = {
-  ...baseOptions,
+  adminCapId: ADMIN_CAP_ID,
   totalShareCount: 500,
   sharePrice: 10,
   outgoingPrice: 100,
@@ -71,3 +72,23 @@ export const mintContractOptions: MintContractParams = {
   currency: "USD",
   image: "reference-id-for-contract",
 };
+
+/**
+ * Get the quantity of a contract or a contract stock.
+ */
+export async function getQuantity(wallet: Wallet, id: string): Promise<number> {
+  const { suiClient } = wallet;
+  const response = await suiClient.getObject({
+    id,
+    options: { showContent: true },
+  });
+  const objectData = getObjectData(response);
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
+
+export function getEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing env variable ${name}`);
+  return value;
+}

@@ -1,94 +1,55 @@
-import assert from "assert";
-import { beforeEach, describe, it } from "mocha";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import { OwnedObjectList } from "../src";
-import { mintContract } from "../src/contract";
-import { mintContractStock } from "../src/contract_stock";
-import { findObjectIdInOwnedObjectList } from "../src/findObjectIdWithOwnerAddress";
-import { splitContractStock } from "../src/split_contract_stock";
-import { transferContractStock } from "../src/transfer_contract_stock";
+import { getContractStocks } from "../src/getContractStocks.js";
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import { transferContractStock } from "../src/transferContractStock.js";
+import type { Wallet } from "../src/Wallet.js";
 import {
-  baseOptions,
-  getClient,
-  getObject,
-  getOwnedObjects,
+  ADMIN_CAP_ID,
+  adminWallet,
+  makeWallet,
   mintContractOptions,
-  USER1_ADDRESS,
-  USER1_PHRASE,
-  USER2_ADDRESS,
-  USER2_PHRASE,
+  PACKAGE_ID,
 } from "./test-helpers";
 
 describe("transferContractStock", () => {
-  const client = getClient();
   let contractId: string;
+  let fromWallet: Wallet;
+  let toWallet: Wallet;
   beforeEach(async () => {
-    contractId = await mintContract(client, mintContractOptions);
-  });
+    const res = await mintContract(adminWallet, mintContractOptions);
+    contractId = res.contractId;
 
-  it("should mint a stock and then transfer it", async () => {
-    const { contractStockId } = await mintContractStock(client, {
-      ...baseOptions,
-      contractId,
-      receiverAddress: USER1_ADDRESS,
-      shares: 12,
-    });
+    fromWallet = await makeWallet();
+    toWallet = await makeWallet();
+  }, 30_000);
 
-    await transferContractStock(client, {
-      ...baseOptions,
+  it("should transfer ownership", async () => {
+    const {
+      contractStockIds: [contractStockId],
+    } = await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: fromWallet.address,
+        quantity: 12,
+      },
+    ]);
+
+    await transferContractStock(fromWallet, {
       contractId,
       contractStockId,
-      signerPhrase: USER1_PHRASE,
-      receiverAddress: USER2_ADDRESS,
+      toAddress: toWallet.address,
     });
 
-    const transferredStock = await getObject(contractStockId);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(transferredStock.data.content.fields.shares, "12");
-  }).timeout(30_000);
-
-  it("should split a split stock and transfer it to new owner", async () => {
-    const { contractStockId } = await mintContractStock(client, {
-      ...baseOptions,
+    const contractStocks = await getContractStocks({
+      suiClient: fromWallet.suiClient,
+      owner: toWallet.address,
       contractId,
-      receiverAddress: USER2_ADDRESS,
-      shares: 12,
+      packageId: PACKAGE_ID,
     });
-
-    const splitStockId1 = await splitContractStock(client, {
-      ...baseOptions,
-      contractStockId,
-      signerPhrase: USER2_PHRASE,
-      shares: 5,
-    });
-
-    const oldStock = await getObject(contractStockId);
-    const splitStock = await getObject(splitStockId1.contractStockId);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(oldStock.data.content.fields.shares, "7");
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(splitStock.data.content.fields.shares, "5");
-
-    const transferContractStockResponse = await transferContractStock(client, {
-      ...baseOptions,
-      contractId,
-      contractStockId: splitStockId1.contractStockId,
-      signerPhrase: USER2_PHRASE,
-      receiverAddress: USER1_ADDRESS,
-    });
-
-    const ownedObjects = await getOwnedObjects(transferContractStockResponse.owner);
-
-    const transferredStock = findObjectIdInOwnedObjectList(
-      ownedObjects as OwnedObjectList,
-      splitStockId1.contractStockId,
-    );
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(transferredStock.data.objectId, splitStockId1.contractStockId);
-  }).timeout(30_000);
+    expect(contractStocks).toHaveLength(1);
+    expect(contractStocks[0].objectId).toEqual(contractStockId);
+  }, 30_000);
 });

@@ -1,147 +1,138 @@
 import assert from "assert";
-import { before, describe, it } from "mocha";
+import { beforeEach, describe, it } from "vitest";
 
-import { mintContract } from "../src/contract";
-import { mintContractStock } from "../src/contract_stock";
-import { endRequestVoting } from "../src/end_request_voting";
-import { vote } from "../src/vote";
-import { createVoteRequest } from "../src/vote_request";
+import { endMotion } from "../src/endMotion.js";
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import { startMotion } from "../src/startMotion.js";
+import { vote } from "../src/vote.js";
+import type { Wallet } from "../src/Wallet.js";
 import {
   ADMIN_ADDRESS,
-  baseOptions,
-  getClient,
+  ADMIN_CAP_ID,
+  adminWallet,
+  makeWallet,
   mintContractOptions,
-  PACKAGE_ID,
-  USER1_ADDRESS,
-  USER1_PHRASE,
-  USER2_ADDRESS,
-  USER3_PHRASE,
-} from "./test-helpers";
+} from "./test-helpers.js";
 
 describe("DAO Voting structure", () => {
-  const client = getClient();
   let contractId: string;
-  before(async function () {
-    this.timeout(30_000);
-    contractId = await mintContract(client, mintContractOptions);
-    await mintContractStock(client, {
-      contractId,
-      receiverAddress: ADMIN_ADDRESS,
-      shares: 151,
-      ...baseOptions,
-    });
-    await mintContractStock(client, {
-      contractId,
-      receiverAddress: USER1_ADDRESS,
-      shares: 249,
-      ...baseOptions,
-    });
-    await mintContractStock(client, {
-      contractId,
-      receiverAddress: USER2_ADDRESS,
-      shares: 100,
-      ...baseOptions,
-    });
-  });
+  let user1: Wallet;
+  let user2: Wallet;
+  let user3: Wallet;
 
-  it("can start a voting session", async () => {
-    const voteRequest = await createVoteRequest(client, {
+  beforeEach(async function () {
+    const res = await mintContract(adminWallet, mintContractOptions);
+    contractId = res.contractId;
+
+    user1 = await makeWallet();
+    user2 = await makeWallet();
+    user3 = await makeWallet();
+
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: ADMIN_ADDRESS,
+        quantity: 151,
+      },
+    ]);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: user1.address,
+        quantity: 249,
+      },
+    ]);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: user2.address,
+        quantity: 100,
+      },
+    ]);
+  }, 30_000);
+
+  it("can start a motion", async () => {
+    const voteRequest = await startMotion(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
     assert.ok(voteRequest);
-  }).timeout(30_000);
+  }, 30_000);
 
   it("can vote as a shareholder", async () => {
-    const voteRequest = await createVoteRequest(client, {
+    const { motionId } = await startMotion(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
-    assert.ok(voteRequest);
-    const userVote = await vote(client, {
+
+    await vote(user1, {
       contractId,
-      voteRequest,
-      packageId: PACKAGE_ID,
-      voterAccount: USER1_PHRASE,
+      motionId,
       choice: true,
     });
-    assert.ok(userVote);
-  });
+  }, 30_000);
 
   it("cannot double vote as a shareholder", async () => {
-    const voteRequest = await createVoteRequest(client, {
+    const { motionId } = await startMotion(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
-    assert.ok(voteRequest);
-    const userVote = await vote(client, {
+
+    await vote(user1, {
       contractId,
-      voteRequest,
-      voterAccount: USER1_PHRASE,
+      motionId,
       choice: true,
-      ...baseOptions,
     });
-    assert.ok(userVote);
     await assert.rejects(
-      vote(client, {
+      vote(user1, {
         contractId,
-        voteRequest,
-        voterAccount: USER1_PHRASE,
+        motionId,
         choice: true,
-        ...baseOptions,
       }),
     );
-  }).timeout(30_000);
+  }, 30_000);
 
   it("cannot vote if not a shareholder", async () => {
-    const voteRequest = await createVoteRequest(client, {
+    const { motionId } = await startMotion(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
       contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
+      motion: "Request to sell artwork to Museum",
     });
-    assert.ok(voteRequest);
-    await assert.rejects(
-      vote(client, {
-        contractId,
-        voteRequest,
-        voterAccount: USER3_PHRASE,
-        packageId: PACKAGE_ID,
-        choice: true,
-      }),
-    );
-  });
 
-  it("cannot vote if vote is closed", async () => {
-    const voteRequest = await createVoteRequest(client, {
-      contractId,
-      request: "Request to sell contract to Museum",
-      ...baseOptions,
-    });
-    assert.ok(voteRequest);
-    const userVote = await vote(client, {
-      contractId,
-      voteRequest,
-      voterAccount: USER1_PHRASE,
-      choice: true,
-      ...baseOptions,
-    });
-    assert.ok(userVote);
-    const endVoteRequest = await endRequestVoting(client, {
-      voteRequest,
-      ...baseOptions,
-    });
-    assert.ok(endVoteRequest);
     await assert.rejects(
-      vote(client, {
+      vote(user3, {
         contractId,
-        voteRequest,
-        voterAccount: USER1_PHRASE,
+        motionId,
         choice: true,
-        ...baseOptions,
       }),
     );
-  }).timeout(30_000);
+  }, 30_000);
+
+  it("cannot vote if motion is closed", async () => {
+    const { motionId } = await startMotion(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      motion: "Request to sell artwork to Museum",
+    });
+
+    await endMotion(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      motionId,
+    });
+
+    await assert.rejects(
+      vote(user1, {
+        contractId,
+        motionId,
+        choice: true,
+      }),
+    );
+  }, 30_000);
 });

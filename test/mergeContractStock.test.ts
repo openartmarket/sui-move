@@ -1,52 +1,63 @@
-import assert from "assert";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import { mintContract } from "../src/contract";
-import { mintContractStock } from "../src/contract_stock";
-import { mergeContractStock } from "../src/merge_contract_stock";
+import { mergeContractStock } from "../src/mergeContractStock.js";
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import type { Wallet } from "../src/Wallet.js";
 import {
-  baseOptions,
-  getClient,
-  getObject,
+  ADMIN_CAP_ID,
+  adminWallet,
+  getQuantity,
+  makeWallet,
   mintContractOptions,
-  USER1_ADDRESS,
-  USER1_PHRASE,
 } from "./test-helpers";
 
 describe("mergeContractStock", () => {
-  const client = getClient();
   let contractId: string;
+  let wallet: Wallet;
   beforeEach(async function () {
-    this.timeout(20_000);
-    contractId = await mintContract(client, mintContractOptions);
-  });
+    const res = await mintContract(adminWallet, mintContractOptions);
+    contractId = res.contractId;
+
+    wallet = await makeWallet();
+  }, 30_000);
 
   it("should merge contract stocks", async () => {
-    const { contractStockId } = await mintContractStock(client, {
-      ...baseOptions,
-      contractId,
-      receiverAddress: USER1_ADDRESS,
-      shares: 10,
-    });
-    const { contractStockId: contractStock2Id } = await mintContractStock(client, {
-      ...baseOptions,
-      contractId,
-      receiverAddress: USER1_ADDRESS,
-      shares: 10,
-    });
+    const {
+      contractStockIds: [toContractStockId],
+    } = await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: wallet.address,
+        quantity: 10,
+      },
+    ]);
 
-    const mergeContractStocks = await mergeContractStock(client, {
-      ...baseOptions,
-      contractStock1Id: contractStockId,
-      contractStock2Id,
-      signerPhrase: USER1_PHRASE,
+    const {
+      contractStockIds: [fromContractStockId],
+    } = await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: wallet.address,
+        quantity: 10,
+      },
+    ]);
+
+    await mergeContractStock(wallet, [
+      {
+        toContractStockId,
+        fromContractStockId,
+      },
+    ]);
+
+    expect(await getQuantity(wallet, toContractStockId)).toEqual(20);
+    await expect(getQuantity(wallet, fromContractStockId)).rejects.toSatisfy((err) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      expect(err.code).toEqual("deleted");
+      return true;
     });
-    const burnedStock = await getObject(contractStock2Id);
-    const newStock = await getObject(mergeContractStocks.contractStockId);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(newStock.data.content.fields.shares, "20");
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    assert.strictEqual(burnedStock.error.code, "deleted");
-  }).timeout(30_000);
+  }, 30_000);
 });

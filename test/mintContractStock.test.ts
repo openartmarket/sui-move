@@ -1,156 +1,171 @@
-import assert from "assert";
-import { beforeEach, describe, it } from "mocha";
+import assert from "node:assert";
 
-import { availableStock } from "../src/available_stock";
-import { mintContract } from "../src/contract";
-import { batchMintContractStock, mintContractStock } from "../src/contract_stock";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { mintContract } from "../src/mintContract.js";
+import { mintContractStock } from "../src/mintContractStock.js";
+import type { Wallet } from "../src/Wallet.js";
 import {
   ADMIN_ADDRESS,
-  baseOptions,
-  getClient,
+  ADMIN_CAP_ID,
+  adminWallet,
+  getQuantity,
+  makeWallet,
   mintContractOptions,
-  USER1_ADDRESS,
-  USER2_ADDRESS,
-  USER3_ADDRESS,
 } from "./test-helpers";
 
 describe("mintContractStock", () => {
-  const client = getClient();
   let contractId: string;
+
+  let wallet1: Wallet;
+  let wallet2: Wallet;
+  let wallet3: Wallet;
   beforeEach(async () => {
-    contractId = await mintContract(client, mintContractOptions);
-  });
+    const res = await mintContract(adminWallet, mintContractOptions);
+    contractId = res.contractId;
 
-  it("should issue new shares", async () => {
-    await mintContractStock(client, {
-      ...baseOptions,
-      contractId,
-      receiverAddress: USER1_ADDRESS,
-      shares: 2,
-    });
-    const sharesLeft = await availableStock(client, {
-      contractId,
-    });
-    assert.equal(sharesLeft, 498);
-  });
+    wallet1 = await makeWallet();
+    wallet2 = await makeWallet();
+    wallet3 = await makeWallet();
+  }, 30_000);
 
-  it("should batch issue new shares", async () => {
-    const contractId2 = await mintContract(client, mintContractOptions);
-    await batchMintContractStock(client, {
-      ...baseOptions,
-      list: [
-        { contractId: contractId2, receiverAddress: USER1_ADDRESS, shares: 20 },
-        { contractId: contractId2, receiverAddress: USER1_ADDRESS, shares: 10 },
-        { contractId, receiverAddress: USER1_ADDRESS, shares: 2 },
-        { contractId, receiverAddress: USER2_ADDRESS, shares: 3 },
-        { contractId, receiverAddress: USER3_ADDRESS, shares: 5 },
-      ],
-    });
-    const sharesLeft = await availableStock(client, {
-      contractId,
-    });
-    const sharesLeft2 = await availableStock(client, {
-      contractId: contractId2,
-    });
-    assert.equal(sharesLeft, 490);
-    assert.equal(sharesLeft2, 470);
-  });
+  it("should issue new shares in batch", async () => {
+    const { contractId: contractId2 } = await mintContract(adminWallet, mintContractOptions);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId: contractId2,
+        receiverAddress: wallet1.address,
+        quantity: 20,
+      },
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId: contractId2,
+        receiverAddress: wallet1.address,
+        quantity: 10,
+      },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: wallet1.address, quantity: 2 },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: wallet2.address, quantity: 3 },
+      { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: wallet3.address, quantity: 5 },
+    ]);
+
+    expect(await getQuantity(wallet1, contractId)).toEqual(490);
+    expect(await getQuantity(wallet1, contractId2)).toEqual(470);
+  }, 30_000);
 
   it("should not issue new shares, when asking for too much", async () => {
     await assert.rejects(
-      mintContractStock(client, {
-        contractId,
-        shares: 501,
-        receiverAddress: USER1_ADDRESS,
-        ...baseOptions,
-      }),
+      mintContractStock(adminWallet, [
+        {
+          adminCapId: ADMIN_CAP_ID,
+          contractId,
+          quantity: 501,
+          receiverAddress: wallet1.address,
+        },
+      ]),
     );
-  });
+  }, 30_000);
 
   it("should issue remaining shares", async () => {
-    await mintContractStock(client, {
-      contractId,
-      shares: 498,
-      receiverAddress: USER1_ADDRESS,
-      ...baseOptions,
-    });
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        quantity: 498,
+        receiverAddress: wallet1.address,
+      },
+    ]);
 
-    await mintContractStock(client, {
-      contractId,
-      shares: 2,
-      receiverAddress: USER1_ADDRESS,
-      ...baseOptions,
-    });
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        quantity: 2,
+        receiverAddress: wallet1.address,
+      },
+    ]);
 
-    const sharesLeft = await availableStock(client, {
-      contractId,
-    });
+    const sharesLeft = await getQuantity(wallet1, contractId);
     assert.equal(sharesLeft, 0);
 
     await assert.rejects(
-      mintContractStock(client, {
-        contractId,
-        shares: 1,
-        receiverAddress: USER1_ADDRESS,
-        ...baseOptions,
-      }),
+      mintContractStock(adminWallet, [
+        {
+          adminCapId: ADMIN_CAP_ID,
+          contractId,
+          quantity: 1,
+          receiverAddress: wallet1.address,
+        },
+      ]),
     );
-  });
+  }, 30_000);
 
   it("should not issue new shares, when sold out", async () => {
-    await mintContractStock(client, {
-      contractId,
-      shares: 150,
-      receiverAddress: USER1_ADDRESS,
-      ...baseOptions,
-    });
-    await mintContractStock(client, {
-      contractId,
-      receiverAddress: USER2_ADDRESS,
-      shares: 250,
-      ...baseOptions,
-    });
-    await mintContractStock(client, {
-      contractId,
-      receiverAddress: USER1_ADDRESS,
-      shares: 98,
-      ...baseOptions,
-    });
-    const sharesLeft = await availableStock(client, {
-      contractId,
-    });
-    assert.equal(sharesLeft, 2);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        quantity: 150,
+        receiverAddress: wallet1.address,
+      },
+    ]);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: wallet2.address,
+        quantity: 250,
+      },
+    ]);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: wallet1.address,
+        quantity: 98,
+      },
+    ]);
+
+    expect(await getQuantity(wallet1, contractId)).toEqual(2);
 
     await assert.rejects(
-      mintContractStock(client, {
-        contractId,
-        receiverAddress: USER2_ADDRESS,
-        shares: 3,
-        ...baseOptions,
-      }),
+      mintContractStock(adminWallet, [
+        {
+          adminCapId: ADMIN_CAP_ID,
+          contractId,
+          receiverAddress: wallet2.address,
+          quantity: 3,
+        },
+      ]),
     );
-  }).timeout(30_000);
+  }, 30_000);
 
   it("can give shares to OAM and owner", async () => {
-    await mintContractStock(client, {
-      contractId,
-      receiverAddress: ADMIN_ADDRESS,
-      shares: 150,
-      ...baseOptions,
-    });
-    await mintContractStock(client, {
-      contractId,
-      receiverAddress: USER1_ADDRESS,
-      shares: 50,
-      ...baseOptions,
-    });
-    await mintContractStock(client, {
-      contractId,
-      receiverAddress: USER2_ADDRESS,
-      shares: 1,
-      ...baseOptions,
-    });
-  }).timeout(30_000);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: ADMIN_ADDRESS,
+        quantity: 150,
+      },
+    ]);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: wallet1.address,
+        quantity: 50,
+      },
+    ]);
+    await mintContractStock(adminWallet, [
+      {
+        adminCapId: ADMIN_CAP_ID,
+        contractId,
+        receiverAddress: wallet2.address,
+        quantity: 1,
+      },
+    ]);
+  }, 30_000);
 
   it.skip("can set the outgoing sale price of the contract", async () => {
     assert.ok(false);
