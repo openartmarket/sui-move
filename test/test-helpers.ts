@@ -1,4 +1,6 @@
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import { KeyClient, WalletClient } from "@shinami/clients";
+import { randomUUID } from "crypto";
 
 import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { MintContractParams } from "../src/mintContract.js";
@@ -9,21 +11,35 @@ import { newWallet } from "../src/Wallet.js";
 
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
 export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
+export const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
 
 export const PACKAGE_ID = getEnv("PACKAGE_ID");
 
 export async function makeWallet(isAdmin = false): Promise<Wallet> {
   if (process.env.SHINAMI_ENABLED) {
     const shinamiAccessKey = getEnv("SHINAMI_ACCESS_KEY");
-    const keypair = isAdmin
-      ? Ed25519Keypair.deriveKeypair(getEnv("ADMIN_PHRASE"))
-      : new Ed25519Keypair();
+
+    const walletClient = new WalletClient(shinamiAccessKey);
+    const keyClient = new KeyClient(shinamiAccessKey);
+    const walletId = randomUUID();
+    let address: string;
+    let secret: string;
+    if (isAdmin) {
+      address = ADMIN_ADDRESS;
+      secret = ADMIN_PHRASE;
+    } else {
+      secret = randomUUID();
+      const sessionToken = await keyClient.createSession(secret);
+      address = isAdmin ? ADMIN_ADDRESS : await walletClient.createWallet(walletId, sessionToken);
+    }
 
     return newWallet({
       type: "shinami",
       packageId: PACKAGE_ID,
       shinamiAccessKey,
-      keypair,
+      address,
+      secret,
+      walletId,
       isAdmin,
     });
   } else {

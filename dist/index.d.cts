@@ -21,7 +21,9 @@ type NewSuiWalletParams = {
 type NewShinamiWalletParams = {
     type: "shinami";
     packageId: string;
-    keypair: Keypair;
+    address: string;
+    walletId: string;
+    secret: string;
     shinamiAccessKey: string;
     isAdmin: boolean;
 };
