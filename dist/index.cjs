@@ -352,11 +352,11 @@ async function vote(wallet, params) {
 
 // src/Wallet.ts
 var import_client = require("@mysten/sui.js/client");
+var import_ed25519 = require("@mysten/sui.js/keypairs/ed25519");
 var import_clients2 = require("@shinami/clients");
 
 // src/wallets.ts
 var import_bcs = require("@mysten/bcs");
-var import_ed25519 = require("@mysten/sui.js/keypairs/ed25519");
 var import_transactions = require("@mysten/sui.js/transactions");
 var import_clients = require("@shinami/clients");
 var SuiWallet = class {
@@ -397,52 +397,27 @@ var ShinamiWallet = class {
     return this.params.address;
   }
   async execute(build) {
-    const {
-      suiClient,
-      gasStationClient,
-      walletClient,
-      keyClient,
-      packageId,
-      walletId,
-      secret,
-      isAdmin
-    } = this.params;
-    let response;
-    if (!isAdmin) {
-      const signer = new import_clients.ShinamiWalletSigner(walletId, walletClient, secret, keyClient);
-      const gaslessPayloadBase64 = await (0, import_clients.buildGaslessTransactionBytes)({
-        sui: suiClient,
-        build: (txb) => build(txb, packageId)
-      });
-      const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
-        gaslessPayloadBase64,
-        this.address,
-        SUI_GAS_FEE_LIMIT
-      );
-      const { signature } = await signer.signTransactionBlock((0, import_bcs.fromB64)(sponsoredResponse.txBytes));
-      console.log("Transaction Digest:", sponsoredResponse.txDigest);
-      response = await suiClient.executeTransactionBlock({
-        transactionBlock: sponsoredResponse.txBytes,
-        signature: [signature, sponsoredResponse.signature],
-        requestType: "WaitForLocalExecution",
-        options: {
-          showObjectChanges: true,
-          showEffects: true
-        }
-      });
-    } else {
-      const tx = new import_transactions.TransactionBlock();
-      await build(tx, packageId);
-      response = await suiClient.signAndExecuteTransactionBlock({
-        transactionBlock: tx,
-        signer: import_ed25519.Ed25519Keypair.deriveKeypair(secret),
-        requestType: "WaitForLocalExecution",
-        options: {
-          showObjectChanges: true,
-          showEffects: true
-        }
-      });
-    }
+    const { suiClient, gasStationClient, walletClient, keyClient, packageId, walletId, secret } = this.params;
+    const signer = new import_clients.ShinamiWalletSigner(walletId, walletClient, secret, keyClient);
+    const gaslessPayloadBase64 = await (0, import_clients.buildGaslessTransactionBytes)({
+      sui: suiClient,
+      build: (txb) => build(txb, packageId)
+    });
+    const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
+      gaslessPayloadBase64,
+      this.address,
+      SUI_GAS_FEE_LIMIT
+    );
+    const { signature } = await signer.signTransactionBlock((0, import_bcs.fromB64)(sponsoredResponse.txBytes));
+    const response = await suiClient.executeTransactionBlock({
+      transactionBlock: sponsoredResponse.txBytes,
+      signature: [signature, sponsoredResponse.signature],
+      requestType: "WaitForLocalExecution",
+      options: {
+        showObjectChanges: true,
+        showEffects: true
+      }
+    });
     return checkResponse(response);
   }
 };
@@ -477,6 +452,13 @@ async function newWallet(params) {
     case "shinami": {
       const { packageId, shinamiAccessKey, address, walletId, secret, isAdmin } = params;
       const suiClient = (0, import_clients2.createSuiClient)(shinamiAccessKey);
+      if (isAdmin) {
+        return new SuiWallet({
+          packageId,
+          suiClient,
+          keypair: import_ed25519.Ed25519Keypair.deriveKeypair(secret)
+        });
+      }
       const gasClient = new import_clients2.GasStationClient(shinamiAccessKey);
       const keyClient = new import_clients2.KeyClient(shinamiAccessKey);
       const walletClient = new import_clients2.WalletClient(shinamiAccessKey);
@@ -488,8 +470,7 @@ async function newWallet(params) {
         packageId,
         address,
         walletId,
-        secret,
-        isAdmin
+        secret
       });
     }
   }

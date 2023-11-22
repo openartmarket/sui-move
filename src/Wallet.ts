@@ -1,6 +1,7 @@
 import type { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import type { Keypair } from "@mysten/sui.js/cryptography";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import type { TransactionBlock } from "@mysten/sui.js/transactions";
 import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
 
@@ -49,6 +50,15 @@ export async function newWallet(params: NewWalletParams): Promise<Wallet> {
     case "shinami": {
       const { packageId, shinamiAccessKey, address, walletId, secret, isAdmin } = params;
       const suiClient = createSuiClient(shinamiAccessKey);
+
+      if (isAdmin) {
+        return new SuiWallet({
+          packageId,
+          suiClient,
+          keypair: Ed25519Keypair.deriveKeypair(secret),
+        });
+      }
+
       const gasClient = new GasStationClient(shinamiAccessKey);
       const keyClient = new KeyClient(shinamiAccessKey);
       const walletClient = new WalletClient(shinamiAccessKey);
@@ -62,7 +72,6 @@ export async function newWallet(params: NewWalletParams): Promise<Wallet> {
         address,
         walletId,
         secret,
-        isAdmin,
       });
     }
   }

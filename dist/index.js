@@ -318,11 +318,11 @@ async function vote(wallet, params) {
 
 // src/Wallet.ts
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
 
 // src/wallets.ts
 import { fromB64 } from "@mysten/bcs";
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients";
 var SuiWallet = class {
@@ -363,52 +363,27 @@ var ShinamiWallet = class {
     return this.params.address;
   }
   async execute(build) {
-    const {
-      suiClient,
-      gasStationClient,
-      walletClient,
-      keyClient,
-      packageId,
-      walletId,
-      secret,
-      isAdmin
-    } = this.params;
-    let response;
-    if (!isAdmin) {
-      const signer = new ShinamiWalletSigner(walletId, walletClient, secret, keyClient);
-      const gaslessPayloadBase64 = await buildGaslessTransactionBytes({
-        sui: suiClient,
-        build: (txb) => build(txb, packageId)
-      });
-      const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
-        gaslessPayloadBase64,
-        this.address,
-        SUI_GAS_FEE_LIMIT
-      );
-      const { signature } = await signer.signTransactionBlock(fromB64(sponsoredResponse.txBytes));
-      console.log("Transaction Digest:", sponsoredResponse.txDigest);
-      response = await suiClient.executeTransactionBlock({
-        transactionBlock: sponsoredResponse.txBytes,
-        signature: [signature, sponsoredResponse.signature],
-        requestType: "WaitForLocalExecution",
-        options: {
-          showObjectChanges: true,
-          showEffects: true
-        }
-      });
-    } else {
-      const tx = new TransactionBlock();
-      await build(tx, packageId);
-      response = await suiClient.signAndExecuteTransactionBlock({
-        transactionBlock: tx,
-        signer: Ed25519Keypair.deriveKeypair(secret),
-        requestType: "WaitForLocalExecution",
-        options: {
-          showObjectChanges: true,
-          showEffects: true
-        }
-      });
-    }
+    const { suiClient, gasStationClient, walletClient, keyClient, packageId, walletId, secret } = this.params;
+    const signer = new ShinamiWalletSigner(walletId, walletClient, secret, keyClient);
+    const gaslessPayloadBase64 = await buildGaslessTransactionBytes({
+      sui: suiClient,
+      build: (txb) => build(txb, packageId)
+    });
+    const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
+      gaslessPayloadBase64,
+      this.address,
+      SUI_GAS_FEE_LIMIT
+    );
+    const { signature } = await signer.signTransactionBlock(fromB64(sponsoredResponse.txBytes));
+    const response = await suiClient.executeTransactionBlock({
+      transactionBlock: sponsoredResponse.txBytes,
+      signature: [signature, sponsoredResponse.signature],
+      requestType: "WaitForLocalExecution",
+      options: {
+        showObjectChanges: true,
+        showEffects: true
+      }
+    });
     return checkResponse(response);
   }
 };
@@ -443,6 +418,13 @@ async function newWallet(params) {
     case "shinami": {
       const { packageId, shinamiAccessKey, address, walletId, secret, isAdmin } = params;
       const suiClient = createSuiClient(shinamiAccessKey);
+      if (isAdmin) {
+        return new SuiWallet({
+          packageId,
+          suiClient,
+          keypair: Ed25519Keypair.deriveKeypair(secret)
+        });
+      }
       const gasClient = new GasStationClient(shinamiAccessKey);
       const keyClient = new KeyClient(shinamiAccessKey);
       const walletClient = new WalletClient(shinamiAccessKey);
@@ -454,8 +436,7 @@ async function newWallet(params) {
         packageId,
         address,
         walletId,
-        secret,
-        isAdmin
+        secret
       });
     }
   }
