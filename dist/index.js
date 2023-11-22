@@ -318,7 +318,6 @@ async function vote(wallet, params) {
 
 // src/Wallet.ts
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
 
 // src/wallets.ts
@@ -416,15 +415,17 @@ async function newWallet(params) {
       });
     }
     case "shinami": {
-      const { packageId, shinamiAccessKey, address, walletId, secret, isAdmin } = params;
+      const { packageId, shinamiAccessKey, keypair } = params;
       const suiClient = createSuiClient(shinamiAccessKey);
-      if (isAdmin) {
-        return new SuiWallet({
-          packageId,
-          suiClient,
-          keypair: Ed25519Keypair.deriveKeypair(secret)
-        });
-      }
+      return new SuiWallet({
+        packageId,
+        suiClient,
+        keypair
+      });
+    }
+    case "shinami-sponsored": {
+      const { packageId, shinamiAccessKey, address, walletId, secret } = params;
+      const suiClient = createSuiClient(shinamiAccessKey);
       const gasClient = new GasStationClient(shinamiAccessKey);
       const keyClient = new KeyClient(shinamiAccessKey);
       const walletClient = new WalletClient(shinamiAccessKey);

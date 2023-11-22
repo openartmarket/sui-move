@@ -20,34 +20,34 @@ export async function makeWallet(isAdmin = false): Promise<Wallet> {
     const shinamiAccessKey = getEnv("SHINAMI_ACCESS_KEY");
 
     const walletClient = new WalletClient(shinamiAccessKey);
-    const keyClient = new KeyClient(shinamiAccessKey);
-    const walletId = randomUUID();
-    let address: string;
-    let secret: string;
     if (isAdmin) {
-      address = ADMIN_ADDRESS;
-      secret = ADMIN_PHRASE;
+      return newWallet({
+        type: "shinami",
+        packageId: PACKAGE_ID,
+        shinamiAccessKey,
+        keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
+      });
     } else {
-      secret = randomUUID();
+      const secret = randomUUID();
+      const walletId = randomUUID();
+      const keyClient = new KeyClient(shinamiAccessKey);
       const sessionToken = await keyClient.createSession(secret);
-      address = isAdmin ? ADMIN_ADDRESS : await walletClient.createWallet(walletId, sessionToken);
+      const address = await walletClient.createWallet(walletId, sessionToken);
+      return newWallet({
+        type: "shinami-sponsored",
+        packageId: PACKAGE_ID,
+        shinamiAccessKey,
+        address,
+        secret,
+        walletId,
+      });
     }
-
-    return newWallet({
-      type: "shinami",
-      packageId: PACKAGE_ID,
-      shinamiAccessKey,
-      address,
-      secret,
-      walletId,
-      isAdmin,
-    });
   } else {
     let suiAddress: SuiAddress;
     if (isAdmin) {
       suiAddress = {
         address: ADMIN_ADDRESS,
-        phrase: getEnv("ADMIN_PHRASE"),
+        phrase: ADMIN_PHRASE,
       };
     } else {
       suiAddress = await newSuiAddress();

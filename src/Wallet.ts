@@ -1,7 +1,6 @@
 import type { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import type { Keypair } from "@mysten/sui.js/cryptography";
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import type { TransactionBlock } from "@mysten/sui.js/transactions";
 import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
 
@@ -16,23 +15,32 @@ export interface Wallet {
 
 export type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promise<void>;
 
-export type NewWalletParams = NewSuiWalletParams | NewShinamiWalletParams;
+export type NewWalletParams =
+  | NewSuiWalletParams
+  | NewShinamiWalletParams
+  | NewShinamiSponsoredWalletParams;
 
 export type NewSuiWalletParams = {
   type: "sui";
   packageId: string;
-  keypair: Keypair;
   network: NetworkName;
+  keypair: Keypair;
 };
 
 export type NewShinamiWalletParams = {
   type: "shinami";
   packageId: string;
+  shinamiAccessKey: string;
+  keypair: Keypair;
+};
+
+export type NewShinamiSponsoredWalletParams = {
+  type: "shinami-sponsored";
+  packageId: string;
+  shinamiAccessKey: string;
   address: string;
   walletId: string;
   secret: string;
-  shinamiAccessKey: string;
-  isAdmin: boolean;
 };
 
 export async function newWallet(params: NewWalletParams): Promise<Wallet> {
@@ -48,16 +56,18 @@ export async function newWallet(params: NewWalletParams): Promise<Wallet> {
       });
     }
     case "shinami": {
-      const { packageId, shinamiAccessKey, address, walletId, secret, isAdmin } = params;
+      const { packageId, shinamiAccessKey, keypair } = params;
       const suiClient = createSuiClient(shinamiAccessKey);
 
-      if (isAdmin) {
-        return new SuiWallet({
-          packageId,
-          suiClient,
-          keypair: Ed25519Keypair.deriveKeypair(secret),
-        });
-      }
+      return new SuiWallet({
+        packageId,
+        suiClient,
+        keypair,
+      });
+    }
+    case "shinami-sponsored": {
+      const { packageId, shinamiAccessKey, address, walletId, secret } = params;
+      const suiClient = createSuiClient(shinamiAccessKey);
 
       const gasClient = new GasStationClient(shinamiAccessKey);
       const keyClient = new KeyClient(shinamiAccessKey);

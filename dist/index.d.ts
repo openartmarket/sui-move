@@ -11,21 +11,26 @@ interface Wallet {
     execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
 }
 type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promise<void>;
-type NewWalletParams = NewSuiWalletParams | NewShinamiWalletParams;
+type NewWalletParams = NewSuiWalletParams | NewShinamiWalletParams | NewShinamiSponsoredWalletParams;
 type NewSuiWalletParams = {
     type: "sui";
     packageId: string;
-    keypair: Keypair;
     network: NetworkName;
+    keypair: Keypair;
 };
 type NewShinamiWalletParams = {
     type: "shinami";
     packageId: string;
+    shinamiAccessKey: string;
+    keypair: Keypair;
+};
+type NewShinamiSponsoredWalletParams = {
+    type: "shinami-sponsored";
+    packageId: string;
+    shinamiAccessKey: string;
     address: string;
     walletId: string;
     secret: string;
-    shinamiAccessKey: string;
-    isAdmin: boolean;
 };
 declare function newWallet(params: NewWalletParams): Promise<Wallet>;
 
@@ -132,4 +137,4 @@ type VoteResult = {
 };
 declare function vote(wallet: Wallet, params: VoteParams): Promise<VoteResult>;
 
-export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newWallet, splitTransferMerge, startMotion, toContractStock, vote };
+export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newWallet, splitTransferMerge, startMotion, toContractStock, vote };

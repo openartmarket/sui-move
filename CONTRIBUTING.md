@@ -45,7 +45,6 @@ By default, the tests run against a local sui node, but if you define the enviro
 Add the following to your `.sui.env` file:
 
 ```bash
-export SUI_NETWORK="testnet"
 export SHINAMI_ENABLED=1
 # Copy the "SUI Testnet" access key from https://app.shinami.com/access-keys
 export SHINAMI_ACCESS_KEY="..."
