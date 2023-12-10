@@ -19,6 +19,7 @@ jobs:
       - run: ./scripts/asdf-install.sh
       - run: npm ci
       - run: npm run upgrade
+      - run: npm install
       - name: Open pull request if needed
         run: ./scripts/gha-open-pr.sh auto-dependency-upgrades "Automated dependency upgrades" "package.json"
         env:
