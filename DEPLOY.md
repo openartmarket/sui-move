@@ -8,3 +8,4 @@
 6. Check that you have gas, run `sui client gas`
 7. Run `./scripts/publish-contracts.sh` to publish the contracts to the environment.
 8. Look for published addresses in `.envrc` for the addresses of the contracts.
+
