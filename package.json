@@ -34,7 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "@mysten/bcs": "0.9.1",
-    "@mysten/sui.js": "0.46.1",
+    "@mysten/sui.js": "0.48.1",
     "@shinami/clients": "0.7.2"
   },
   "devDependencies": {
