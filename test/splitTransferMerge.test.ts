@@ -72,7 +72,7 @@ describe("splitTransferMerge", () => {
     // TODO: verify that user1 has one stock with 7 and user2 has one stock with 18
   }, 30_000);
 
-  it.only("should not split when stock is already the size of the transfer quantity", async () => {
+  it("should not split when stock is already the size of the transfer quantity", async () => {
     const fromWallet = await makeWallet();
     const toWallet = await makeWallet();
 

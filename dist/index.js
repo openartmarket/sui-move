@@ -282,7 +282,10 @@ async function splitTransferMerge({
       )}`
     );
   }
-  const currentQuantity = await getWalletQuantity(fromWallet, fromContractStocksAfterMerge[0].objectId);
+  const currentQuantity = await getWalletQuantity(
+    fromWallet,
+    fromContractStocksAfterMerge[0].objectId
+  );
   if (currentQuantity < quantity) {
     throw new Error(
       `Cannot transfer ${quantity} stocks, because there are only ${currentQuantity} stocks`
