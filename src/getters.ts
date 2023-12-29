@@ -1,11 +1,14 @@
 import type {
   MoveStruct,
+  SuiClient,
   SuiObjectChangeCreated,
   SuiObjectData,
   SuiObjectResponse,
   SuiParsedData,
   SuiTransactionBlockResponse,
 } from "@mysten/sui.js/client";
+
+import type { Wallet } from "./Wallet.js";
 
 export function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[] {
   return (txRes.objectChanges || []).filter(
@@ -59,6 +62,53 @@ export function getStringField(data: SuiParsedData, key: string): string {
   }
 
   return getStringField(fields, key);
+}
+
+/**
+ * Get the quantity of a contract or a contract stock.
+ */
+export async function getQuantity(suiClient: SuiClient, id: string): Promise<number> {
+  const response = await suiClient.getObject({
+    id,
+    options: { showContent: true, showOwner: true },
+  });
+  const objectData = getObjectData(response);
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
+
+/**
+ * Get the quantity of a contract or a contract stock.
+ */
+export async function getWalletQuantity(wallet: Wallet, id: string): Promise<number> {
+  const { suiClient } = wallet;
+  const response = await suiClient.getObject({
+    id,
+    options: { showContent: true, showOwner: true },
+  });
+  const objectData = getObjectData(response);
+  const addressOwner = getAddressOwner(objectData);
+  if (addressOwner !== wallet.address) {
+    throw new Error(
+      `Object ${objectData} is not owned by ${wallet.address} but by ${addressOwner}`,
+    );
+  }
+
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
+
+export function getAddressOwner(objectData: SuiObjectData): string | null {
+  const owner = objectData.owner;
+  if (!owner) throw new Error(`Object ${objectData} has no owner`);
+  if (typeof owner === "string") {
+    throw new Error(`Object ${objectData} has a string owner ${owner}`);
+  }
+  if ("AddressOwner" in owner) {
+    return owner.AddressOwner;
+  }
+  console.log("owner", owner);
+  throw new Error("FIXME");
 }
 
 function getMoveObject(data: SuiParsedData) {

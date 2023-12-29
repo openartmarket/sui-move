@@ -2,7 +2,6 @@ import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { KeyClient, WalletClient } from "@shinami/clients";
 import { randomUUID } from "crypto";
 
-import { getIntField, getObjectData, getParsedData } from "../src/getters.js";
 import type { MintContractParams } from "../src/mintContract.js";
 import { newSuiAddress, type SuiAddress } from "../src/sui.js";
 import type { NetworkName } from "../src/types.js";
@@ -72,20 +71,6 @@ export const mintContractOptions: MintContractParams = {
   currency: "USD",
   image: "reference-id-for-contract",
 };
-
-/**
- * Get the quantity of a contract or a contract stock.
- */
-export async function getQuantity(wallet: Wallet, id: string): Promise<number> {
-  const { suiClient } = wallet;
-  const response = await suiClient.getObject({
-    id,
-    options: { showContent: true },
-  });
-  const objectData = getObjectData(response);
-  const parsedData = getParsedData(objectData);
-  return getIntField(parsedData, "shares");
-}
 
 export function getEnv(name: string): string {
   const value = process.env[name];

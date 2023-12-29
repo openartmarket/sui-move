@@ -93,6 +93,35 @@ function getStringField(data, key) {
   }
   return getStringField2(fields, key);
 }
+async function getWalletQuantity(wallet, id) {
+  const { suiClient } = wallet;
+  const response = await suiClient.getObject({
+    id,
+    options: { showContent: true, showOwner: true }
+  });
+  const objectData = getObjectData(response);
+  const addressOwner = getAddressOwner(objectData);
+  if (addressOwner !== wallet.address) {
+    throw new Error(
+      `Object ${objectData} is not owned by ${wallet.address} but by ${addressOwner}`
+    );
+  }
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
+function getAddressOwner(objectData) {
+  const owner = objectData.owner;
+  if (!owner)
+    throw new Error(`Object ${objectData} has no owner`);
+  if (typeof owner === "string") {
+    throw new Error(`Object ${objectData} has a string owner ${owner}`);
+  }
+  if ("AddressOwner" in owner) {
+    return owner.AddressOwner;
+  }
+  console.log("owner", owner);
+  throw new Error("FIXME");
+}
 function getMoveObject(data) {
   const { dataType } = data;
   if (dataType !== "moveObject") {
@@ -272,13 +301,40 @@ async function splitTransferMerge({
   )) {
     await mergeContractStock(fromWallet, [{ fromContractStockId, toContractStockId }]);
   }
-  const { splitContractStockId } = await splitContractStock(fromWallet, {
-    contractStockId: fromContractStocks[0].objectId,
-    quantity
+  const fromContractStocksAfterMerge = await getContractStocks({
+    suiClient: fromWallet.suiClient,
+    owner: fromWallet.address,
+    contractId,
+    packageId
   });
+  if (fromContractStocksAfterMerge.length !== 1) {
+    throw new Error(
+      `Expected a single stock after merge, but got ${JSON.stringify(
+        fromContractStocksAfterMerge,
+        null,
+        2
+      )}`
+    );
+  }
+  const currentQuantity = await getWalletQuantity(fromWallet, fromContractStocksAfterMerge[0].objectId);
+  if (currentQuantity < quantity) {
+    throw new Error(
+      `Cannot transfer ${quantity} stocks, because there are only ${currentQuantity} stocks`
+    );
+  }
+  let contractStockId;
+  if (currentQuantity > quantity) {
+    const { splitContractStockId } = await splitContractStock(fromWallet, {
+      contractStockId: fromContractStocksAfterMerge[0].objectId,
+      quantity
+    });
+    contractStockId = splitContractStockId;
+  } else {
+    contractStockId = fromContractStocks[0].objectId;
+  }
   const { digest } = await transferContractStock(fromWallet, {
     contractId,
-    contractStockId: splitContractStockId,
+    contractStockId,
     toAddress: toWallet.address
   });
   const toContractStocks = await getContractStocks({

@@ -1,16 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { getWalletQuantity } from "../src/getters.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
 import { splitContractStock } from "../src/splitContractStock.js";
 import type { Wallet } from "../src/Wallet.js";
-import {
-  ADMIN_CAP_ID,
-  adminWallet,
-  getQuantity,
-  makeWallet,
-  mintContractOptions,
-} from "./test-helpers";
+import { ADMIN_CAP_ID, adminWallet, makeWallet, mintContractOptions } from "./test-helpers";
 
 describe("splitContractStock", () => {
   let contractId: string;
@@ -39,8 +34,8 @@ describe("splitContractStock", () => {
       quantity: 2,
     });
 
-    expect(await getQuantity(wallet, splitContractStockId)).toEqual(2);
-    expect(await getQuantity(wallet, contractStockId)).toEqual(8);
+    expect(await getWalletQuantity(wallet, splitContractStockId)).toEqual(2);
+    expect(await getWalletQuantity(wallet, contractStockId)).toEqual(8);
   }, 30_000);
 
   it("should split a split stock", async () => {
@@ -64,8 +59,8 @@ describe("splitContractStock", () => {
       quantity: 3,
     });
 
-    expect(await getQuantity(wallet, contractStockId)).toEqual(7);
-    expect(await getQuantity(wallet, splitContractStockId)).toEqual(2);
-    expect(await getQuantity(wallet, splitAgainContractStockId)).toEqual(3);
+    expect(await getWalletQuantity(wallet, contractStockId)).toEqual(7);
+    expect(await getWalletQuantity(wallet, splitContractStockId)).toEqual(2);
+    expect(await getWalletQuantity(wallet, splitAgainContractStockId)).toEqual(3);
   }, 30_000);
 });

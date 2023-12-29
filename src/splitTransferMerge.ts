@@ -1,6 +1,7 @@
 import type { SuiObjectData } from "@mysten/sui.js/client";
 
 import { getContractStocks } from "./getContractStocks.js";
+import { getWalletQuantity } from "./getters.js";
 import type { MergeContractStockParam } from "./mergeContractStock.js";
 import { mergeContractStock } from "./mergeContractStock.js";
 import { splitContractStock } from "./splitContractStock.js";
@@ -44,13 +45,47 @@ export async function splitTransferMerge({
   )) {
     await mergeContractStock(fromWallet, [{ fromContractStockId, toContractStockId }]);
   }
-  const { splitContractStockId } = await splitContractStock(fromWallet, {
-    contractStockId: fromContractStocks[0].objectId,
-    quantity,
+
+  // Check if we need to split the stock
+  const fromContractStocksAfterMerge = await getContractStocks({
+    suiClient: fromWallet.suiClient,
+    owner: fromWallet.address,
+    contractId,
+    packageId,
   });
+  if (fromContractStocksAfterMerge.length !== 1) {
+    throw new Error(
+      `Expected a single stock after merge, but got ${JSON.stringify(
+        fromContractStocksAfterMerge,
+        null,
+        2,
+      )}`,
+    );
+  }
+
+  const currentQuantity = await getWalletQuantity(
+    fromWallet,
+    fromContractStocksAfterMerge[0].objectId,
+  );
+  if (currentQuantity < quantity) {
+    throw new Error(
+      `Cannot transfer ${quantity} stocks, because there are only ${currentQuantity} stocks`,
+    );
+  }
+  let contractStockId: string;
+  if (currentQuantity > quantity) {
+    const { splitContractStockId } = await splitContractStock(fromWallet, {
+      contractStockId: fromContractStocksAfterMerge[0].objectId,
+      quantity,
+    });
+    contractStockId = splitContractStockId;
+  } else {
+    contractStockId = fromContractStocks[0].objectId;
+  }
+
   const { digest } = await transferContractStock(fromWallet, {
     contractId,
-    contractStockId: splitContractStockId,
+    contractStockId,
     toAddress: toWallet.address,
   });
 

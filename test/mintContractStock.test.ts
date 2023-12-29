@@ -2,6 +2,7 @@ import assert from "node:assert";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { getQuantity } from "../src/getters.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
 import type { Wallet } from "../src/Wallet.js";
@@ -9,7 +10,6 @@ import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   adminWallet,
-  getQuantity,
   makeWallet,
   mintContractOptions,
 } from "./test-helpers";
@@ -49,8 +49,8 @@ describe("mintContractStock", () => {
       { adminCapId: ADMIN_CAP_ID, contractId, receiverAddress: wallet3.address, quantity: 5 },
     ]);
 
-    expect(await getQuantity(wallet1, contractId)).toEqual(490);
-    expect(await getQuantity(wallet1, contractId2)).toEqual(470);
+    expect(await getQuantity(adminWallet.suiClient, contractId)).toEqual(490);
+    expect(await getQuantity(adminWallet.suiClient, contractId2)).toEqual(470);
   }, 30_000);
 
   it("should not issue new shares, when asking for too much", async () => {
@@ -85,7 +85,7 @@ describe("mintContractStock", () => {
       },
     ]);
 
-    const sharesLeft = await getQuantity(wallet1, contractId);
+    const sharesLeft = await getQuantity(adminWallet.suiClient, contractId);
     assert.equal(sharesLeft, 0);
 
     await assert.rejects(
@@ -126,7 +126,7 @@ describe("mintContractStock", () => {
       },
     ]);
 
-    expect(await getQuantity(wallet1, contractId)).toEqual(2);
+    expect(await getQuantity(adminWallet.suiClient, contractId)).toEqual(2);
 
     await assert.rejects(
       mintContractStock(adminWallet, [
