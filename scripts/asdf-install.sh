@@ -9,3 +9,4 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cat $SCRIPT_DIR/../.tool-versions | cut -d' ' -f1 | xargs -n 1 asdf plugin add || echo "asdf plugins installed"
 
 asdf install
+asdf reshim

@@ -3,8 +3,12 @@ name = "open_art_market"
 version = "0.0.1"
 
 [dependencies]
-# Keep the version in sync with scripts/install-sui.sh
-Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "mainnet-v1.8.2" }
+# IMPORTANT!! Keep rev in sync with $SUI_GIT_TAG defined in .envrc
+Sui = { 
+  git = "https://github.com/MystenLabs/sui.git",
+  rev = "test-v1.16.0",
+  subdir = "crates/sui-framework/packages/sui-framework" 
+}
 
 [addresses]
 open_art_market = "0x0"

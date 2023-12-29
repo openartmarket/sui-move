@@ -1,6 +1,6 @@
-cmake 3.26.4
-direnv 2.32.2
+cmake 3.28.1
+direnv 2.33.0
 jq 1.6
-rust 1.70.0
-nodejs 18.16.0
-github-cli 2.29.0
+rust 1.75.0
+nodejs 18.19.0
+github-cli 2.40.1
