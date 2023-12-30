@@ -118,6 +118,15 @@ type StartMotionResult = {
 };
 declare function startMotion(wallet: Wallet, params: StartMotionParams): Promise<StartMotionResult>;
 
+type SuiAddress = {
+    readonly address: string;
+    readonly phrase: string;
+};
+/**
+ * Creates a new address and transfers balance to it.
+ */
+declare function newSuiAddress(balance?: number): Promise<SuiAddress>;
+
 type ContractStock = {
     contractStockId: string;
     digest: string;
@@ -137,4 +146,4 @@ type VoteResult = {
 };
 declare function vote(wallet: Wallet, params: VoteParams): Promise<VoteResult>;
 
-export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newWallet, splitTransferMerge, startMotion, toContractStock, vote };
+export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type SuiAddress, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newSuiAddress, newWallet, splitTransferMerge, startMotion, toContractStock, vote };
