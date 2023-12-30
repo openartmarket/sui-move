@@ -73,17 +73,17 @@ type MintContractResult = {
 };
 declare function mintContract(wallet: Wallet, params: MintContractParams): Promise<MintContractResult>;
 
-type MintContractStockParam = {
+type MintContractStockParams = {
     adminCapId: string;
     contractId: string;
     receiverAddress: string;
     quantity: number;
 };
 type MintContractStockResult = {
-    contractStockIds: readonly string[];
+    contractStockId: string;
     digest: string;
 };
-declare function mintContractStock(wallet: Wallet, params: MintContractStockParam[]): Promise<MintContractStockResult>;
+declare function mintContractStock(wallet: Wallet, params: MintContractStockParams): Promise<MintContractStockResult>;
 
 type SplitMergeTransferParams = {
     packageId: string;
@@ -137,4 +137,4 @@ type VoteResult = {
 };
 declare function vote(wallet: Wallet, params: VoteParams): Promise<VoteResult>;
 
-export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParam, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newWallet, splitTransferMerge, startMotion, toContractStock, vote };
+export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type VoteParams, type VoteResult, type Wallet, endMotion, getContractStocks, mintContract, mintContractStock, newWallet, splitTransferMerge, startMotion, toContractStock, vote };

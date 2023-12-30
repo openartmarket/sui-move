@@ -18,27 +18,19 @@ describe("mergeContractStock", () => {
   }, 30_000);
 
   it("should merge contract stocks", async () => {
-    const {
-      contractStockIds: [toContractStockId],
-    } = await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: wallet.address,
-        quantity: 10,
-      },
-    ]);
+    const { contractStockId: toContractStockId } = await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: wallet.address,
+      quantity: 10,
+    });
 
-    const {
-      contractStockIds: [fromContractStockId],
-    } = await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: wallet.address,
-        quantity: 10,
-      },
-    ]);
+    const { contractStockId: fromContractStockId } = await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: wallet.address,
+      quantity: 10,
+    });
 
     await mergeContractStock(wallet, [
       {

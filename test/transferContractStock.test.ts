@@ -26,16 +26,12 @@ describe("transferContractStock", () => {
   }, 30_000);
 
   it("should transfer ownership", async () => {
-    const {
-      contractStockIds: [contractStockId],
-    } = await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: fromWallet.address,
-        quantity: 12,
-      },
-    ]);
+    const { contractStockId } = await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: fromWallet.address,
+      quantity: 12,
+    });
 
     await transferContractStock(fromWallet, {
       contractId,

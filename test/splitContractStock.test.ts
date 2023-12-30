@@ -17,17 +17,13 @@ describe("splitContractStock", () => {
     wallet = await makeWallet();
   }, 30_000);
 
-  it("should split an contract stock", async () => {
-    const {
-      contractStockIds: [contractStockId],
-    } = await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: wallet.address,
-        quantity: 10,
-      },
-    ]);
+  it("should split a stock", async () => {
+    const { contractStockId } = await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: wallet.address,
+      quantity: 10,
+    });
 
     const { splitContractStockId } = await splitContractStock(wallet, {
       contractStockId,
@@ -39,16 +35,12 @@ describe("splitContractStock", () => {
   }, 30_000);
 
   it("should split a split stock", async () => {
-    const {
-      contractStockIds: [contractStockId],
-    } = await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: wallet.address,
-        quantity: 12,
-      },
-    ]);
+    const { contractStockId } = await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: wallet.address,
+      quantity: 12,
+    });
 
     const { splitContractStockId } = await splitContractStock(wallet, {
       contractStockId,

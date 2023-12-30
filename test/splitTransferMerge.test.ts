@@ -23,7 +23,8 @@ describe("splitTransferMerge", () => {
     const fromWallet = await makeWallet();
     const toWallet = await makeWallet();
 
-    await mintContractStock(adminWallet, [
+    await mintContractStock(
+      adminWallet,
       // User 1 has bought stocks in 3 batches. Total: 9
       {
         adminCapId: ADMIN_CAP_ID,
@@ -31,32 +32,32 @@ describe("splitTransferMerge", () => {
         receiverAddress: fromWallet.address,
         quantity: 1,
       },
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: fromWallet.address,
-        quantity: 3,
-      },
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: fromWallet.address,
-        quantity: 5,
-      },
-      // User 2 has bought stocks in 2 batches. Total: 16
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: toWallet.address,
-        quantity: 7,
-      },
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: toWallet.address,
-        quantity: 9,
-      },
-    ]);
+    );
+    await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: fromWallet.address,
+      quantity: 3,
+    });
+    await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: fromWallet.address,
+      quantity: 5,
+    });
+    // User 2 has bought stocks in 2 batches. Total: 16
+    await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: toWallet.address,
+      quantity: 7,
+    });
+    await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: toWallet.address,
+      quantity: 9,
+    });
 
     const { fromContractStockId, toContractStockId } = await splitTransferMerge({
       packageId: PACKAGE_ID,
@@ -76,14 +77,12 @@ describe("splitTransferMerge", () => {
     const fromWallet = await makeWallet();
     const toWallet = await makeWallet();
 
-    await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: fromWallet.address,
-        quantity: 3,
-      },
-    ]);
+    await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: fromWallet.address,
+      quantity: 3,
+    });
 
     const { fromContractStockId, toContractStockId } = await splitTransferMerge({
       packageId: PACKAGE_ID,

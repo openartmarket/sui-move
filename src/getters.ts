@@ -107,8 +107,7 @@ export function getAddressOwner(objectData: SuiObjectData): string | null {
   if ("AddressOwner" in owner) {
     return owner.AddressOwner;
   }
-  console.log("owner", owner);
-  throw new Error("FIXME");
+  return null;
 }
 
 function getMoveObject(data: SuiParsedData) {
