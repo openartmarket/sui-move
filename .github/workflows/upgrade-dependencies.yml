@@ -21,7 +21,7 @@ jobs:
       - run: npm run upgrade
       - run: npm install
       - name: Open pull request if needed
-        run: ./scripts/gha-open-pr.sh auto-dependency-upgrades "Automated dependency upgrades" "package.json"
+        run: ./scripts/gha-open-pr.sh auto-dependency-upgrades "Automated dependency upgrades" "*/*.json"
         env:
           # https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
           GH_TOKEN: ${{ secrets.GHA_PR_GITHUB_TOKEN }}

@@ -6,6 +6,7 @@
 set -e
 branch_name=$1
 title=$2
+# https://css-tricks.com/git-pathspecs-and-how-to-use-them/
 path_spec=$3
 
 changes=$(git status --porcelain=v1 2>/dev/null "${path_spec}" | wc -l)
