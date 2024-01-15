@@ -59,6 +59,15 @@ function getStringField(data, key) {
   }
   return getStringField2(fields, key);
 }
+async function getQuantity(suiClient, id) {
+  const response = await suiClient.getObject({
+    id,
+    options: { showContent: true, showOwner: true }
+  });
+  const objectData = getObjectData(response);
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
 async function getWalletQuantity(wallet, id) {
   const { suiClient } = wallet;
   const response = await suiClient.getObject({
@@ -539,7 +548,16 @@ async function newWallet(params) {
 }
 export {
   endMotion,
+  getAddressOwner,
   getContractStocks,
+  getCreatedObjects,
+  getIntField,
+  getObjectData,
+  getParsedData,
+  getQuantity,
+  getStringField,
+  getType,
+  getWalletQuantity,
   mintContract,
   mintContractStock,
   newSuiAddress,

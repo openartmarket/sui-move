@@ -21,7 +21,16 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var src_exports = {};
 __export(src_exports, {
   endMotion: () => endMotion,
+  getAddressOwner: () => getAddressOwner,
   getContractStocks: () => getContractStocks,
+  getCreatedObjects: () => getCreatedObjects,
+  getIntField: () => getIntField,
+  getObjectData: () => getObjectData,
+  getParsedData: () => getParsedData,
+  getQuantity: () => getQuantity,
+  getStringField: () => getStringField,
+  getType: () => getType,
+  getWalletQuantity: () => getWalletQuantity,
   mintContract: () => mintContract,
   mintContractStock: () => mintContractStock,
   newSuiAddress: () => newSuiAddress,
@@ -93,6 +102,15 @@ function getStringField(data, key) {
     return value;
   }
   return getStringField2(fields, key);
+}
+async function getQuantity(suiClient, id) {
+  const response = await suiClient.getObject({
+    id,
+    options: { showContent: true, showOwner: true }
+  });
+  const objectData = getObjectData(response);
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
 }
 async function getWalletQuantity(wallet, id) {
   const { suiClient } = wallet;
@@ -575,7 +593,16 @@ async function newWallet(params) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   endMotion,
+  getAddressOwner,
   getContractStocks,
+  getCreatedObjects,
+  getIntField,
+  getObjectData,
+  getParsedData,
+  getQuantity,
+  getStringField,
+  getType,
+  getWalletQuantity,
   mintContract,
   mintContractStock,
   newSuiAddress,

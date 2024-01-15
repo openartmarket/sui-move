@@ -1,5 +1,6 @@
 export * from "./endMotion.js";
 export * from "./getContractStocks.js";
+export * from "./getters.js";
 export * from "./mintContract.js";
 export * from "./mintContractStock.js";
 export * from "./splitTransferMerge.js";
