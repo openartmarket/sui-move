@@ -73,7 +73,7 @@ export const mintContractOptions: MintContractParams = {
   artist: "Leonardo da Vinci",
   description: "Choconta painting",
   currency: "USD",
-  image: "reference-id-for-contract",
+  productId: "reference-id-for-contract",
 };
 
 export function getEnv(name: string): string {
