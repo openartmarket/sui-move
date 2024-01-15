@@ -65,7 +65,7 @@ type MintContractParams = {
     creationTimestampMillis: number;
     description: string;
     currency: Currency;
-    image: string;
+    productId: string;
 };
 type MintContractResult = {
     contractId: string;

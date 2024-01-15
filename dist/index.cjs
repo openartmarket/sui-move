@@ -181,7 +181,7 @@ async function mintContract(wallet, params) {
     creationTimestampMillis,
     description,
     currency,
-    image
+    productId
   } = params;
   const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
@@ -196,7 +196,8 @@ async function mintContract(wallet, params) {
         txb.pure(creationTimestampMillis),
         txb.pure(description),
         txb.pure(currency),
-        txb.pure(image)
+        // AKA reference AKA image
+        txb.pure(productId)
       ]
     });
   });
