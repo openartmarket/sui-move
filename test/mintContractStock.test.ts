@@ -34,6 +34,9 @@ describe("mintContractStock", () => {
   }, 30_000);
 
   it("should issue remaining shares", async () => {
+    const sharesLeftBefore = await getQuantity(adminWallet.suiClient, contractId);
+    expect(sharesLeftBefore).toEqual(500);
+
     await mintContractStock(adminWallet, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
@@ -48,8 +51,8 @@ describe("mintContractStock", () => {
       receiverAddress: wallet1.address,
     });
 
-    const sharesLeft = await getQuantity(adminWallet.suiClient, contractId);
-    expect(sharesLeft).toEqual(0);
+    const sharesLeftAfter = await getQuantity(adminWallet.suiClient, contractId);
+    expect(sharesLeftAfter).toEqual(0);
 
     await assert.rejects(
       mintContractStock(adminWallet, {
