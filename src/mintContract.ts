@@ -12,7 +12,7 @@ export type MintContractParams = {
   creationTimestampMillis: number;
   description: string;
   currency: Currency;
-  image: string;
+  productId: string;
 };
 
 export type MintContractResult = {
@@ -34,7 +34,7 @@ export async function mintContract(
     creationTimestampMillis,
     description,
     currency,
-    image,
+    productId,
   } = params;
   const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
@@ -49,7 +49,8 @@ export async function mintContract(
         txb.pure(creationTimestampMillis),
         txb.pure(description),
         txb.pure(currency),
-        txb.pure(image),
+        // AKA reference AKA image
+        txb.pure(productId),
       ],
     });
   });

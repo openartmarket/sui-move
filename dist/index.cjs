@@ -21,9 +21,19 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var src_exports = {};
 __export(src_exports, {
   endMotion: () => endMotion,
+  getAddressOwner: () => getAddressOwner,
   getContractStocks: () => getContractStocks,
+  getCreatedObjects: () => getCreatedObjects,
+  getIntField: () => getIntField,
+  getObjectData: () => getObjectData,
+  getParsedData: () => getParsedData,
+  getQuantity: () => getQuantity,
+  getStringField: () => getStringField,
+  getType: () => getType,
+  getWalletQuantity: () => getWalletQuantity,
   mintContract: () => mintContract,
   mintContractStock: () => mintContractStock,
+  newSuiAddress: () => newSuiAddress,
   newWallet: () => newWallet,
   splitTransferMerge: () => splitTransferMerge,
   startMotion: () => startMotion,
@@ -93,6 +103,43 @@ function getStringField(data, key) {
   }
   return getStringField2(fields, key);
 }
+async function getQuantity(suiClient, id) {
+  const response = await suiClient.getObject({
+    id,
+    options: { showContent: true, showOwner: true }
+  });
+  const objectData = getObjectData(response);
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
+async function getWalletQuantity(wallet, id) {
+  const { suiClient } = wallet;
+  const response = await suiClient.getObject({
+    id,
+    options: { showContent: true, showOwner: true }
+  });
+  const objectData = getObjectData(response);
+  const addressOwner = getAddressOwner(objectData);
+  if (addressOwner !== wallet.address) {
+    throw new Error(
+      `Object ${objectData} is not owned by ${wallet.address} but by ${addressOwner}`
+    );
+  }
+  const parsedData = getParsedData(objectData);
+  return getIntField(parsedData, "shares");
+}
+function getAddressOwner(objectData) {
+  const owner = objectData.owner;
+  if (!owner)
+    throw new Error(`Object ${objectData} has no owner`);
+  if (typeof owner === "string") {
+    throw new Error(`Object ${objectData} has a string owner ${owner}`);
+  }
+  if ("AddressOwner" in owner) {
+    return owner.AddressOwner;
+  }
+  return null;
+}
 function getMoveObject(data) {
   const { dataType } = data;
   if (dataType !== "moveObject") {
@@ -152,7 +199,7 @@ async function mintContract(wallet, params) {
     creationTimestampMillis,
     description,
     currency,
-    image
+    productId
   } = params;
   const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
@@ -167,7 +214,8 @@ async function mintContract(wallet, params) {
         txb.pure(creationTimestampMillis),
         txb.pure(description),
         txb.pure(currency),
-        txb.pure(image)
+        // AKA reference AKA image
+        txb.pure(productId)
       ]
     });
   });
@@ -181,30 +229,26 @@ async function mintContract(wallet, params) {
 
 // src/mintContractStock.ts
 async function mintContractStock(wallet, params) {
+  const { adminCapId, contractId, quantity, receiverAddress } = params;
   const response = await wallet.execute(async (txb, packageId) => {
-    for (const { adminCapId, contractId, quantity, receiverAddress } of params) {
-      txb.moveCall({
-        target: `${packageId}::open_art_market::mint_contract_stock`,
-        arguments: [
-          txb.object(adminCapId),
-          txb.object(contractId),
-          txb.pure(quantity),
-          txb.pure(receiverAddress)
-        ]
-      });
-    }
+    txb.moveCall({
+      target: `${packageId}::open_art_market::mint_contract_stock`,
+      arguments: [
+        txb.object(adminCapId),
+        txb.object(contractId),
+        txb.pure(quantity),
+        txb.pure(receiverAddress)
+      ]
+    });
   });
-  const addressOwnedObjects = getCreatedObjects(response).filter(
-    (object) => typeof object.owner !== "string" && "AddressOwner" in object.owner
-  );
-  const contractStockIds = addressOwnedObjects.map((object) => object.objectId);
-  if (contractStockIds.length !== params.length) {
-    throw new Error(
-      `Expected ${params.length} contract stock ids, got ${JSON.stringify(contractStockIds)}`
-    );
-  }
   const { digest } = response;
-  return { contractStockIds, digest };
+  const objects = getCreatedObjects(response);
+  const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
+  if (ownedObjects.length !== 1) {
+    throw new Error(`Expected 1 owned objects, got ${JSON.stringify(ownedObjects, null, 2)}`);
+  }
+  const contractStockId = ownedObjects[0].objectId;
+  return { contractStockId, digest };
 }
 
 // src/mergeContractStock.ts
@@ -272,13 +316,43 @@ async function splitTransferMerge({
   )) {
     await mergeContractStock(fromWallet, [{ fromContractStockId, toContractStockId }]);
   }
-  const { splitContractStockId } = await splitContractStock(fromWallet, {
-    contractStockId: fromContractStocks[0].objectId,
-    quantity
+  const fromContractStocksAfterMerge = await getContractStocks({
+    suiClient: fromWallet.suiClient,
+    owner: fromWallet.address,
+    contractId,
+    packageId
   });
+  if (fromContractStocksAfterMerge.length !== 1) {
+    throw new Error(
+      `Expected a single stock after merge, but got ${JSON.stringify(
+        fromContractStocksAfterMerge,
+        null,
+        2
+      )}`
+    );
+  }
+  const currentQuantity = await getWalletQuantity(
+    fromWallet,
+    fromContractStocksAfterMerge[0].objectId
+  );
+  if (currentQuantity < quantity) {
+    throw new Error(
+      `Cannot transfer ${quantity} stocks, because there are only ${currentQuantity} stocks`
+    );
+  }
+  let contractStockId;
+  if (currentQuantity > quantity) {
+    const { splitContractStockId } = await splitContractStock(fromWallet, {
+      contractStockId: fromContractStocksAfterMerge[0].objectId,
+      quantity
+    });
+    contractStockId = splitContractStockId;
+  } else {
+    contractStockId = fromContractStocks[0].objectId;
+  }
   const { digest } = await transferContractStock(fromWallet, {
     contractId,
-    contractStockId: splitContractStockId,
+    contractStockId,
     toAddress: toWallet.address
   });
   const toContractStocks = await getContractStocks({
@@ -323,6 +397,46 @@ async function startMotion(wallet, params) {
   const createdObject = createdObjects[0];
   const motionId = createdObject.objectId;
   return { digest, motionId };
+}
+
+// src/sui.ts
+var import_node_child_process = require("child_process");
+async function getSuiCoinObjectId() {
+  const gas = await execSui("sui client gas --json");
+  return gas[0].id.id;
+}
+async function newSuiAddress(balance = 2e10) {
+  const [address, phrase] = await execSui(
+    "sui client new-address ed25519 --json"
+  );
+  const suiCoinObjectId = await getSuiCoinObjectId();
+  await transferSui({ to: address, suiCoinObjectId, amount: balance });
+  return { address, phrase };
+}
+async function transferSui({
+  to,
+  suiCoinObjectId,
+  amount,
+  gasBudget = 2e8
+}) {
+  await execSui(
+    `sui client transfer-sui --amount ${amount} --to "${to}" --gas-budget ${gasBudget} --sui-coin-object-id "${suiCoinObjectId}" --json`
+  );
+}
+async function execSui(command) {
+  return new Promise((resolve, reject) => {
+    (0, import_node_child_process.exec)(command, (err, stdout, stderr) => {
+      if (err)
+        return reject(err);
+      if (stderr)
+        return reject(new Error(stderr));
+      try {
+        resolve(JSON.parse(stdout));
+      } catch (err2) {
+        reject(`Didn't get JSON output from sui: ${stdout}`);
+      }
+    });
+  });
 }
 
 // src/toContractStock.ts
@@ -479,9 +593,19 @@ async function newWallet(params) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   endMotion,
+  getAddressOwner,
   getContractStocks,
+  getCreatedObjects,
+  getIntField,
+  getObjectData,
+  getParsedData,
+  getQuantity,
+  getStringField,
+  getType,
+  getWalletQuantity,
   mintContract,
   mintContractStock,
+  newSuiAddress,
   newWallet,
   splitTransferMerge,
   startMotion,

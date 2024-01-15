@@ -29,30 +29,24 @@ describe("DAO Voting structure", () => {
     user2 = await makeWallet();
     user3 = await makeWallet();
 
-    await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: ADMIN_ADDRESS,
-        quantity: 151,
-      },
-    ]);
-    await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: user1.address,
-        quantity: 249,
-      },
-    ]);
-    await mintContractStock(adminWallet, [
-      {
-        adminCapId: ADMIN_CAP_ID,
-        contractId,
-        receiverAddress: user2.address,
-        quantity: 100,
-      },
-    ]);
+    await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: ADMIN_ADDRESS,
+      quantity: 151,
+    });
+    await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: user1.address,
+      quantity: 249,
+    });
+    await mintContractStock(adminWallet, {
+      adminCapId: ADMIN_CAP_ID,
+      contractId,
+      receiverAddress: user2.address,
+      quantity: 100,
+    });
   }, 30_000);
 
   it("can start a motion", async () => {
