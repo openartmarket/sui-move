@@ -5,9 +5,11 @@ import { TransactionBlock } from '@mysten/sui.js/transactions';
 type NetworkName = "mainnet" | "testnet" | "devnet" | "localnet";
 type Currency = "USD" | "EUR" | "GBP" | "NOK";
 
-interface Wallet {
+type ReadonlyWallet = {
     readonly address: string;
     readonly suiClient: SuiClient;
+};
+interface Wallet extends ReadonlyWallet {
     execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
 }
 type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promise<void>;
@@ -67,7 +69,7 @@ declare function getQuantity(suiClient: SuiClient, id: string): Promise<number>;
 /**
  * Get the quantity of a contract or a contract stock.
  */
-declare function getWalletQuantity(wallet: Wallet, id: string): Promise<number>;
+declare function getWalletQuantity(wallet: ReadonlyWallet, id: string): Promise<number>;
 declare function getAddressOwner(objectData: SuiObjectData): string | null;
 declare function getIntField(data: SuiParsedData, key: string): number;
 
@@ -162,4 +164,4 @@ type VoteResult = {
 };
 declare function vote(wallet: Wallet, params: VoteParams): Promise<VoteResult>;
 
-export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type SuiAddress, type VoteParams, type VoteResult, type Wallet, endMotion, getAddressOwner, getContractStocks, getCreatedObjects, getIntField, getObjectData, getParsedData, getQuantity, getStringField, getType, getWalletQuantity, mintContract, mintContractStock, newSuiAddress, newWallet, splitTransferMerge, startMotion, toContractStock, vote };
+export { type BuildTransactionBlock, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type ReadonlyWallet, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type SuiAddress, type VoteParams, type VoteResult, type Wallet, endMotion, getAddressOwner, getContractStocks, getCreatedObjects, getIntField, getObjectData, getParsedData, getQuantity, getStringField, getType, getWalletQuantity, mintContract, mintContractStock, newSuiAddress, newWallet, splitTransferMerge, startMotion, toContractStock, vote };

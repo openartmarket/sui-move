@@ -7,9 +7,12 @@ import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shi
 import type { NetworkName } from "./types.js";
 import { ShinamiWallet, SuiWallet } from "./wallets.js";
 
-export interface Wallet {
+export type ReadonlyWallet = {
   readonly address: string;
   readonly suiClient: SuiClient;
+};
+
+export interface Wallet extends ReadonlyWallet {
   execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
 }
 

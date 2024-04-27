@@ -8,7 +8,7 @@ import type {
   SuiTransactionBlockResponse,
 } from "@mysten/sui.js/client";
 
-import type { Wallet } from "./Wallet.js";
+import type { ReadonlyWallet } from "./Wallet.js";
 
 export function getCreatedObjects(txRes: SuiTransactionBlockResponse): SuiObjectChangeCreated[] {
   return (txRes.objectChanges || []).filter(
@@ -80,7 +80,7 @@ export async function getQuantity(suiClient: SuiClient, id: string): Promise<num
 /**
  * Get the quantity of a contract or a contract stock.
  */
-export async function getWalletQuantity(wallet: Wallet, id: string): Promise<number> {
+export async function getWalletQuantity(wallet: ReadonlyWallet, id: string): Promise<number> {
   const { suiClient } = wallet;
   const response = await suiClient.getObject({
     id,
