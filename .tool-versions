@@ -2,5 +2,5 @@ cmake 3.26.4
 direnv 2.32.2
 jq 1.6
 rust 1.70.0
-nodejs 18.16.0
+nodejs 20.12.2
 github-cli 2.29.0
