@@ -41,24 +41,24 @@ export async function makeWallet(): Promise<Wallet> {
 }
 
 export async function makeAdminWallet(): Promise<Wallet> {
-  // if (process.env.SHINAMI_ENABLED) {
-  //   const shinamiAccessKey = getEnv("SHINAMI_ACCESS_KEY");
+  if (process.env.SHINAMI_ENABLED) {
+    const shinamiAccessKey = getEnv("SHINAMI_ACCESS_KEY");
 
-  //   return newWallet({
-  //     type: "shinami",
-  //     packageId: PACKAGE_ID,
-  //     shinamiAccessKey,
-  //     keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
-  //   });
-  // } else {
-  const suiAddress: SuiAddress = {
-    address: ADMIN_ADDRESS,
-    phrase: ADMIN_PHRASE,
-  };
-  const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
-  const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
-  return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, keypair });
-  // }
+    return newWallet({
+      type: "shinami",
+      packageId: PACKAGE_ID,
+      shinamiAccessKey,
+      keypair: Ed25519Keypair.deriveKeypair(ADMIN_PHRASE),
+    });
+  } else {
+    const suiAddress: SuiAddress = {
+      address: ADMIN_ADDRESS,
+      phrase: ADMIN_PHRASE,
+    };
+    const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
+    const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
+    return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, keypair });
+  }
 }
 
 export const adminWallet = await makeAdminWallet();
