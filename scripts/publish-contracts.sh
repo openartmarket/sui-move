@@ -33,6 +33,6 @@ echo "export UPGRADE_CAP_ID=\"$UPGRADE_CAP_ID\"" >> .sui.env
 direnv allow
 
 # Publish the display of the contracts
-direnv exec . npx ts-node ./scripts/publish-displays.ts
+direnv exec . npx tsx ./scripts/publish-displays.ts
 
 echo "✅ Package published → https://suiscan.xyz/$SUI_NETWORK/object/$PACKAGE_ID"

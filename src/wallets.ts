@@ -2,8 +2,8 @@ import { fromB64 } from "@mysten/bcs";
 import type { SuiClient, SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import type { Keypair } from "@mysten/sui.js/cryptography";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import type { GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
-import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients";
+import type { GasStationClient, KeyClient, WalletClient } from "@shinami/clients/sui";
+import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients/sui";
 
 import type { BuildTransactionBlock, Wallet } from "./Wallet.js";
 

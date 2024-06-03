@@ -86,8 +86,7 @@ async function getWalletQuantity(wallet, id) {
 }
 function getAddressOwner(objectData) {
   const owner = objectData.owner;
-  if (!owner)
-    throw new Error(`Object ${objectData} has no owner`);
+  if (!owner) throw new Error(`Object ${objectData} has no owner`);
   if (typeof owner === "string") {
     throw new Error(`Object ${objectData} has a string owner ${owner}`);
   }
@@ -177,8 +176,7 @@ async function mintContract(wallet, params) {
   });
   const { digest } = response;
   const objects = getCreatedObjects(response);
-  if (objects.length !== 1)
-    throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
+  if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
   const contractId = objects[0].objectId;
   return { contractId, digest };
 }
@@ -382,10 +380,8 @@ async function transferSui({
 async function execSui(command) {
   return new Promise((resolve, reject) => {
     exec(command, (err, stdout, stderr) => {
-      if (err)
-        return reject(err);
-      if (stderr)
-        return reject(new Error(stderr));
+      if (err) return reject(err);
+      if (stderr) return reject(new Error(stderr));
       try {
         resolve(JSON.parse(stdout));
       } catch (err2) {
@@ -422,12 +418,12 @@ async function vote(wallet, params) {
 
 // src/Wallet.ts
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
-import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
+import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients/sui";
 
 // src/wallets.ts
 import { fromB64 } from "@mysten/bcs";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients";
+import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients/sui";
 var SuiWallet = class {
   constructor(params) {
     this.params = params;
