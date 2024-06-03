@@ -418,12 +418,12 @@ async function vote(wallet, params) {
 
 // src/Wallet.ts
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
-import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
+import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients/sui";
 
 // src/wallets.ts
 import { fromB64 } from "@mysten/bcs";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients";
+import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients/sui";
 var SuiWallet = class {
   constructor(params) {
     this.params = params;

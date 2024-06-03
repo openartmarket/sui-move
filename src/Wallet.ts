@@ -2,7 +2,7 @@ import type { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import type { Keypair } from "@mysten/sui.js/cryptography";
 import type { TransactionBlock } from "@mysten/sui.js/transactions";
-import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
+import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients/sui";
 
 import type { NetworkName } from "./types.js";
 import { ShinamiWallet, SuiWallet } from "./wallets.js";
