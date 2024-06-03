@@ -130,8 +130,7 @@ async function getWalletQuantity(wallet, id) {
 }
 function getAddressOwner(objectData) {
   const owner = objectData.owner;
-  if (!owner)
-    throw new Error(`Object ${objectData} has no owner`);
+  if (!owner) throw new Error(`Object ${objectData} has no owner`);
   if (typeof owner === "string") {
     throw new Error(`Object ${objectData} has a string owner ${owner}`);
   }
@@ -221,8 +220,7 @@ async function mintContract(wallet, params) {
   });
   const { digest } = response;
   const objects = getCreatedObjects(response);
-  if (objects.length !== 1)
-    throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
+  if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
   const contractId = objects[0].objectId;
   return { contractId, digest };
 }
@@ -426,10 +424,8 @@ async function transferSui({
 async function execSui(command) {
   return new Promise((resolve, reject) => {
     (0, import_node_child_process.exec)(command, (err, stdout, stderr) => {
-      if (err)
-        return reject(err);
-      if (stderr)
-        return reject(new Error(stderr));
+      if (err) return reject(err);
+      if (stderr) return reject(new Error(stderr));
       try {
         resolve(JSON.parse(stdout));
       } catch (err2) {
