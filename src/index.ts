@@ -7,6 +7,6 @@ export * from "./splitTransferMerge.js";
 export * from "./startMotion.js";
 export * from "./sui.js";
 export * from "./toContractStock.js";
-export * from "./types.js";
+export type * from "./types.js";
 export * from "./vote.js";
 export * from "./Wallet.js";

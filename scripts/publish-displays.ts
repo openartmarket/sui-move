@@ -1,4 +1,4 @@
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 
 import { ContractFields, ContractStockFields, createDisplay } from "../src/createDisplay.js";
 import { adminWallet, getEnv } from "../test/test-helpers.js";

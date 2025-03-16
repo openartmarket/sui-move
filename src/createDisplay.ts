@@ -44,7 +44,11 @@ export async function createDisplay(
 
     const contractDisplay = txb.moveCall({
       target: "0x2::display::new_with_fields",
-      arguments: [txb.object(publisherId), txb.pure(keys), txb.pure(values)],
+      arguments: [
+        txb.object(publisherId),
+        txb.pure.vector("string", keys),
+        txb.pure.vector("string", values),
+      ],
       typeArguments: [typeArgument],
     });
 
@@ -54,7 +58,7 @@ export async function createDisplay(
       typeArguments: [typeArgument],
     });
 
-    txb.transferObjects([contractDisplay], txb.pure(address));
+    txb.transferObjects([contractDisplay], txb.pure.address(address));
   });
 
   const { digest } = response;
