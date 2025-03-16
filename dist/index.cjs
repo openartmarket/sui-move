@@ -465,24 +465,8 @@ async function vote(wallet, params) {
 }
 
 // src/Wallet.ts
-var import_client2 = require("@mysten/sui.js/client");
-var import_clients2 = require("@shinami/clients");
-
-// src/createShinamiSuiClient.ts
 var import_client = require("@mysten/sui.js/client");
-var NODE_RPC_URL = "https://api.shinami.com/sui/node/v1";
-var NODE_WS_URL = "wss://api.shinami.com/sui/node/v1";
-function createShinamiSuiClient(accessKey, fetcher, url = NODE_RPC_URL, wsUrl = NODE_WS_URL) {
-  return new import_client.SuiClient({
-    transport: new import_client.SuiHTTPTransport({
-      url: `${url}/${accessKey}`,
-      websocket: {
-        url: `${wsUrl}/${accessKey}`
-      },
-      fetch: fetcher
-    })
-  });
-}
+var import_clients2 = require("@shinami/clients");
 
 // src/wallets.ts
 var import_bcs = require("@mysten/bcs");
@@ -566,12 +550,12 @@ function checkResponse(response) {
 }
 
 // src/Wallet.ts
-async function newWallet(params, fetcher) {
+async function newWallet(params) {
   switch (params.type) {
     case "sui": {
       const { network, packageId, keypair } = params;
-      const url = (0, import_client2.getFullnodeUrl)(network);
-      const suiClient = new import_client2.SuiClient({ url });
+      const url = (0, import_client.getFullnodeUrl)(network);
+      const suiClient = new import_client.SuiClient({ url });
       return new SuiWallet({
         packageId,
         suiClient,
@@ -580,7 +564,7 @@ async function newWallet(params, fetcher) {
     }
     case "shinami": {
       const { packageId, shinamiAccessKey, keypair } = params;
-      const suiClient = createShinamiSuiClient(shinamiAccessKey, fetcher);
+      const suiClient = (0, import_clients2.createSuiClient)(shinamiAccessKey);
       return new SuiWallet({
         packageId,
         suiClient,
@@ -589,7 +573,7 @@ async function newWallet(params, fetcher) {
     }
     case "shinami-sponsored": {
       const { packageId, shinamiAccessKey, address, walletId, secret } = params;
-      const suiClient = createShinamiSuiClient(shinamiAccessKey, fetcher);
+      const suiClient = (0, import_clients2.createSuiClient)(shinamiAccessKey);
       const gasClient = new import_clients2.GasStationClient(shinamiAccessKey);
       const keyClient = new import_clients2.KeyClient(shinamiAccessKey);
       const walletClient = new import_clients2.WalletClient(shinamiAccessKey);
