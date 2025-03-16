@@ -2,8 +2,9 @@ import type { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import type { Keypair } from "@mysten/sui.js/cryptography";
 import type { TransactionBlock } from "@mysten/sui.js/transactions";
-import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
+import { GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
 
+import { createShinamiSuiClient } from "./createShinamiSuiClient.js";
 import type { NetworkName } from "./types.js";
 import { ShinamiWallet, SuiWallet } from "./wallets.js";
 
@@ -46,7 +47,10 @@ export type NewShinamiSponsoredWalletParams = {
   secret: string;
 };
 
-export async function newWallet(params: NewWalletParams): Promise<Wallet> {
+export async function newWallet(
+  params: NewWalletParams,
+  fetcher: typeof globalThis.fetch,
+): Promise<Wallet> {
   switch (params.type) {
     case "sui": {
       const { network, packageId, keypair } = params;
@@ -60,7 +64,7 @@ export async function newWallet(params: NewWalletParams): Promise<Wallet> {
     }
     case "shinami": {
       const { packageId, shinamiAccessKey, keypair } = params;
-      const suiClient = createSuiClient(shinamiAccessKey);
+      const suiClient = createShinamiSuiClient(shinamiAccessKey, fetcher);
 
       return new SuiWallet({
         packageId,
@@ -70,7 +74,7 @@ export async function newWallet(params: NewWalletParams): Promise<Wallet> {
     }
     case "shinami-sponsored": {
       const { packageId, shinamiAccessKey, address, walletId, secret } = params;
-      const suiClient = createSuiClient(shinamiAccessKey);
+      const suiClient = createShinamiSuiClient(shinamiAccessKey, fetcher);
 
       const gasClient = new GasStationClient(shinamiAccessKey);
       const keyClient = new KeyClient(shinamiAccessKey);
