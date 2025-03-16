@@ -1,5 +1,5 @@
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import { KeyClient, WalletClient } from "@shinami/clients";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { KeyClient, WalletClient } from "@shinami/clients/sui";
 import { randomUUID } from "crypto";
 
 import type { MintContractParams } from "../src/mintContract.js";

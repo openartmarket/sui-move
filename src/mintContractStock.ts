@@ -24,8 +24,8 @@ export async function mintContractStock(
       arguments: [
         txb.object(adminCapId),
         txb.object(contractId),
-        txb.pure(quantity),
-        txb.pure(receiverAddress),
+        txb.pure.u64(quantity),
+        txb.pure.address(receiverAddress),
       ],
     });
   });

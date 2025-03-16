@@ -18,7 +18,11 @@ export async function transferContractStock(
     const { contractId, contractStockId, toAddress } = params;
     txb.moveCall({
       target: `${packageId}::open_art_market::transfer_contract_stock`,
-      arguments: [txb.object(contractId), txb.pure(contractStockId), txb.pure(toAddress)],
+      arguments: [
+        txb.object(contractId),
+        txb.pure.string(contractStockId),
+        txb.pure.address(toAddress),
+      ],
     });
   });
   const { digest } = response;

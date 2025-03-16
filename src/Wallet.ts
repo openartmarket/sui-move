@@ -1,8 +1,8 @@
-import type { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
-import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
-import type { Keypair } from "@mysten/sui.js/cryptography";
-import type { TransactionBlock } from "@mysten/sui.js/transactions";
-import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
+import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
+import type { Keypair } from "@mysten/sui/cryptography";
+import type { Transaction } from "@mysten/sui/transactions";
+import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients/sui";
 
 import type { NetworkName } from "./types.js";
 import { ShinamiWallet, SuiWallet } from "./wallets.js";
@@ -13,10 +13,10 @@ export type ReadonlyWallet = {
 };
 
 export interface Wallet extends ReadonlyWallet {
-  execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;
+  execute(build: BuildTransaction): Promise<SuiTransactionBlockResponse>;
 }
 
-export type BuildTransactionBlock = (txb: TransactionBlock, packageId: string) => Promise<void>;
+export type BuildTransaction = (txn: Transaction, packageId: string) => Promise<void>;
 
 export type NewWalletParams =
   | NewSuiWalletParams
