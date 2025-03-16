@@ -73,7 +73,9 @@ export class ShinamiWallet implements Wallet {
 
     const signer = new ShinamiWalletSigner(walletId, walletClient, secret, keyClient);
 
-    const gaslessTxn = await buildGaslessTransaction((txb) => build(txb, packageId));
+    const gaslessTxn = await buildGaslessTransaction((txb) => build(txb, packageId), {
+      sui: suiClient,
+    });
 
     const sponsoredResponse = await gasStationClient.sponsorTransaction({
       gasBudget: SUI_GAS_FEE_LIMIT,

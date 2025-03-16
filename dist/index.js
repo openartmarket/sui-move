@@ -469,7 +469,9 @@ var ShinamiWallet = class {
   async execute(build) {
     const { suiClient, gasStationClient, walletClient, keyClient, packageId, walletId, secret } = this.params;
     const signer = new ShinamiWalletSigner(walletId, walletClient, secret, keyClient);
-    const gaslessTxn = await buildGaslessTransaction((txb) => build(txb, packageId));
+    const gaslessTxn = await buildGaslessTransaction((txb) => build(txb, packageId), {
+      sui: suiClient
+    });
     const sponsoredResponse = await gasStationClient.sponsorTransaction({
       gasBudget: SUI_GAS_FEE_LIMIT,
       txKind: gaslessTxn.txKind,
