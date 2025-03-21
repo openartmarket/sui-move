@@ -17,7 +17,6 @@ export async function getContractStocks(
   params: GetContractStocksParams,
 ): Promise<readonly SuiObjectData[]> {
   const { suiClient, owner, contractId, packageId, cursor } = params;
-  const type = `${packageId}::open_art_market::ContractStock`;
   const response = await suiClient.getOwnedObjects({
     owner,
     options: {
@@ -27,6 +26,7 @@ export async function getContractStocks(
   });
   const data = response.data.map(getObjectData).filter((object) => {
     const parsedData = getParsedData(object);
+    const type = `${packageId}::open_art_market::ContractStock`;
     return getType(parsedData) === type && getStringField(parsedData, "contract_id") === contractId;
   });
   if (response.hasNextPage && response.nextCursor) {
