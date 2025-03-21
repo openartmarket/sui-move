@@ -1,118 +1,69 @@
 {
-  "name": "@openartmarket/sui",
-  "version": "0.3.0",
-  "description": "Contracts for Open Art Market (https://www.openartmarket.com/)",
-  "author": {
-    "name": "Open Art Market",
-    "email": "hi@openartmarket.com",
-    "url": "https://github.com/openartmarket/sui-move"
-  },
-  "files": [
-    "./dist"
-  ],
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "scripts": {
-    "test": "vitest run --coverage",
-    "compile": "tsc --build",
-    "build": "tsup",
-    "upgrade": "npm-check-updates --upgrade",
-    "prepare": "husky install",
-    "lint-staged": "lint-staged",
-    "format": "prettier '{scripts,src,test}/**/*.ts' --write --list-different",
-    "lint": "eslint '{scripts,src,test}/**/*.ts' --quiet --fix"
-  },
-  "repository": "openartmarket/sui-move",
-  "license": "MIT",
-  "dependencies": {
-    "@mysten/bcs": "0.9.1",
-    "@mysten/sui.js": "0.48.1",
-    "@shinami/clients": "0.7.2"
-  },
-  "devDependencies": {
-    "@types/node": "22.13.11",
-    "@typescript-eslint/eslint-plugin": "8.27.0",
-    "@typescript-eslint/parser": "8.27.0",
-    "@vitest/coverage-v8": "3.0.9",
-    "@vitest/ui": "3.0.9",
-    "eslint": "9.23.0",
-    "eslint-config-prettier": "10.1.1",
-    "eslint-plugin-simple-import-sort": "12.1.1",
-    "husky": "9.1.7",
-    "lint-staged": "15.5.0",
-    "npm-check-updates": "17.1.16",
-    "prettier": "3.5.3",
-    "tsup": "8.4.0",
-    "tsx": "4.19.3",
-    "typescript": "5.8.2",
-    "vite": "6.2.2",
-    "vitest": "3.0.9"
-  },
-  "prettier": {
-    "semi": true,
-    "plugins": [],
-    "printWidth": 100,
-    "singleQuote": false,
-    "trailingComma": "all",
-    "arrowParens": "always"
-  },
-  "lint-staged": {
-    "{scripts,src,test}/**/*.ts": [
-      "eslint --quiet --fix",
-      "prettier --write --list-different"
-    ]
-  },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "project": "./tsconfig.json",
-      "ecmaVersion": "latest",
-      "sourceType": "module"
-    },
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended"
-    ],
-    "rules": {
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
-      "@typescript-eslint/consistent-type-exports": "error",
-      "@typescript-eslint/consistent-type-imports": "error"
-    },
-    "plugins": [
-      "simple-import-sort"
-    ],
-    "env": {
-      "node": true
-    },
-    "ignorePatterns": [
-      "dist"
-    ]
-  },
-  "tsup": {
-    "dts": true,
-    "entryPoints": [
-      "src/index.ts"
-    ],
-    "external": [
-      "@mysten/bcs",
-      "@mysten/sui.js"
-    ],
-    "format": [
-      "cjs",
-      "esm"
-    ],
-    "sourcemap": true,
-    "splitting": false,
-    "bundle": true,
-    "clean": true
-  }
+	"name": "@openartmarket/sui",
+	"version": "0.3.0",
+	"description": "Contracts for Open Art Market (https://www.openartmarket.com/)",
+	"author": {
+		"name": "Open Art Market",
+		"email": "hi@openartmarket.com",
+		"url": "https://github.com/openartmarket/sui-move"
+	},
+	"files": [
+		"./dist"
+	],
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"scripts": {
+		"test": "vitest run --coverage",
+		"compile": "tsc --build",
+		"build": "tsup",
+		"upgrade": "npm-check-updates --upgrade",
+		"check": "npx @biomejs/biome check --write src test"
+	},
+	"repository": "openartmarket/sui-move",
+	"license": "MIT",
+	"dependencies": {
+		"@mysten/bcs": "0.9.1",
+		"@mysten/sui.js": "0.48.1",
+		"@shinami/clients": "0.7.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/node": "22.13.11",
+		"@vitest/coverage-v8": "3.0.9",
+		"@vitest/ui": "3.0.9",
+		"eslint": "9.23.0",
+		"npm-check-updates": "17.1.16",
+		"prettier": "3.5.3",
+		"tsup": "8.4.0",
+		"tsx": "4.19.3",
+		"typescript": "5.8.2",
+		"vite": "6.2.2",
+		"vitest": "3.0.9"
+	},
+	"tsup": {
+		"dts": true,
+		"entryPoints": [
+			"src/index.ts"
+		],
+		"external": [
+			"@mysten/bcs",
+			"@mysten/sui.js"
+		],
+		"format": [
+			"cjs",
+			"esm"
+		],
+		"sourcemap": true,
+		"splitting": false,
+		"bundle": true,
+		"clean": true
+	}
 }

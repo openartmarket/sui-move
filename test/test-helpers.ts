@@ -1,12 +1,12 @@
+import { randomUUID } from "crypto";
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { KeyClient, WalletClient } from "@shinami/clients";
-import { randomUUID } from "crypto";
 
-import type { MintContractParams } from "../src/mintContract.js";
-import { newSuiAddress, type SuiAddress } from "../src/sui.js";
-import type { NetworkName } from "../src/types.js";
 import type { Wallet } from "../src/Wallet.js";
 import { newWallet } from "../src/Wallet.js";
+import type { MintContractParams } from "../src/mintContract.js";
+import { type SuiAddress, newSuiAddress } from "../src/sui.js";
+import type { NetworkName } from "../src/types.js";
 
 export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
 export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
@@ -36,7 +36,12 @@ export async function makeWallet(): Promise<Wallet> {
     const suiAddress = await newSuiAddress();
     const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
     const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
-    return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, keypair });
+    return newWallet({
+      type: "sui",
+      packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
+      keypair,
+    });
   }
 }
 
@@ -57,7 +62,12 @@ export async function makeAdminWallet(): Promise<Wallet> {
     };
     const keypair = Ed25519Keypair.deriveKeypair(suiAddress.phrase);
     const SUI_NETWORK = getEnv("SUI_NETWORK") as NetworkName;
-    return newWallet({ type: "sui", packageId: PACKAGE_ID, network: SUI_NETWORK, keypair });
+    return newWallet({
+      type: "sui",
+      packageId: PACKAGE_ID,
+      network: SUI_NETWORK,
+      keypair,
+    });
   }
 }
 

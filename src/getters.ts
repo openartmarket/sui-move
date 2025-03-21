@@ -127,7 +127,7 @@ function toInt(s: string) {
   if (!s.match(/^[0-9]+$/)) {
     throw new Error(`${s} is not a valid integer`);
   }
-  const number = parseInt(s, 10);
+  const number = Number.parseInt(s, 10);
   if (isNaN(number) || !Number.isInteger(number)) {
     throw new Error(`${s} is not a valid integer`);
   }

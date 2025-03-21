@@ -1,12 +1,12 @@
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 
+import type { Wallet } from "../src/Wallet.js";
 import { endMotion } from "../src/endMotion.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
 import { startMotion } from "../src/startMotion.js";
 import { vote } from "../src/vote.js";
-import type { Wallet } from "../src/Wallet.js";
 import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
@@ -21,7 +21,7 @@ describe("DAO Voting structure", () => {
   let user2: Wallet;
   let user3: Wallet;
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 

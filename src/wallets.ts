@@ -3,7 +3,7 @@ import type { SuiClient, SuiTransactionBlockResponse } from "@mysten/sui.js/clie
 import type { Keypair } from "@mysten/sui.js/cryptography";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import type { GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
-import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients";
+import { ShinamiWalletSigner, buildGaslessTransactionBytes } from "@shinami/clients";
 
 import type { BuildTransactionBlock, Wallet } from "./Wallet.js";
 

@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
+import type { Wallet } from "../src/Wallet.js";
 import { getWalletQuantity } from "../src/getters.js";
 import { mergeContractStock } from "../src/mergeContractStock.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
-import type { Wallet } from "../src/Wallet.js";
 import { ADMIN_CAP_ID, adminWallet, makeWallet, mintContractOptions } from "./test-helpers";
 
 describe("mergeContractStock", () => {
   let contractId: string;
   let wallet: Wallet;
-  beforeEach(async function () {
+  beforeEach(async () => {
     const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 

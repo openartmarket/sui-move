@@ -1,11 +1,11 @@
-import {
+import type {
   QueryTransactionBlocksParams,
   SuiClient,
   SuiTransactionBlockResponse,
 } from "@mysten/sui.js/dist/cjs/client/index.js";
+import type { Wallet } from "./Wallet.js";
 import { getCreatedObjects } from "./getters.js";
 import type { Currency } from "./types.js";
-import type { Wallet } from "./Wallet.js";
 
 export type MintContractParams = {
   adminCapId: string;
@@ -113,7 +113,7 @@ export async function mintContract(
 }
 
 async function queryAllTransactions(client: SuiClient, params: QueryTransactionBlocksParams) {
-  let data: SuiTransactionBlockResponse[] = [];
+  const data: SuiTransactionBlockResponse[] = [];
   let cursor = undefined;
   do {
     const result = await client.queryTransactionBlocks({ ...params, cursor });

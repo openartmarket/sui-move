@@ -110,7 +110,7 @@ function toInt(s) {
   if (!s.match(/^[0-9]+$/)) {
     throw new Error(`${s} is not a valid integer`);
   }
-  const number = parseInt(s, 10);
+  const number = Number.parseInt(s, 10);
   if (isNaN(number) || !Number.isInteger(number)) {
     throw new Error(`${s} is not a valid integer`);
   }
@@ -221,7 +221,7 @@ async function mintContract(wallet, params) {
   return { contractId, digest };
 }
 async function queryAllTransactions(client, params) {
-  let data = [];
+  const data = [];
   let cursor = void 0;
   do {
     const result = await client.queryTransactionBlocks({ ...params, cursor });
@@ -434,7 +434,7 @@ async function execSui(command) {
       if (stderr) return reject(new Error(stderr));
       try {
         resolve(JSON.parse(stdout));
-      } catch (err2) {
+      } catch {
         reject(`Didn't get JSON output from sui: ${stdout}`);
       }
     });
@@ -467,13 +467,13 @@ async function vote(wallet, params) {
 }
 
 // src/Wallet.ts
-import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
-import { createSuiClient, GasStationClient, KeyClient, WalletClient } from "@shinami/clients";
+import { SuiClient, getFullnodeUrl } from "@mysten/sui.js/client";
+import { GasStationClient, KeyClient, WalletClient, createSuiClient } from "@shinami/clients";
 
 // src/wallets.ts
 import { fromB64 } from "@mysten/bcs";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { buildGaslessTransactionBytes, ShinamiWalletSigner } from "@shinami/clients";
+import { ShinamiWalletSigner, buildGaslessTransactionBytes } from "@shinami/clients";
 var SuiWallet = class {
   constructor(params) {
     this.params = params;

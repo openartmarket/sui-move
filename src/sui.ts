@@ -49,7 +49,7 @@ async function execSui<T extends Json>(command: string): Promise<T> {
       if (stderr) return reject(new Error(stderr));
       try {
         resolve(JSON.parse(stdout) as T);
-      } catch (err) {
+      } catch {
         reject(`Didn't get JSON output from sui: ${stdout}`);
       }
     });

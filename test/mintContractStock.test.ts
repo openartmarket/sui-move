@@ -2,10 +2,10 @@ import assert from "node:assert";
 
 import { beforeEach, describe, expect, it } from "vitest";
 
+import type { Wallet } from "../src/Wallet.js";
 import { getQuantity } from "../src/getters.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
-import type { Wallet } from "../src/Wallet.js";
 import { ADMIN_CAP_ID, adminWallet, makeWallet, mintContractOptions } from "./test-helpers";
 
 describe("mintContractStock", () => {

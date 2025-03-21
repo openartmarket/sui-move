@@ -1,5 +1,5 @@
-import { getAddressOwner, getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
+import { getAddressOwner, getCreatedObjects } from "./getters.js";
 
 export type MintContractStockParams = {
   adminCapId: string;

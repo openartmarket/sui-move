@@ -1,5 +1,5 @@
-import { getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
+import { getCreatedObjects } from "./getters.js";
 
 export type StartMotionParams = {
   adminCapId: string;

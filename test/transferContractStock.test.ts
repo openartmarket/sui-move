@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
+import type { Wallet } from "../src/Wallet.js";
 import { getContractStocks } from "../src/getContractStocks.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
 import { transferContractStock } from "../src/transferContractStock.js";
-import type { Wallet } from "../src/Wallet.js";
 import {
   ADMIN_CAP_ID,
+  PACKAGE_ID,
   adminWallet,
   makeWallet,
   mintContractOptions,
-  PACKAGE_ID,
 } from "./test-helpers";
 
 describe("transferContractStock", () => {

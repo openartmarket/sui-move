@@ -154,7 +154,7 @@ function toInt(s) {
   if (!s.match(/^[0-9]+$/)) {
     throw new Error(`${s} is not a valid integer`);
   }
-  const number = parseInt(s, 10);
+  const number = Number.parseInt(s, 10);
   if (isNaN(number) || !Number.isInteger(number)) {
     throw new Error(`${s} is not a valid integer`);
   }
@@ -265,7 +265,7 @@ async function mintContract(wallet, params) {
   return { contractId, digest };
 }
 async function queryAllTransactions(client, params) {
-  let data = [];
+  const data = [];
   let cursor = void 0;
   do {
     const result = await client.queryTransactionBlocks({ ...params, cursor });
@@ -478,7 +478,7 @@ async function execSui(command) {
       if (stderr) return reject(new Error(stderr));
       try {
         resolve(JSON.parse(stdout));
-      } catch (err2) {
+      } catch {
         reject(`Didn't get JSON output from sui: ${stdout}`);
       }
     });

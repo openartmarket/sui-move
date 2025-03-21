@@ -6,10 +6,10 @@ import { mintContractStock } from "../src/mintContractStock.js";
 import { splitTransferMerge } from "../src/splitTransferMerge.js";
 import {
   ADMIN_CAP_ID,
+  PACKAGE_ID,
   adminWallet,
   makeWallet,
   mintContractOptions,
-  PACKAGE_ID,
 } from "./test-helpers.js";
 
 describe("splitTransferMerge", () => {
