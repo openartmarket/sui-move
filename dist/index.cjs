@@ -18,8 +18,8 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
-var src_exports = {};
-__export(src_exports, {
+var index_exports = {};
+__export(index_exports, {
   endMotion: () => endMotion,
   getAddressOwner: () => getAddressOwner,
   getContractStocks: () => getContractStocks,
@@ -40,7 +40,7 @@ __export(src_exports, {
   toContractStock: () => toContractStock,
   vote: () => vote
 });
-module.exports = __toCommonJS(src_exports);
+module.exports = __toCommonJS(index_exports);
 
 // src/endMotion.ts
 async function endMotion(wallet, params) {
@@ -130,8 +130,7 @@ async function getWalletQuantity(wallet, id) {
 }
 function getAddressOwner(objectData) {
   const owner = objectData.owner;
-  if (!owner)
-    throw new Error(`Object ${objectData} has no owner`);
+  if (!owner) throw new Error(`Object ${objectData} has no owner`);
   if (typeof owner === "string") {
     throw new Error(`Object ${objectData} has a string owner ${owner}`);
   }
@@ -165,7 +164,6 @@ function toInt(s) {
 // src/getContractStocks.ts
 async function getContractStocks(params) {
   const { suiClient, owner, contractId, packageId, cursor } = params;
-  const type = `${packageId}::open_art_market::ContractStock`;
   const response = await suiClient.getOwnedObjects({
     owner,
     options: {
@@ -175,6 +173,7 @@ async function getContractStocks(params) {
   });
   const data = response.data.map(getObjectData).filter((object) => {
     const parsedData = getParsedData(object);
+    const type = `${packageId}::open_art_market::ContractStock`;
     return getType(parsedData) === type && getStringField(parsedData, "contract_id") === contractId;
   });
   if (response.hasNextPage && response.nextCursor) {
@@ -221,8 +220,7 @@ async function mintContract(wallet, params) {
   });
   const { digest } = response;
   const objects = getCreatedObjects(response);
-  if (objects.length !== 1)
-    throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
+  if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
   const contractId = objects[0].objectId;
   return { contractId, digest };
 }
@@ -426,10 +424,8 @@ async function transferSui({
 async function execSui(command) {
   return new Promise((resolve, reject) => {
     (0, import_node_child_process.exec)(command, (err, stdout, stderr) => {
-      if (err)
-        return reject(err);
-      if (stderr)
-        return reject(new Error(stderr));
+      if (err) return reject(err);
+      if (stderr) return reject(new Error(stderr));
       try {
         resolve(JSON.parse(stdout));
       } catch (err2) {
