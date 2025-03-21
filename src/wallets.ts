@@ -24,6 +24,10 @@ export class SuiWallet implements Wallet {
     return this.params.suiClient;
   }
 
+  get packageId(): string {
+    return this.params.packageId;
+  }
+
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {
     const txb = new TransactionBlock();
     const { suiClient, packageId, keypair } = this.params;
@@ -65,6 +69,10 @@ export class ShinamiWallet implements Wallet {
 
   get address(): string {
     return this.params.address;
+  }
+
+  get packageId(): string {
+    return this.params.packageId;
   }
 
   async execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse> {

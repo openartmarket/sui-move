@@ -10,6 +10,7 @@ import { ShinamiWallet, SuiWallet } from "./wallets.js";
 export type ReadonlyWallet = {
   readonly address: string;
   readonly suiClient: SuiClient;
+  readonly packageId: string;
 };
 
 export interface Wallet extends ReadonlyWallet {

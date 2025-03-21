@@ -8,6 +8,7 @@ type Currency = "USD" | "EUR" | "GBP" | "NOK";
 type ReadonlyWallet = {
     readonly address: string;
     readonly suiClient: SuiClient;
+    readonly packageId: string;
 };
 interface Wallet extends ReadonlyWallet {
     execute(build: BuildTransactionBlock): Promise<SuiTransactionBlockResponse>;

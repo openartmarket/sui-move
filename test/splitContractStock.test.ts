@@ -5,7 +5,18 @@ import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
 import { splitContractStock } from "../src/splitContractStock.js";
 import type { Wallet } from "../src/Wallet.js";
-import { ADMIN_CAP_ID, adminWallet, makeWallet, mintContractOptions } from "./test-helpers";
+import {
+  ADMIN_CAP_ID,
+  adminWallet,
+  makeWallet,
+  mintContractOptions,
+  PACKAGE_ID,
+} from "./test-helpers";
+import type {
+  QueryTransactionBlocksParams,
+  SuiClient,
+  SuiTransactionBlockResponse,
+} from "@mysten/sui.js/client";
 
 describe("splitContractStock", () => {
   let contractId: string;
