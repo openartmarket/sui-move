@@ -90,6 +90,15 @@ type MintContractResult = {
     contractId: string;
     digest: string;
 };
+/**
+ * Mint a new contract.
+ *
+ * This function is idempotent. If a contract with the same parameters already exists on the chain, it will be returned.
+ *
+ * @param wallet - The wallet to use to mint the contract.
+ * @param params - The parameters for the contract.
+ * @returns The result of the minting.
+ */
 declare function mintContract(wallet: Wallet, params: MintContractParams): Promise<MintContractResult>;
 
 type MintContractStockParams = {
@@ -102,6 +111,15 @@ type MintContractStockResult = {
     contractStockId: string;
     digest: string;
 };
+/**
+ * Mint a new contract stock.
+ *
+ * This function is idempotent. If a contract stock with the same parameters already exists on the chain, it will be returned.
+ *
+ * @param wallet - The wallet to use to mint the contract stock.
+ * @param params - The parameters for the contract stock.
+ * @returns The result of the minting.
+ */
 declare function mintContractStock(wallet: Wallet, params: MintContractStockParams): Promise<MintContractStockResult>;
 
 type SplitMergeTransferParams = {

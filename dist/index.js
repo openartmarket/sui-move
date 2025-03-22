@@ -142,6 +142,18 @@ async function getContractStocks(params) {
   return data;
 }
 
+// src/queryAllTransactions.ts
+async function queryAllTransactions(client, params) {
+  const data = [];
+  let cursor = void 0;
+  do {
+    const result = await client.queryTransactionBlocks({ ...params, cursor });
+    data.push(...result.data);
+    cursor = result.hasNextPage ? result.nextCursor : null;
+  } while (cursor !== null);
+  return data;
+}
+
 // src/mintContract.ts
 async function mintContract(wallet, params) {
   const {
@@ -220,31 +232,52 @@ async function mintContract(wallet, params) {
   const contractId = objects[0].objectId;
   return { contractId, digest };
 }
-async function queryAllTransactions(client, params) {
-  const data = [];
-  let cursor = void 0;
-  do {
-    const result = await client.queryTransactionBlocks({ ...params, cursor });
-    data.push(...result.data);
-    cursor = result.hasNextPage ? result.nextCursor : null;
-  } while (cursor !== null);
-  return data;
-}
 
 // src/mintContractStock.ts
 async function mintContractStock(wallet, params) {
   const { adminCapId, contractId, quantity, receiverAddress } = params;
-  const response = await wallet.execute(async (txb, packageId) => {
-    txb.moveCall({
-      target: `${packageId}::open_art_market::mint_contract_stock`,
-      arguments: [
-        txb.object(adminCapId),
-        txb.object(contractId),
-        txb.pure(quantity),
-        txb.pure(receiverAddress)
-      ]
-    });
+  const responses = await queryAllTransactions(wallet.suiClient, {
+    filter: {
+      MoveFunction: {
+        function: "mint_contract_stock",
+        module: "open_art_market",
+        package: wallet.packageId
+      }
+    },
+    options: {
+      showInput: true,
+      showObjectChanges: true
+    }
   });
+  const expected = [adminCapId, contractId, quantity, receiverAddress].map(
+    (value) => value.toString()
+  );
+  let response = responses.find((res) => {
+    if (res.transaction?.data?.transaction?.kind === "ProgrammableTransaction") {
+      const inputs = res.transaction.data.transaction.inputs;
+      const inputValues = inputs.map((input) => {
+        if (input.type === "pure") {
+          return input.value;
+        }
+        return input.objectId;
+      });
+      return inputValues.every((value, index) => value === expected[index]);
+    }
+    return false;
+  });
+  if (!response) {
+    response = await wallet.execute(async (txb, packageId) => {
+      txb.moveCall({
+        target: `${packageId}::open_art_market::mint_contract_stock`,
+        arguments: [
+          txb.object(adminCapId),
+          txb.object(contractId),
+          txb.pure(quantity),
+          txb.pure(receiverAddress)
+        ]
+      });
+    });
+  }
   const { digest } = response;
   const objects = getCreatedObjects(response);
   const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
