@@ -1,10 +1,6 @@
-import type {
-  QueryTransactionBlocksParams,
-  SuiClient,
-  SuiTransactionBlockResponse,
-} from "@mysten/sui.js/dist/cjs/client/index.js";
 import type { Wallet } from "./Wallet.js";
 import { getCreatedObjects } from "./getters.js";
+import { queryAllTransactions } from "./queryAllTransactions.js";
 import type { Currency } from "./types.js";
 
 export type MintContractParams = {
@@ -25,6 +21,15 @@ export type MintContractResult = {
   digest: string;
 };
 
+/**
+ * Mint a new contract.
+ *
+ * This function is idempotent. If a contract with the same parameters already exists on the chain, it will be returned.
+ *
+ * @param wallet - The wallet to use to mint the contract.
+ * @param params - The parameters for the contract.
+ * @returns The result of the minting.
+ */
 export async function mintContract(
   wallet: Wallet,
   params: MintContractParams,
@@ -110,15 +115,4 @@ export async function mintContract(
   const contractId = objects[0].objectId;
 
   return { contractId, digest };
-}
-
-async function queryAllTransactions(client: SuiClient, params: QueryTransactionBlocksParams) {
-  const data: SuiTransactionBlockResponse[] = [];
-  let cursor = undefined;
-  do {
-    const result = await client.queryTransactionBlocks({ ...params, cursor });
-    data.push(...result.data);
-    cursor = result.hasNextPage ? result.nextCursor : null;
-  } while (cursor !== null);
-  return data;
 }

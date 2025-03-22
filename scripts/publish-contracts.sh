@@ -13,7 +13,7 @@ sui client switch --address "$ADMIN_ADDRESS"
 
 rm -rf tmp
 mkdir -p tmp
-# Publish the contracts
+# Publish the Move modules
 sui client publish --gas-budget 200000000 --json --skip-fetch-latest-git-deps ./move/open_art_market > tmp/publish.res.json
 
 # Collect the relevant data from the response

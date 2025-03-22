@@ -1,26 +1,16 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type {
-  QueryTransactionBlocksParams,
-  SuiClient,
-  SuiTransactionBlockResponse,
-} from "@mysten/sui.js/client";
 import type { Wallet } from "../src/Wallet.js";
 import { getWalletQuantity } from "../src/getters.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
 import { splitContractStock } from "../src/splitContractStock.js";
-import {
-  ADMIN_CAP_ID,
-  PACKAGE_ID,
-  adminWallet,
-  makeWallet,
-  mintContractOptions,
-} from "./test-helpers";
+import { ADMIN_CAP_ID, adminWallet, makeWallet, mintContractOptions } from "./test-helpers";
 
 describe("splitContractStock", () => {
   let contractId: string;
   let wallet: Wallet;
+
   beforeEach(async () => {
     const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
