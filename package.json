@@ -16,8 +16,7 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		}
 	},
 	"scripts": {
@@ -30,9 +29,9 @@
 	"repository": "openartmarket/sui-move",
 	"license": "MIT",
 	"dependencies": {
-		"@mysten/bcs": "0.9.1",
-		"@mysten/sui.js": "0.48.1",
-		"@shinami/clients": "0.7.2"
+		"@mysten/bcs": "1.5.0",
+    "@mysten/sui": "1.24.0",
+		"@shinami/clients": "0.9.5"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -55,10 +54,10 @@
 		],
 		"external": [
 			"@mysten/bcs",
-			"@mysten/sui.js"
+			"@mysten/sui",
+      "@shinami/clients"
 		],
 		"format": [
-			"cjs",
 			"esm"
 		],
 		"sourcemap": true,

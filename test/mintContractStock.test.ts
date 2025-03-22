@@ -6,7 +6,7 @@ import type { Wallet } from "../src/Wallet.js";
 import { getQuantity } from "../src/getters.js";
 import { mintContract } from "../src/mintContract.js";
 import { type MintContractStockParams, mintContractStock } from "../src/mintContractStock.js";
-import { ADMIN_CAP_ID, adminWallet, makeWallet, mintContractOptions } from "./test-helpers";
+import { ADMIN_CAP_ID, adminWallet, makeMintContractOptions, makeWallet } from "./test-helpers";
 
 describe("mintContractStock", () => {
   let contractId: string;
@@ -15,10 +15,9 @@ describe("mintContractStock", () => {
   let wallet2: Wallet;
 
   beforeEach(async () => {
-    const res = await mintContract(adminWallet, {
-      ...mintContractOptions,
-      productId: `${mintContractOptions.productId}-${crypto.randomUUID()}`,
-    });
+    const mintContractOptions = makeMintContractOptions();
+
+    const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 
     wallet1 = await makeWallet();

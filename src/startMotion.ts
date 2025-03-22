@@ -23,7 +23,7 @@ export async function startMotion(
   const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::start_vote`,
-      arguments: [txb.object(adminCapId), txb.pure(contractId), txb.pure(motion)],
+      arguments: [txb.object(adminCapId), txb.object(contractId), txb.pure.string(motion)],
     });
   });
   const { digest } = response;

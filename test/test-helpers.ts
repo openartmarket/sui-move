@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import { KeyClient, WalletClient } from "@shinami/clients";
+import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { KeyClient, WalletClient } from "@shinami/clients/sui";
 
 import type { Wallet } from "../src/Wallet.js";
 import { newWallet } from "../src/Wallet.js";
@@ -73,18 +73,20 @@ export async function makeAdminWallet(): Promise<Wallet> {
 
 export const adminWallet = await makeAdminWallet();
 
-export const mintContractOptions: MintContractParams = {
-  adminCapId: ADMIN_CAP_ID,
-  totalShareCount: 500,
-  sharePrice: 10,
-  outgoingPrice: 100,
-  creationTimestampMillis: 1685548680595,
-  name: "Mona Lisa",
-  artist: "Leonardo da Vinci",
-  description: "Choconta painting",
-  currency: "USD",
-  productId: "mona-lisa",
-};
+export function makeMintContractOptions(): MintContractParams {
+  return {
+    adminCapId: ADMIN_CAP_ID,
+    totalShareCount: 500,
+    sharePrice: 10,
+    outgoingPrice: 100,
+    creationTimestampMillis: 1685548680595,
+    name: "Mona Lisa",
+    artist: "Leonardo da Vinci",
+    description: "Choconta painting",
+    currency: "USD",
+    productId: `mona-lisa-${randomUUID()}`,
+  };
+}
 
 export function getEnv(name: string): string {
   const value = process.env[name];

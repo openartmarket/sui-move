@@ -15,7 +15,7 @@ export async function vote(wallet: Wallet, params: VoteParams): Promise<VoteResu
   const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::vote`,
-      arguments: [txb.object(contractId), txb.object(motionId), txb.pure(choice)],
+      arguments: [txb.object(contractId), txb.object(motionId), txb.pure.bool(choice)],
     });
   });
   const { digest } = response;

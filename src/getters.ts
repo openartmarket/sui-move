@@ -6,7 +6,7 @@ import type {
   SuiObjectResponse,
   SuiParsedData,
   SuiTransactionBlockResponse,
-} from "@mysten/sui.js/client";
+} from "@mysten/sui/client";
 
 import type { ReadonlyWallet } from "./Wallet.js";
 

@@ -5,12 +5,13 @@ import { getWalletQuantity } from "../src/getters.js";
 import { mergeContractStock } from "../src/mergeContractStock.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
-import { ADMIN_CAP_ID, adminWallet, makeWallet, mintContractOptions } from "./test-helpers";
+import { ADMIN_CAP_ID, adminWallet, makeMintContractOptions, makeWallet } from "./test-helpers";
 
 describe("mergeContractStock", () => {
   let contractId: string;
   let wallet: Wallet;
   beforeEach(async () => {
+    const mintContractOptions = makeMintContractOptions();
     const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 
@@ -22,14 +23,14 @@ describe("mergeContractStock", () => {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       receiverAddress: wallet.address,
-      quantity: 10,
+      quantity: 9,
     });
 
     const { contractStockId: fromContractStockId } = await mintContractStock(adminWallet, {
       adminCapId: ADMIN_CAP_ID,
       contractId,
       receiverAddress: wallet.address,
-      quantity: 10,
+      quantity: 11,
     });
 
     await mergeContractStock(wallet, [

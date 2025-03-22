@@ -19,7 +19,7 @@ export async function splitContractStock(
     const { contractStockId, quantity } = params;
     txb.moveCall({
       target: `${packageId}::open_art_market::split_contract_stock`,
-      arguments: [txb.object(contractStockId), txb.pure(quantity)],
+      arguments: [txb.object(contractStockId), txb.pure.u64(quantity)],
     });
   });
   const { digest } = response;

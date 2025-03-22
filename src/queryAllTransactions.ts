@@ -2,7 +2,7 @@ import type {
   QueryTransactionBlocksParams,
   SuiClient,
   SuiTransactionBlockResponse,
-} from "@mysten/sui.js/dist/cjs/client";
+} from "@mysten/sui/dist/cjs/client";
 
 export async function queryAllTransactions(
   client: SuiClient,

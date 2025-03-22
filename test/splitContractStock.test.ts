@@ -5,13 +5,14 @@ import { getWalletQuantity } from "../src/getters.js";
 import { mintContract } from "../src/mintContract.js";
 import { mintContractStock } from "../src/mintContractStock.js";
 import { splitContractStock } from "../src/splitContractStock.js";
-import { ADMIN_CAP_ID, adminWallet, makeWallet, mintContractOptions } from "./test-helpers";
+import { ADMIN_CAP_ID, adminWallet, makeMintContractOptions, makeWallet } from "./test-helpers";
 
 describe("splitContractStock", () => {
   let contractId: string;
   let wallet: Wallet;
 
   beforeEach(async () => {
+    const mintContractOptions = makeMintContractOptions();
     const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 

@@ -212,16 +212,16 @@ async function mintContract(wallet, params) {
         target: `${packageId}::open_art_market::mint_contract`,
         arguments: [
           txb.object(adminCapId),
-          txb.pure(totalShareCount),
-          txb.pure(sharePrice),
-          txb.pure(outgoingPrice),
-          txb.pure(name),
-          txb.pure(artist),
-          txb.pure(creationTimestampMillis),
-          txb.pure(description),
-          txb.pure(currency),
+          txb.pure.u64(totalShareCount),
+          txb.pure.u64(sharePrice),
+          txb.pure.u64(outgoingPrice),
+          txb.pure.string(name),
+          txb.pure.string(artist),
+          txb.pure.u64(creationTimestampMillis),
+          txb.pure.string(description),
+          txb.pure.string(currency),
           // AKA reference AKA image
-          txb.pure(productId)
+          txb.pure.string(productId)
         ]
       });
     });
@@ -272,8 +272,8 @@ async function mintContractStock(wallet, params) {
         arguments: [
           txb.object(adminCapId),
           txb.object(contractId),
-          txb.pure(quantity),
-          txb.pure(receiverAddress)
+          txb.pure.u64(quantity),
+          txb.pure.address(receiverAddress)
         ]
       });
     });
@@ -308,7 +308,7 @@ async function splitContractStock(wallet, params) {
     const { contractStockId, quantity } = params;
     txb.moveCall({
       target: `${packageId}::open_art_market::split_contract_stock`,
-      arguments: [txb.object(contractStockId), txb.pure(quantity)]
+      arguments: [txb.object(contractStockId), txb.pure.u64(quantity)]
     });
   });
   const { digest } = response;
@@ -327,7 +327,7 @@ async function transferContractStock(wallet, params) {
     const { contractId, contractStockId, toAddress } = params;
     txb.moveCall({
       target: `${packageId}::open_art_market::transfer_contract_stock`,
-      arguments: [txb.object(contractId), txb.pure(contractStockId), txb.pure(toAddress)]
+      arguments: [txb.object(contractId), txb.object(contractStockId), txb.pure.address(toAddress)]
     });
   });
   const { digest } = response;
@@ -423,7 +423,7 @@ async function startMotion(wallet, params) {
   const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::start_vote`,
-      arguments: [txb.object(adminCapId), txb.pure(contractId), txb.pure(motion)]
+      arguments: [txb.object(adminCapId), txb.object(contractId), txb.pure.string(motion)]
     });
   });
   const { digest } = response;
@@ -492,7 +492,7 @@ async function vote(wallet, params) {
   const response = await wallet.execute(async (txb, packageId) => {
     txb.moveCall({
       target: `${packageId}::dao::vote`,
-      arguments: [txb.object(contractId), txb.object(motionId), txb.pure(choice)]
+      arguments: [txb.object(contractId), txb.object(motionId), txb.pure.bool(choice)]
     });
   });
   const { digest } = response;
@@ -500,13 +500,13 @@ async function vote(wallet, params) {
 }
 
 // src/Wallet.ts
-import { SuiClient, getFullnodeUrl } from "@mysten/sui.js/client";
-import { GasStationClient, KeyClient, WalletClient, createSuiClient } from "@shinami/clients";
+import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
+import { GasStationClient, KeyClient, WalletClient, createSuiClient } from "@shinami/clients/sui";
 
 // src/wallets.ts
-import { fromB64 } from "@mysten/bcs";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { ShinamiWalletSigner, buildGaslessTransactionBytes } from "@shinami/clients";
+import { fromBase64 } from "@mysten/bcs";
+import { Transaction } from "@mysten/sui/transactions";
+import { ShinamiWalletSigner, buildGaslessTransaction } from "@shinami/clients/sui";
 var SuiWallet = class {
   constructor(params) {
     this.params = params;
@@ -521,12 +521,12 @@ var SuiWallet = class {
     return this.params.packageId;
   }
   async execute(build) {
-    const txb = new TransactionBlock();
+    const txn = new Transaction();
     const { suiClient, packageId, keypair } = this.params;
-    await build(txb, packageId);
-    const response = await suiClient.signAndExecuteTransactionBlock({
+    await build(txn, packageId);
+    const response = await suiClient.signAndExecuteTransaction({
       signer: keypair,
-      transactionBlock: txb,
+      transaction: txn,
       requestType: "WaitForLocalExecution",
       options: {
         showObjectChanges: true,
@@ -553,16 +553,15 @@ var ShinamiWallet = class {
   async execute(build) {
     const { suiClient, gasStationClient, walletClient, keyClient, packageId, walletId, secret } = this.params;
     const signer = new ShinamiWalletSigner(walletId, walletClient, secret, keyClient);
-    const gaslessPayloadBase64 = await buildGaslessTransactionBytes({
-      sui: suiClient,
-      build: (txb) => build(txb, packageId)
+    const gaslessTxn = await buildGaslessTransaction((txb) => build(txb, packageId), {
+      sui: suiClient
     });
-    const sponsoredResponse = await gasStationClient.sponsorTransactionBlock(
-      gaslessPayloadBase64,
-      this.address,
-      SUI_GAS_FEE_LIMIT
-    );
-    const { signature } = await signer.signTransactionBlock(fromB64(sponsoredResponse.txBytes));
+    const sponsoredResponse = await gasStationClient.sponsorTransaction({
+      gasBudget: SUI_GAS_FEE_LIMIT,
+      txKind: gaslessTxn.txKind,
+      sender: this.address
+    });
+    const { signature } = await signer.signTransaction(fromBase64(sponsoredResponse.txBytes));
     const response = await suiClient.executeTransactionBlock({
       transactionBlock: sponsoredResponse.txBytes,
       signature: [signature, sponsoredResponse.signature],

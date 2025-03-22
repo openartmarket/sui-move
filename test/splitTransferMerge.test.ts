@@ -8,13 +8,15 @@ import {
   ADMIN_CAP_ID,
   PACKAGE_ID,
   adminWallet,
+  makeMintContractOptions,
   makeWallet,
-  mintContractOptions,
 } from "./test-helpers.js";
 
 describe("splitTransferMerge", () => {
   let contractId: string;
   beforeEach(async () => {
+    const mintContractOptions = makeMintContractOptions();
+
     const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
   }, 30_000);

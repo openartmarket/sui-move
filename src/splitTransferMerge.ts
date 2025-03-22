@@ -1,4 +1,4 @@
-import type { SuiObjectData } from "@mysten/sui.js/client";
+import type { SuiObjectData } from "@mysten/sui/client";
 
 import type { Wallet } from "./Wallet.js";
 import { getContractStocks } from "./getContractStocks.js";

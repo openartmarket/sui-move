@@ -94,16 +94,16 @@ export async function mintContract(
         target: `${packageId}::open_art_market::mint_contract`,
         arguments: [
           txb.object(adminCapId),
-          txb.pure(totalShareCount),
-          txb.pure(sharePrice),
-          txb.pure(outgoingPrice),
-          txb.pure(name),
-          txb.pure(artist),
-          txb.pure(creationTimestampMillis),
-          txb.pure(description),
-          txb.pure(currency),
+          txb.pure.u64(totalShareCount),
+          txb.pure.u64(sharePrice),
+          txb.pure.u64(outgoingPrice),
+          txb.pure.string(name),
+          txb.pure.string(artist),
+          txb.pure.u64(creationTimestampMillis),
+          txb.pure.string(description),
+          txb.pure.string(currency),
           // AKA reference AKA image
-          txb.pure(productId),
+          txb.pure.string(productId),
         ],
       });
     });

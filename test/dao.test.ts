@@ -11,8 +11,8 @@ import {
   ADMIN_ADDRESS,
   ADMIN_CAP_ID,
   adminWallet,
+  makeMintContractOptions,
   makeWallet,
-  mintContractOptions,
 } from "./test-helpers.js";
 
 describe("DAO Voting structure", () => {
@@ -22,6 +22,7 @@ describe("DAO Voting structure", () => {
   let user3: Wallet;
 
   beforeEach(async () => {
+    const mintContractOptions = makeMintContractOptions();
     const res = await mintContract(adminWallet, mintContractOptions);
     contractId = res.contractId;
 

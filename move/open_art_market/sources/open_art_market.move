@@ -106,7 +106,7 @@ module open_art_market::open_art_market {
         transfer::public_share_object<Contract>(contract);
     }
 
-    // Create an ContractStock NFT
+    // Create a ContractStock NFT
     public fun mint_contract_stock(_: &mut AdminCap, contract: &mut Contract, shares: u64, receiver: address, ctx: &mut TxContext) {
         let remaining_shares = contract.shares;
 
