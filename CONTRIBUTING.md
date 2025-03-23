@@ -53,6 +53,13 @@ export ADMIN_CAP_ID="..."
 export PACKAGE_ID="..."
 export ADMIN_ADDRESS="..."
 export ADMIN_PHRASE="..."
+
+export SHINAMI_ENABLED=1
+export SHINAMI_ACCESS_KEY=sui_testnet_9694e6fec605d3b35dc72a85478437d4
+export ADMIN_CAP_ID=0x9dee40d1a413c4b71874d35427ab7f1233d31f105e264cef395c6b51663824ae
+export PACKAGE_ID=0xa8ab427eab83ad9e1a27b3263359176333c4fc4dbbd3b59adc76eb397828e0f6
+export ADMIN_PHRASE="candy reason mammal garden choose price sense sad animal admit try cross"
+
 ```
 
 ## Create sui addresses (accounts)

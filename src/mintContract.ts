@@ -1,6 +1,7 @@
+import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
 import type { Wallet } from "./Wallet.js";
+import { findTransaction } from "./findTransaction.js";
 import { getCreatedObjects } from "./getters.js";
-import { queryAllTransactions } from "./queryAllTransactions.js";
 import type { Currency } from "./types.js";
 
 export type MintContractParams = {
@@ -47,46 +48,49 @@ export async function mintContract(
     productId,
   } = params;
 
-  const responses = await queryAllTransactions(wallet.suiClient, {
-    filter: {
-      MoveFunction: {
-        function: "mint_contract",
-        module: "open_art_market",
-        package: wallet.packageId,
+  const isSameContract = (res: SuiTransactionBlockResponse) => {
+    const expected = [
+      adminCapId,
+      totalShareCount,
+      sharePrice,
+      outgoingPrice,
+      name,
+      artist,
+      creationTimestampMillis,
+      description,
+      currency,
+      productId,
+    ].map((value) => value.toString());
+    if (res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction") {
+      return false;
+    }
+    const inputs = res.transaction.data.transaction.inputs;
+    const inputValues = inputs.map((input) => {
+      if (input.type === "pure") {
+        return input.value;
+      }
+      return input.objectId;
+    });
+    return inputValues.every((value, index) => value === expected[index]);
+  };
+
+  let response = await findTransaction(
+    wallet.suiClient,
+    {
+      filter: {
+        MoveFunction: {
+          function: "mint_contract",
+          module: "open_art_market",
+          package: wallet.packageId,
+        },
+      },
+      options: {
+        showInput: true,
+        showObjectChanges: true,
       },
     },
-    options: {
-      showInput: true,
-      showObjectChanges: true,
-    },
-  });
-
-  const expected = [
-    adminCapId,
-    totalShareCount,
-    sharePrice,
-    outgoingPrice,
-    name,
-    artist,
-    creationTimestampMillis,
-    description,
-    currency,
-    productId,
-  ].map((value) => value.toString());
-
-  let response = responses.find((res) => {
-    if (res.transaction?.data?.transaction?.kind === "ProgrammableTransaction") {
-      const inputs = res.transaction.data.transaction.inputs;
-      const inputValues = inputs.map((input) => {
-        if (input.type === "pure") {
-          return input.value;
-        }
-        return input.objectId;
-      });
-      return inputValues.every((value, index) => value === expected[index]);
-    }
-    return false;
-  });
+    isSameContract,
+  );
 
   if (!response) {
     response = await wallet.execute(async (txb, packageId) => {

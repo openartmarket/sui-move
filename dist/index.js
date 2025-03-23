@@ -142,16 +142,22 @@ async function getContractStocks(params) {
   return data;
 }
 
-// src/queryAllTransactions.ts
-async function queryAllTransactions(client, params) {
-  const data = [];
+// src/findTransaction.ts
+async function findTransaction(client, params, predicate) {
+  return null;
   let cursor = void 0;
   do {
     const result = await client.queryTransactionBlocks({ ...params, cursor });
-    data.push(...result.data);
+    const found = result.data.find(predicate);
+    if (found) {
+      console.log("FOUND AN OLD ONE");
+      return found;
+    }
     cursor = result.hasNextPage ? result.nextCursor : null;
+    console.log("NOT FOUND. Next cursor:", cursor);
   } while (cursor !== null);
-  return data;
+  console.log("NOT FOUND AT ALL");
+  return null;
 }
 
 // src/mintContract.ts
@@ -168,44 +174,48 @@ async function mintContract(wallet, params) {
     currency,
     productId
   } = params;
-  const responses = await queryAllTransactions(wallet.suiClient, {
-    filter: {
-      MoveFunction: {
-        function: "mint_contract",
-        module: "open_art_market",
-        package: wallet.packageId
+  const isSameContract = (res) => {
+    const expected = [
+      adminCapId,
+      totalShareCount,
+      sharePrice,
+      outgoingPrice,
+      name,
+      artist,
+      creationTimestampMillis,
+      description,
+      currency,
+      productId
+    ].map((value) => value.toString());
+    if (res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction") {
+      return false;
+    }
+    const inputs = res.transaction.data.transaction.inputs;
+    const inputValues = inputs.map((input) => {
+      if (input.type === "pure") {
+        return input.value;
+      }
+      return input.objectId;
+    });
+    return inputValues.every((value, index) => value === expected[index]);
+  };
+  let response = await findTransaction(
+    wallet.suiClient,
+    {
+      filter: {
+        MoveFunction: {
+          function: "mint_contract",
+          module: "open_art_market",
+          package: wallet.packageId
+        }
+      },
+      options: {
+        showInput: true,
+        showObjectChanges: true
       }
     },
-    options: {
-      showInput: true,
-      showObjectChanges: true
-    }
-  });
-  const expected = [
-    adminCapId,
-    totalShareCount,
-    sharePrice,
-    outgoingPrice,
-    name,
-    artist,
-    creationTimestampMillis,
-    description,
-    currency,
-    productId
-  ].map((value) => value.toString());
-  let response = responses.find((res) => {
-    if (res.transaction?.data?.transaction?.kind === "ProgrammableTransaction") {
-      const inputs = res.transaction.data.transaction.inputs;
-      const inputValues = inputs.map((input) => {
-        if (input.type === "pure") {
-          return input.value;
-        }
-        return input.objectId;
-      });
-      return inputValues.every((value, index) => value === expected[index]);
-    }
-    return false;
-  });
+    isSameContract
+  );
   if (!response) {
     response = await wallet.execute(async (txb, packageId) => {
       txb.moveCall({
@@ -236,35 +246,39 @@ async function mintContract(wallet, params) {
 // src/mintContractStock.ts
 async function mintContractStock(wallet, params) {
   const { adminCapId, contractId, quantity, receiverAddress } = params;
-  const responses = await queryAllTransactions(wallet.suiClient, {
-    filter: {
-      MoveFunction: {
-        function: "mint_contract_stock",
-        module: "open_art_market",
-        package: wallet.packageId
+  const isSameContractStock = (res) => {
+    const expected = [adminCapId, contractId, quantity, receiverAddress].map(
+      (value) => value.toString()
+    );
+    if (res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction") {
+      return false;
+    }
+    const inputs = res.transaction.data.transaction.inputs;
+    const inputValues = inputs.map((input) => {
+      if (input.type === "pure") {
+        return input.value;
+      }
+      return input.objectId;
+    });
+    return inputValues.every((value, index) => value === expected[index]);
+  };
+  let response = await findTransaction(
+    wallet.suiClient,
+    {
+      filter: {
+        MoveFunction: {
+          function: "mint_contract_stock",
+          module: "open_art_market",
+          package: wallet.packageId
+        }
+      },
+      options: {
+        showInput: true,
+        showObjectChanges: true
       }
     },
-    options: {
-      showInput: true,
-      showObjectChanges: true
-    }
-  });
-  const expected = [adminCapId, contractId, quantity, receiverAddress].map(
-    (value) => value.toString()
+    isSameContractStock
   );
-  let response = responses.find((res) => {
-    if (res.transaction?.data?.transaction?.kind === "ProgrammableTransaction") {
-      const inputs = res.transaction.data.transaction.inputs;
-      const inputValues = inputs.map((input) => {
-        if (input.type === "pure") {
-          return input.value;
-        }
-        return input.objectId;
-      });
-      return inputValues.every((value, index) => value === expected[index]);
-    }
-    return false;
-  });
   if (!response) {
     response = await wallet.execute(async (txb, packageId) => {
       txb.moveCall({
