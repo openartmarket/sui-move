@@ -69,7 +69,10 @@ export async function mintContract(
   return makeContract(response);
 }
 
-export async function findContract(wallet: Wallet, params: MintContractParams) {
+export async function findContract(
+  wallet: Wallet,
+  params: MintContractParams,
+): Promise<MintContractResult | null> {
   const response = await findTransaction(
     wallet.suiClient,
     {
@@ -130,7 +133,7 @@ export async function findContract(wallet: Wallet, params: MintContractParams) {
   return makeContract(response);
 }
 
-function makeContract(response: SuiTransactionBlockResponse) {
+function makeContract(response: SuiTransactionBlockResponse): MintContractResult {
   const { digest } = response;
   const objects = getCreatedObjects(response);
   if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);

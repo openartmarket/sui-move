@@ -100,10 +100,7 @@ type MintContractResult = {
  * @returns The result of the minting.
  */
 declare function mintContract(wallet: Wallet, params: MintContractParams): Promise<MintContractResult>;
-declare function findContract(wallet: Wallet, params: MintContractParams): Promise<{
-    contractId: string;
-    digest: string;
-} | null>;
+declare function findContract(wallet: Wallet, params: MintContractParams): Promise<MintContractResult | null>;
 
 type MintContractStockParams = {
     adminCapId: string;
@@ -125,10 +122,7 @@ type MintContractStockResult = {
  * @returns The result of the minting.
  */
 declare function mintContractStock(wallet: Wallet, params: MintContractStockParams): Promise<MintContractStockResult>;
-declare function findContractStock(wallet: Wallet, params: MintContractStockParams): Promise<{
-    contractStockId: string;
-    digest: string;
-} | null>;
+declare function findContractStock(wallet: Wallet, params: MintContractStockParams): Promise<MintContractStockResult | null>;
 
 type SplitMergeTransferParams = {
     packageId: string;

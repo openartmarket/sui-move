@@ -45,7 +45,10 @@ export async function mintContractStock(
   return makeContractStock(response);
 }
 
-export async function findContractStock(wallet: Wallet, params: MintContractStockParams) {
+export async function findContractStock(
+  wallet: Wallet,
+  params: MintContractStockParams,
+): Promise<MintContractStockResult | null> {
   const response = await findTransaction(
     wallet.suiClient,
     {
@@ -85,7 +88,7 @@ export async function findContractStock(wallet: Wallet, params: MintContractStoc
   return makeContractStock(response);
 }
 
-function makeContractStock(response: SuiTransactionBlockResponse) {
+function makeContractStock(response: SuiTransactionBlockResponse): MintContractStockResult {
   const { digest } = response;
   const objects = getCreatedObjects(response);
   const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
