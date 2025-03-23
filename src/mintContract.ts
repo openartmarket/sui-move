@@ -48,49 +48,7 @@ export async function mintContract(
     productId,
   } = params;
 
-  const isSameContract = (res: SuiTransactionBlockResponse) => {
-    const expected = [
-      adminCapId,
-      totalShareCount,
-      sharePrice,
-      outgoingPrice,
-      name,
-      artist,
-      creationTimestampMillis,
-      description,
-      currency,
-      productId,
-    ].map((value) => value.toString());
-    if (res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction") {
-      return false;
-    }
-    const inputs = res.transaction.data.transaction.inputs;
-    const inputValues = inputs.map((input) => {
-      if (input.type === "pure") {
-        return input.value;
-      }
-      return input.objectId;
-    });
-    return inputValues.every((value, index) => value === expected[index]);
-  };
-
-  let response = await findTransaction(
-    wallet.suiClient,
-    {
-      filter: {
-        MoveFunction: {
-          function: "mint_contract",
-          module: "open_art_market",
-          package: wallet.packageId,
-        },
-      },
-      options: {
-        showInput: true,
-        showObjectChanges: true,
-      },
-    },
-    isSameContract,
-  );
+  let response = await findContract(wallet, params);
 
   if (!response) {
     response = await wallet.execute(async (txb, packageId) => {
@@ -113,10 +71,71 @@ export async function mintContract(
     });
   }
 
+  return makeContract(response);
+}
+
+export function makeContract(response: SuiTransactionBlockResponse) {
   const { digest } = response;
   const objects = getCreatedObjects(response);
   if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
   const contractId = objects[0].objectId;
 
   return { contractId, digest };
+}
+
+export async function findContract(wallet: Wallet, params: MintContractParams) {
+  return await findTransaction(
+    wallet.suiClient,
+    {
+      filter: {
+        MoveFunction: {
+          function: "mint_contract",
+          module: "open_art_market",
+          package: wallet.packageId,
+        },
+      },
+      options: {
+        showInput: true,
+        showObjectChanges: true,
+      },
+    },
+    (res: SuiTransactionBlockResponse) => {
+      const {
+        adminCapId,
+        totalShareCount,
+        sharePrice,
+        outgoingPrice,
+        name,
+        artist,
+        creationTimestampMillis,
+        description,
+        currency,
+        productId,
+      } = params;
+
+      const expected = [
+        adminCapId,
+        totalShareCount,
+        sharePrice,
+        outgoingPrice,
+        name,
+        artist,
+        creationTimestampMillis,
+        description,
+        currency,
+        productId,
+      ].map((value) => value.toString());
+      if (res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction") {
+        return false;
+      }
+      const inputs = res.transaction.data.transaction.inputs;
+      const inputValues = inputs.map((input) => {
+        if (input.type === "pure") {
+          return input.value;
+        }
+        return input.objectId;
+      });
+      return inputValues.every((value, index) => value === expected[index]);
+    },
+  );
 }

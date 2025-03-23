@@ -100,6 +100,11 @@ type MintContractResult = {
  * @returns The result of the minting.
  */
 declare function mintContract(wallet: Wallet, params: MintContractParams): Promise<MintContractResult>;
+declare function makeContract(response: SuiTransactionBlockResponse): {
+    contractId: string;
+    digest: string;
+};
+declare function findContract(wallet: Wallet, params: MintContractParams): Promise<SuiTransactionBlockResponse | null>;
 
 type MintContractStockParams = {
     adminCapId: string;
@@ -121,6 +126,11 @@ type MintContractStockResult = {
  * @returns The result of the minting.
  */
 declare function mintContractStock(wallet: Wallet, params: MintContractStockParams): Promise<MintContractStockResult>;
+declare function makeContractStock(response: SuiTransactionBlockResponse): {
+    contractStockId: string;
+    digest: string;
+};
+declare function findContractStock(wallet: Wallet, params: MintContractStockParams): Promise<SuiTransactionBlockResponse | null>;
 
 type SplitMergeTransferParams = {
     packageId: string;
@@ -183,4 +193,4 @@ type VoteResult = {
 };
 declare function vote(wallet: Wallet, params: VoteParams): Promise<VoteResult>;
 
-export { type BuildTransaction, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type ReadonlyWallet, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type SuiAddress, type VoteParams, type VoteResult, type Wallet, endMotion, getAddressOwner, getContractStocks, getCreatedObjects, getIntField, getObjectData, getParsedData, getQuantity, getStringField, getType, getWalletQuantity, mintContract, mintContractStock, newSuiAddress, newWallet, splitTransferMerge, startMotion, toContractStock, vote };
+export { type BuildTransaction, type ContractStock, type Currency, type EndMotionParams, type EndMotionResult, type GetContractStocksParams, type MintContractParams, type MintContractResult, type MintContractStockParams, type MintContractStockResult, type NetworkName, type NewShinamiSponsoredWalletParams, type NewShinamiWalletParams, type NewSuiWalletParams, type NewWalletParams, type ReadonlyWallet, type SplitMergeTransferParams, type SplitMergeTransferResult, type StartMotionParams, type StartMotionResult, type SuiAddress, type VoteParams, type VoteResult, type Wallet, endMotion, findContract, findContractStock, getAddressOwner, getContractStocks, getCreatedObjects, getIntField, getObjectData, getParsedData, getQuantity, getStringField, getType, getWalletQuantity, makeContract, makeContractStock, mintContract, mintContractStock, newSuiAddress, newWallet, splitTransferMerge, startMotion, toContractStock, vote };

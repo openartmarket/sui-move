@@ -30,40 +30,7 @@ export async function mintContractStock(
 ): Promise<MintContractStockResult> {
   const { adminCapId, contractId, quantity, receiverAddress } = params;
 
-  const isSameContractStock = (res: SuiTransactionBlockResponse) => {
-    const expected = [adminCapId, contractId, quantity, receiverAddress].map((value) =>
-      value.toString(),
-    );
-    if (res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction") {
-      return false;
-    }
-    const inputs = res.transaction.data.transaction.inputs;
-    const inputValues = inputs.map((input) => {
-      if (input.type === "pure") {
-        return input.value;
-      }
-      return input.objectId;
-    });
-    return inputValues.every((value, index) => value === expected[index]);
-  };
-
-  let response = await findTransaction(
-    wallet.suiClient,
-    {
-      filter: {
-        MoveFunction: {
-          function: "mint_contract_stock",
-          module: "open_art_market",
-          package: wallet.packageId,
-        },
-      },
-      options: {
-        showInput: true,
-        showObjectChanges: true,
-      },
-    },
-    isSameContractStock,
-  );
+  let response = await findContractStock(wallet, params);
 
   if (!response) {
     response = await wallet.execute(async (txb, packageId) => {
@@ -79,6 +46,10 @@ export async function mintContractStock(
     });
   }
 
+  return makeContractStock(response);
+}
+
+export function makeContractStock(response: SuiTransactionBlockResponse) {
   const { digest } = response;
   const objects = getCreatedObjects(response);
   const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
@@ -87,4 +58,40 @@ export async function mintContractStock(
   }
   const contractStockId = ownedObjects[0].objectId;
   return { contractStockId, digest };
+}
+
+export async function findContractStock(wallet: Wallet, params: MintContractStockParams) {
+  return findTransaction(
+    wallet.suiClient,
+    {
+      filter: {
+        MoveFunction: {
+          function: "mint_contract_stock",
+          module: "open_art_market",
+          package: wallet.packageId,
+        },
+      },
+      options: {
+        showInput: true,
+        showObjectChanges: true,
+      },
+    },
+    (res: SuiTransactionBlockResponse) => {
+      const { adminCapId, contractId, quantity, receiverAddress } = params;
+      const expected = [adminCapId, contractId, quantity, receiverAddress].map((value) =>
+        value.toString(),
+      );
+      if (res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction") {
+        return false;
+      }
+      const inputs = res.transaction.data.transaction.inputs;
+      const inputValues = inputs.map((input) => {
+        if (input.type === "pure") {
+          return input.value;
+        }
+        return input.objectId;
+      });
+      return inputValues.every((value, index) => value === expected[index]);
+    },
+  );
 }
