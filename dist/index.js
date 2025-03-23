@@ -144,19 +144,15 @@ async function getContractStocks(params) {
 
 // src/findTransaction.ts
 async function findTransaction(client, params, predicate) {
-  return null;
   let cursor = void 0;
   do {
     const result = await client.queryTransactionBlocks({ ...params, cursor });
     const found = result.data.find(predicate);
     if (found) {
-      console.log("FOUND AN OLD ONE");
       return found;
     }
     cursor = result.hasNextPage ? result.nextCursor : null;
-    console.log("NOT FOUND. Next cursor:", cursor);
   } while (cursor !== null);
-  console.log("NOT FOUND AT ALL");
   return null;
 }
 
