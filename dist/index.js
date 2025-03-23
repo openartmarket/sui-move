@@ -146,13 +146,13 @@ async function getContractStocks(params) {
 async function findTransaction(client, params, predicate) {
   let cursor = void 0;
   do {
-    const result = await client.queryTransactionBlocks({ ...params, cursor });
+    const result = await client.queryTransactionBlocks({ ...params, cursor, order: "descending" });
     const found = result.data.find(predicate);
     if (found) {
       return found;
     }
     cursor = result.hasNextPage ? result.nextCursor : null;
-  } while (cursor !== null);
+  } while (cursor);
   return null;
 }
 
