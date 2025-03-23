@@ -30,38 +30,23 @@ export async function mintContractStock(
 ): Promise<MintContractStockResult> {
   const { adminCapId, contractId, quantity, receiverAddress } = params;
 
-  let response = await findContractStock(wallet, params);
-
-  if (!response) {
-    response = await wallet.execute(async (txb, packageId) => {
-      txb.moveCall({
-        target: `${packageId}::open_art_market::mint_contract_stock`,
-        arguments: [
-          txb.object(adminCapId),
-          txb.object(contractId),
-          txb.pure.u64(quantity),
-          txb.pure.address(receiverAddress),
-        ],
-      });
+  const response = await wallet.execute(async (txb, packageId) => {
+    txb.moveCall({
+      target: `${packageId}::open_art_market::mint_contract_stock`,
+      arguments: [
+        txb.object(adminCapId),
+        txb.object(contractId),
+        txb.pure.u64(quantity),
+        txb.pure.address(receiverAddress),
+      ],
     });
-  }
+  });
 
   return makeContractStock(response);
 }
 
-export function makeContractStock(response: SuiTransactionBlockResponse) {
-  const { digest } = response;
-  const objects = getCreatedObjects(response);
-  const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
-  if (ownedObjects.length !== 1) {
-    throw new Error(`Expected 1 owned objects, got ${JSON.stringify(ownedObjects, null, 2)}`);
-  }
-  const contractStockId = ownedObjects[0].objectId;
-  return { contractStockId, digest };
-}
-
 export async function findContractStock(wallet: Wallet, params: MintContractStockParams) {
-  return findTransaction(
+  const response = await findTransaction(
     wallet.suiClient,
     {
       filter: {
@@ -94,4 +79,19 @@ export async function findContractStock(wallet: Wallet, params: MintContractStoc
       return inputValues.every((value, index) => value === expected[index]);
     },
   );
+  if (!response) {
+    return null;
+  }
+  return makeContractStock(response);
+}
+
+function makeContractStock(response: SuiTransactionBlockResponse) {
+  const { digest } = response;
+  const objects = getCreatedObjects(response);
+  const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
+  if (ownedObjects.length !== 1) {
+    throw new Error(`Expected 1 owned objects, got ${JSON.stringify(ownedObjects, null, 2)}`);
+  }
+  const contractStockId = ownedObjects[0].objectId;
+  return { contractStockId, digest };
 }

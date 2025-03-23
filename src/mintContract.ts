@@ -48,43 +48,29 @@ export async function mintContract(
     productId,
   } = params;
 
-  let response = await findContract(wallet, params);
-
-  if (!response) {
-    response = await wallet.execute(async (txb, packageId) => {
-      txb.moveCall({
-        target: `${packageId}::open_art_market::mint_contract`,
-        arguments: [
-          txb.object(adminCapId),
-          txb.pure.u64(totalShareCount),
-          txb.pure.u64(sharePrice),
-          txb.pure.u64(outgoingPrice),
-          txb.pure.string(name),
-          txb.pure.string(artist),
-          txb.pure.u64(creationTimestampMillis),
-          txb.pure.string(description),
-          txb.pure.string(currency),
-          // AKA reference AKA image
-          txb.pure.string(productId),
-        ],
-      });
+  const response = await wallet.execute(async (txb, packageId) => {
+    txb.moveCall({
+      target: `${packageId}::open_art_market::mint_contract`,
+      arguments: [
+        txb.object(adminCapId),
+        txb.pure.u64(totalShareCount),
+        txb.pure.u64(sharePrice),
+        txb.pure.u64(outgoingPrice),
+        txb.pure.string(name),
+        txb.pure.string(artist),
+        txb.pure.u64(creationTimestampMillis),
+        txb.pure.string(description),
+        txb.pure.string(currency),
+        // AKA reference AKA image
+        txb.pure.string(productId),
+      ],
     });
-  }
-
+  });
   return makeContract(response);
 }
 
-export function makeContract(response: SuiTransactionBlockResponse) {
-  const { digest } = response;
-  const objects = getCreatedObjects(response);
-  if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
-  const contractId = objects[0].objectId;
-
-  return { contractId, digest };
-}
-
 export async function findContract(wallet: Wallet, params: MintContractParams) {
-  return await findTransaction(
+  const response = await findTransaction(
     wallet.suiClient,
     {
       filter: {
@@ -138,4 +124,17 @@ export async function findContract(wallet: Wallet, params: MintContractParams) {
       return inputValues.every((value, index) => value === expected[index]);
     },
   );
+  if (!response) {
+    return null;
+  }
+  return makeContract(response);
+}
+
+function makeContract(response: SuiTransactionBlockResponse) {
+  const { digest } = response;
+  const objects = getCreatedObjects(response);
+  if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
+  const contractId = objects[0].objectId;
+
+  return { contractId, digest };
 }

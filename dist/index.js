@@ -170,38 +170,28 @@ async function mintContract(wallet, params) {
     currency,
     productId
   } = params;
-  let response = await findContract(wallet, params);
-  if (!response) {
-    response = await wallet.execute(async (txb, packageId) => {
-      txb.moveCall({
-        target: `${packageId}::open_art_market::mint_contract`,
-        arguments: [
-          txb.object(adminCapId),
-          txb.pure.u64(totalShareCount),
-          txb.pure.u64(sharePrice),
-          txb.pure.u64(outgoingPrice),
-          txb.pure.string(name),
-          txb.pure.string(artist),
-          txb.pure.u64(creationTimestampMillis),
-          txb.pure.string(description),
-          txb.pure.string(currency),
-          // AKA reference AKA image
-          txb.pure.string(productId)
-        ]
-      });
+  const response = await wallet.execute(async (txb, packageId) => {
+    txb.moveCall({
+      target: `${packageId}::open_art_market::mint_contract`,
+      arguments: [
+        txb.object(adminCapId),
+        txb.pure.u64(totalShareCount),
+        txb.pure.u64(sharePrice),
+        txb.pure.u64(outgoingPrice),
+        txb.pure.string(name),
+        txb.pure.string(artist),
+        txb.pure.u64(creationTimestampMillis),
+        txb.pure.string(description),
+        txb.pure.string(currency),
+        // AKA reference AKA image
+        txb.pure.string(productId)
+      ]
     });
-  }
+  });
   return makeContract(response);
 }
-function makeContract(response) {
-  const { digest } = response;
-  const objects = getCreatedObjects(response);
-  if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
-  const contractId = objects[0].objectId;
-  return { contractId, digest };
-}
 async function findContract(wallet, params) {
-  return await findTransaction(
+  const response = await findTransaction(
     wallet.suiClient,
     {
       filter: {
@@ -254,39 +244,37 @@ async function findContract(wallet, params) {
       return inputValues.every((value, index) => value === expected[index]);
     }
   );
+  if (!response) {
+    return null;
+  }
+  return makeContract(response);
+}
+function makeContract(response) {
+  const { digest } = response;
+  const objects = getCreatedObjects(response);
+  if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
+  const contractId = objects[0].objectId;
+  return { contractId, digest };
 }
 
 // src/mintContractStock.ts
 async function mintContractStock(wallet, params) {
   const { adminCapId, contractId, quantity, receiverAddress } = params;
-  let response = await findContractStock(wallet, params);
-  if (!response) {
-    response = await wallet.execute(async (txb, packageId) => {
-      txb.moveCall({
-        target: `${packageId}::open_art_market::mint_contract_stock`,
-        arguments: [
-          txb.object(adminCapId),
-          txb.object(contractId),
-          txb.pure.u64(quantity),
-          txb.pure.address(receiverAddress)
-        ]
-      });
+  const response = await wallet.execute(async (txb, packageId) => {
+    txb.moveCall({
+      target: `${packageId}::open_art_market::mint_contract_stock`,
+      arguments: [
+        txb.object(adminCapId),
+        txb.object(contractId),
+        txb.pure.u64(quantity),
+        txb.pure.address(receiverAddress)
+      ]
     });
-  }
+  });
   return makeContractStock(response);
 }
-function makeContractStock(response) {
-  const { digest } = response;
-  const objects = getCreatedObjects(response);
-  const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
-  if (ownedObjects.length !== 1) {
-    throw new Error(`Expected 1 owned objects, got ${JSON.stringify(ownedObjects, null, 2)}`);
-  }
-  const contractStockId = ownedObjects[0].objectId;
-  return { contractStockId, digest };
-}
 async function findContractStock(wallet, params) {
-  return findTransaction(
+  const response = await findTransaction(
     wallet.suiClient,
     {
       filter: {
@@ -319,6 +307,20 @@ async function findContractStock(wallet, params) {
       return inputValues.every((value, index) => value === expected[index]);
     }
   );
+  if (!response) {
+    return null;
+  }
+  return makeContractStock(response);
+}
+function makeContractStock(response) {
+  const { digest } = response;
+  const objects = getCreatedObjects(response);
+  const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
+  if (ownedObjects.length !== 1) {
+    throw new Error(`Expected 1 owned objects, got ${JSON.stringify(ownedObjects, null, 2)}`);
+  }
+  const contractStockId = ownedObjects[0].objectId;
+  return { contractStockId, digest };
 }
 
 // src/mergeContractStock.ts
@@ -677,8 +679,6 @@ export {
   getStringField,
   getType,
   getWalletQuantity,
-  makeContract,
-  makeContractStock,
   mintContract,
   mintContractStock,
   newSuiAddress,
