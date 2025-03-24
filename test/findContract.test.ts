@@ -10,4 +10,19 @@ describe("findContract", () => {
     const contract2 = await findContract(adminWallet, mintContractOptions);
     expect(contract2).toEqual(contract1);
   });
+
+  it(
+    "should find a previously minted contract even if the timestamp is different",
+    { timeout: 100_000 },
+    async () => {
+      const mintContractOptions = makeMintContractOptions();
+
+      const contract1 = await mintContract(adminWallet, mintContractOptions);
+      const contract2 = await findContract(adminWallet, {
+        ...mintContractOptions,
+        creationTimestampMillis: mintContractOptions.creationTimestampMillis + 1,
+      });
+      expect(contract2).toEqual(contract1);
+    },
+  );
 });

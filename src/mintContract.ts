@@ -66,7 +66,7 @@ export async function mintContract(
       ],
     });
   });
-  return makeContract(response);
+  return toMintContractResult(response);
 }
 
 export async function findContract(
@@ -124,16 +124,22 @@ export async function findContract(
         }
         return input.objectId;
       });
-      return inputValues.every((value, index) => value === expected[index]);
+      return inputValues.every((value, index) => {
+        if (index === 6) {
+          // We allow creationTimestampMillis to be different
+          return true;
+        }
+        return value === expected[index];
+      });
     },
   );
   if (!response) {
     return null;
   }
-  return makeContract(response);
+  return toMintContractResult(response);
 }
 
-function makeContract(response: SuiTransactionBlockResponse): MintContractResult {
+function toMintContractResult(response: SuiTransactionBlockResponse): MintContractResult {
   const { digest } = response;
   const objects = getCreatedObjects(response);
   if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);

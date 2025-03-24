@@ -188,7 +188,7 @@ async function mintContract(wallet, params) {
       ]
     });
   });
-  return makeContract(response);
+  return toMintContractResult(response);
 }
 async function findContract(wallet, params) {
   const response = await findTransaction(
@@ -241,15 +241,20 @@ async function findContract(wallet, params) {
         }
         return input.objectId;
       });
-      return inputValues.every((value, index) => value === expected[index]);
+      return inputValues.every((value, index) => {
+        if (index === 6) {
+          return true;
+        }
+        return value === expected[index];
+      });
     }
   );
   if (!response) {
     return null;
   }
-  return makeContract(response);
+  return toMintContractResult(response);
 }
-function makeContract(response) {
+function toMintContractResult(response) {
   const { digest } = response;
   const objects = getCreatedObjects(response);
   if (objects.length !== 1) throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
@@ -271,7 +276,7 @@ async function mintContractStock(wallet, params) {
       ]
     });
   });
-  return makeContractStock(response);
+  return toMintContractStockResult(response);
 }
 async function findContractStock(wallet, params) {
   const response = await findTransaction(
@@ -310,9 +315,9 @@ async function findContractStock(wallet, params) {
   if (!response) {
     return null;
   }
-  return makeContractStock(response);
+  return toMintContractStockResult(response);
 }
-function makeContractStock(response) {
+function toMintContractStockResult(response) {
   const { digest } = response;
   const objects = getCreatedObjects(response);
   const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
@@ -625,7 +630,7 @@ function checkResponse(response) {
 }
 
 // src/Wallet.ts
-async function newWallet(params) {
+function newWallet(params) {
   switch (params.type) {
     case "sui": {
       const { network, packageId, keypair } = params;

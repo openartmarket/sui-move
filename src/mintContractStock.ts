@@ -42,7 +42,7 @@ export async function mintContractStock(
     });
   });
 
-  return makeContractStock(response);
+  return toMintContractStockResult(response);
 }
 
 export async function findContractStock(
@@ -85,10 +85,10 @@ export async function findContractStock(
   if (!response) {
     return null;
   }
-  return makeContractStock(response);
+  return toMintContractStockResult(response);
 }
 
-function makeContractStock(response: SuiTransactionBlockResponse): MintContractStockResult {
+function toMintContractStockResult(response: SuiTransactionBlockResponse): MintContractStockResult {
   const { digest } = response;
   const objects = getCreatedObjects(response);
   const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);

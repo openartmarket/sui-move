@@ -47,7 +47,7 @@ export type NewShinamiSponsoredWalletParams = {
   secret: string;
 };
 
-export async function newWallet(params: NewWalletParams): Promise<Wallet> {
+export function newWallet(params: NewWalletParams): Wallet {
   switch (params.type) {
     case "sui": {
       const { network, packageId, keypair } = params;

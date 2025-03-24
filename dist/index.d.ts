@@ -35,7 +35,7 @@ type NewShinamiSponsoredWalletParams = {
     walletId: string;
     secret: string;
 };
-declare function newWallet(params: NewWalletParams): Promise<Wallet>;
+declare function newWallet(params: NewWalletParams): Wallet;
 
 type EndMotionParams = {
     adminCapId: string;
