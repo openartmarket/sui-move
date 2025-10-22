@@ -24,7 +24,7 @@
 		"compile": "tsc --build --noEmit",
 		"build": "tsup",
 		"upgrade": "npm-check-updates --upgrade",
-		"check": "npx @biomejs/biome check --write src test"
+		"check": "npx @biomejs/biome check --write --unsafe src test"
 	},
 	"repository": "openartmarket/sui-move",
 	"license": "MIT",

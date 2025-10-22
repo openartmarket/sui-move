@@ -1,27 +1,31 @@
 import type { Wallet } from "./Wallet.js";
 
 export type TransferContractStockParams = {
-  contractId: string;
-  contractStockId: string;
-  toAddress: string;
+	contractId: string;
+	contractStockId: string;
+	toAddress: string;
 };
 
 export type TransferContractStockResult = {
-  digest: string;
+	digest: string;
 };
 
 export async function transferContractStock(
-  wallet: Wallet,
-  params: TransferContractStockParams,
+	wallet: Wallet,
+	params: TransferContractStockParams,
 ): Promise<TransferContractStockResult> {
-  const response = await wallet.execute(async (txb, packageId) => {
-    const { contractId, contractStockId, toAddress } = params;
-    txb.moveCall({
-      target: `${packageId}::open_art_market::transfer_contract_stock`,
-      arguments: [txb.object(contractId), txb.object(contractStockId), txb.pure.address(toAddress)],
-    });
-  });
-  const { digest } = response;
+	const response = await wallet.execute(async (txb, packageId) => {
+		const { contractId, contractStockId, toAddress } = params;
+		txb.moveCall({
+			target: `${packageId}::open_art_market::transfer_contract_stock`,
+			arguments: [
+				txb.object(contractId),
+				txb.object(contractStockId),
+				txb.pure.address(toAddress),
+			],
+		});
+	});
+	const { digest } = response;
 
-  return { digest };
+	return { digest };
 }
