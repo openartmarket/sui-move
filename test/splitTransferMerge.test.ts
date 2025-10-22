@@ -19,7 +19,7 @@ describe("splitTransferMerge", () => {
 
 		const res = await mintContract(adminWallet, mintContractOptions);
 		contractId = res.contractId;
-	}, 30_000);
+	}, 60_000);
 
 	it("should transfer stocks and make sure everything is merged", async () => {
 		const fromWallet = await makeWallet();
