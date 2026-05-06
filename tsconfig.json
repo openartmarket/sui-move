@@ -4,7 +4,7 @@
 		"target": "ESNext",
 		"module": "ESNext",
 		"strict": true,
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"sourceMap": true,
 		"experimentalDecorators": true,
 		"pretty": true,
@@ -15,7 +15,6 @@
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
 		"declaration": true,
-		"downlevelIteration": true,
 		"lib": ["ESNext", "DOM", "DOM.Iterable"]
 	},
 	"exclude": ["dist", "node_modules"]

@@ -9,8 +9,8 @@ type Json =
 	| Json[];
 
 async function getSuiCoinObjectId(): Promise<string> {
-	const gas = await execSui<{ id: { id: string } }[]>("sui client gas --json");
-	return gas[0].id.id;
+	const gas = await execSui<{ gasCoinId: string }[]>("sui client gas --json");
+	return gas[0].gasCoinId;
 }
 
 export type SuiAddress = {
@@ -24,12 +24,13 @@ export type SuiAddress = {
 export async function newSuiAddress(
 	balance = 20_000_000_000,
 ): Promise<SuiAddress> {
-	const [address, phrase] = await execSui<[string, string, string]>(
-		"sui client new-address ed25519 --json",
-	);
+	const { address, recoveryPhrase } = await execSui<{
+		address: string;
+		recoveryPhrase: string;
+	}>("sui client new-address ed25519 --json");
 	const suiCoinObjectId = await getSuiCoinObjectId();
 	await transferSui({ to: address, suiCoinObjectId, amount: balance });
-	return { address, phrase };
+	return { address, phrase: recoveryPhrase };
 }
 
 type TransferSuiParams = {
