@@ -15,9 +15,9 @@ The `sui` command line is not available in `asdf`. To install it, run this comma
 
     ./scripts/sui-install.sh
 
-Finally, install the npm dependencies:
+Finally, install the npm dependencies with pnpm:
 
-    npm install
+    pnpm install
 
 ## Configure `direnv`
 
@@ -80,15 +80,15 @@ This will append more environment variables to `.sui.env` which will be used by 
 
 Now that the contracts are deployed, run the tests:
 
-    npm test
+    pnpm test
 
-You can rerun tests without redeploying the contracts. Just run `npm test` again.
+You can rerun tests without redeploying the contracts. Just run `pnpm test` again.
 
 ### Running a single test
 
 While you're developing, you may want to run only the single test you're working with.
 
-Change `it('...')` to `it.only('...')`, and `npm test` will *only* run that test.
+Change `it('...')` to `it.only('...')`, and `pnpm test` will *only* run that test.
 
 ### Viewing on local blockchain explorer
 
@@ -104,7 +104,7 @@ Go to [SUI Explorer](https://suiexplorer.com/?network=local)
 
 The TypeScript code is compiled to JavaScript (esm and cjs) with the following command:
 
-    npm run build
+    pnpm build
 
 ## Contributing changes
 
