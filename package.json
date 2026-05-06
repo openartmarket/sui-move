@@ -24,10 +24,11 @@
 		"compile": "tsc --build --noEmit",
 		"build": "tsup",
 		"upgrade": "npm-check-updates --upgrade",
-		"check": "npx @biomejs/biome check --write --unsafe src test"
+		"check": "biome check --write --unsafe src test"
 	},
 	"repository": "openartmarket/sui-move",
 	"license": "MIT",
+	"packageManager": "pnpm@10.30.1",
 	"dependencies": {
 		"@mysten/bcs": "1.9.2",
     "@mysten/sui": "1.45.2",

@@ -21,10 +21,11 @@ jobs:
     - run: sui start > sui.log 2>&1 &
     - run: sleep 5
     - run: ./scripts/sui-new-addresses.sh
-    - run: npm ci
+    - run: corepack enable
+    - run: pnpm install --frozen-lockfile
     - run: direnv exec . ./scripts/publish-contracts.sh
-    - run: direnv exec . npm test
-    - run: npm run compile
+    - run: direnv exec . pnpm test
+    - run: pnpm compile
     - run: ./scripts/fail-if-dirty
     - name: Print environment variables
       run: |
@@ -42,11 +43,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
-        node-version: "18"
-    - run: npm ci
-    - run: npm test
+        node-version: "22"
+    - run: corepack enable
+    - run: pnpm install --frozen-lockfile
+    - run: pnpm test
       env:
         SHINAMI_ENABLED: "1"
         ADMIN_CAP_ID: ${{secrets.ADMIN_CAP_ID}}

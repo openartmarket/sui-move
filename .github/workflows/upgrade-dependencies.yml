@@ -17,11 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: ./scripts/asdf-install.sh
-      - run: npm install
-      - run: npm run upgrade
-      - run: npm install
+      - run: corepack enable
+      - run: pnpm install
+      - run: pnpm run upgrade
+      - run: pnpm install
       - name: Open pull request if needed
-        run: ./scripts/gha-open-pr.sh auto-dependency-upgrades "Automated dependency upgrades" "*/*.json"
+        run: ./scripts/gha-open-pr.sh auto-dependency-upgrades "Automated dependency upgrades" ":(glob)*.{json,yaml}"
         env:
           # https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
           GH_TOKEN: ${{ secrets.GHA_PR_GITHUB_TOKEN }}
