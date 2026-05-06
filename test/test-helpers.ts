@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { KeyClient, WalletClient } from "@shinami/clients/sui";
 import type { MintContractParams } from "../src/mintContract.js";
-import { newSuiAddress, type SuiAddress } from "../src/sui.js";
+import { newSuiAddress, type SuiAddress } from "../src/helpers.js";
 import type { NetworkName } from "../src/types.js";
 import type { Wallet } from "../src/Wallet.js";
 import { newWallet } from "../src/Wallet.js";

@@ -4,3 +4,5 @@ sui.log.*
 .sui.env
 coverage
 Pub.*.toml
+dist
+*.tsbuildinfo

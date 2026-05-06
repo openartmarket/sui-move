@@ -1,6 +1,9 @@
 {
 	"name": "@openartmarket/sui",
 	"version": "0.3.0",
+	"publishConfig": {
+		"access": "public"
+	},
 	"description": "Contracts for Open Art Market (https://www.openartmarket.com/)",
 	"author": {
 		"name": "Open Art Market",
@@ -11,18 +14,24 @@
 		"./dist"
 	],
 	"type": "module",
-	"main": "./dist/index.cjs",
+	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js"
+		},
+		"./helpers": {
+			"types": "./dist/helpers.d.ts",
+			"import": "./dist/helpers.js"
 		}
 	},
 	"scripts": {
 		"test": "vitest run --coverage",
 		"compile": "tsc --build --noEmit",
-		"build": "tsup",
+		"build": "tsc --build --clean tsconfig.build.json && tsc --build tsconfig.build.json",
+		"prepublishOnly": "pnpm build",
+		"release": "np",
 		"upgrade": "npm-check-updates --upgrade",
 		"check": "biome check --write --unsafe src test"
 	},
@@ -31,7 +40,7 @@
 	"packageManager": "pnpm@10.30.1",
 	"dependencies": {
 		"@mysten/bcs": "1.9.2",
-    "@mysten/sui": "1.45.2",
+		"@mysten/sui": "1.45.2",
 		"@shinami/clients": "0.10.0"
 	},
 	"devDependencies": {
@@ -40,30 +49,15 @@
 		"@vitest/coverage-v8": "4.1.5",
 		"@vitest/ui": "4.1.5",
 		"eslint": "10.3.0",
+		"np": "^11.2.0",
 		"npm-check-updates": "22.1.0",
 		"prettier": "3.8.3",
-		"tsup": "8.5.1",
 		"tsx": "4.21.0",
 		"typescript": "6.0.3",
 		"vite": "8.0.10",
 		"vitest": "4.1.5"
 	},
-	"tsup": {
-		"dts": true,
-		"entryPoints": [
-			"src/index.ts"
-		],
-		"external": [
-			"@mysten/bcs",
-			"@mysten/sui",
-      "@shinami/clients"
-		],
-		"format": [
-			"esm"
-		],
-		"sourcemap": true,
-		"splitting": false,
-		"bundle": true,
-		"clean": true
+	"np": {
+		"branch": "main"
 	}
 }
