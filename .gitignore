@@ -3,3 +3,4 @@ tmp/
 sui.log.*
 .sui.env
 coverage
+Pub.*.toml

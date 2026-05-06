@@ -5,7 +5,7 @@ envs=$(sui client active-env)
 
 gas=$(sui client gas --json)
 echo $gas
-sui_coin_object_id=$(echo $gas | jq -r '.[0].id.id')
+sui_coin_object_id=$(echo $gas | jq -r '.[0].gasCoinId')
 
 rm -f .sui.env
 
@@ -13,8 +13,8 @@ function new_address() {
   name=$1
   amount=$2
   address_json=$(sui client new-address ed25519 --json)
-  address=$(echo $address_json | jq -r '.[0]')
-  phrase=$(echo $address_json | jq -r '.[1]')
+  address=$(echo $address_json | jq -r '.address')
+  phrase=$(echo $address_json | jq -r '.recoveryPhrase')
   echo "export ${name}_ADDRESS=\"$address\"" >> .sui.env
   echo "export ${name}_PHRASE=\"$phrase\"" >> .sui.env
 
