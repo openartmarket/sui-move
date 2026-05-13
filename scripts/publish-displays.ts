@@ -8,7 +8,9 @@ import { adminWallet, getEnv } from "../test/test-helpers.js";
 
 const PUBLISHER_ID = getEnv("PUBLISHER_ID");
 const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
-const DISPLAY_BASE_URL = getEnv("DISPLAY_BASE_URL");
+// Off-chain URL templates baked into Display objects. Merchant-specific; defaults
+// to the public Coownable host so CI / localnet runs don't need to set anything.
+const DISPLAY_BASE_URL = process.env.DISPLAY_BASE_URL ?? "https://coownable.com";
 
 async function main() {
 	const keypair = Ed25519Keypair.deriveKeypair(ADMIN_PHRASE);
