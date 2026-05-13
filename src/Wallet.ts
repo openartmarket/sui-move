@@ -1,20 +1,17 @@
-import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
-import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
+import type {
+	SuiObjectRef,
+	SuiTransactionBlockResponse,
+} from "@mysten/sui/jsonRpc";
+import { getJsonRpcFullnodeUrl, SuiJsonRpcClient } from "@mysten/sui/jsonRpc";
 import type { Keypair } from "@mysten/sui/cryptography";
 import type { Transaction } from "@mysten/sui/transactions";
-import {
-	createSuiClient,
-	GasStationClient,
-	KeyClient,
-	WalletClient,
-} from "@shinami/clients/sui";
 
 import type { NetworkName } from "./types.js";
-import { ShinamiWallet, SuiWallet } from "./wallets.js";
+import { SponsoredWallet, SuiWallet } from "./wallets.js";
 
 export type ReadonlyWallet = {
 	readonly address: string;
-	readonly suiClient: SuiClient;
+	readonly suiClient: SuiJsonRpcClient;
 	readonly packageId: string;
 };
 
@@ -27,10 +24,17 @@ export type BuildTransaction = (
 	packageId: string,
 ) => Promise<void>;
 
-export type NewWalletParams =
-	| NewSuiWalletParams
-	| NewShinamiWalletParams
-	| NewShinamiSponsoredWalletParams;
+export type SponsoredSubmitRequest = {
+	transactionBytes: Uint8Array;
+	senderSignature: string;
+	senderAddress: string;
+};
+
+export type SponsoredSubmit = (
+	req: SponsoredSubmitRequest,
+) => Promise<SuiTransactionBlockResponse>;
+
+export type NewWalletParams = NewSuiWalletParams | NewSponsoredWalletParams;
 
 export type NewSuiWalletParams = {
 	type: "sui";
@@ -39,61 +43,46 @@ export type NewSuiWalletParams = {
 	keypair: Keypair;
 };
 
-export type NewShinamiWalletParams = {
-	type: "shinami";
+export type NewSponsoredWalletParams = {
+	type: "sponsored";
 	packageId: string;
-	shinamiAccessKey: string;
-	keypair: Keypair;
-};
-
-export type NewShinamiSponsoredWalletParams = {
-	type: "shinami-sponsored";
-	packageId: string;
-	shinamiAccessKey: string;
-	address: string;
-	walletId: string;
-	secret: string;
+	network: NetworkName;
+	senderKeypair: Keypair;
+	sponsorAddress: string;
+	reserveGasCoins: () => Promise<SuiObjectRef[]>;
+	submit: SponsoredSubmit;
 };
 
 export function newWallet(params: NewWalletParams): Wallet {
 	switch (params.type) {
 		case "sui": {
 			const { network, packageId, keypair } = params;
-			const url = getFullnodeUrl(network);
-			const suiClient = new SuiClient({ url });
+			const url = getJsonRpcFullnodeUrl(network);
+			const suiClient = new SuiJsonRpcClient({ url, network });
 			return new SuiWallet({
 				packageId,
 				suiClient,
 				keypair,
 			});
 		}
-		case "shinami": {
-			const { packageId, shinamiAccessKey, keypair } = params;
-			const suiClient = createSuiClient(shinamiAccessKey);
-
-			return new SuiWallet({
+		case "sponsored": {
+			const {
+				network,
+				packageId,
+				senderKeypair,
+				sponsorAddress,
+				reserveGasCoins,
+				submit,
+			} = params;
+			const url = getJsonRpcFullnodeUrl(network);
+			const suiClient = new SuiJsonRpcClient({ url, network });
+			return new SponsoredWallet({
 				packageId,
 				suiClient,
-				keypair,
-			});
-		}
-		case "shinami-sponsored": {
-			const { packageId, shinamiAccessKey, address, walletId, secret } = params;
-			const suiClient = createSuiClient(shinamiAccessKey);
-
-			const gasClient = new GasStationClient(shinamiAccessKey);
-			const keyClient = new KeyClient(shinamiAccessKey);
-			const walletClient = new WalletClient(shinamiAccessKey);
-
-			return new ShinamiWallet({
-				suiClient,
-				gasStationClient: gasClient,
-				keyClient,
-				walletClient,
-				packageId,
-				address,
-				walletId,
-				secret,
+				senderKeypair,
+				sponsorAddress,
+				reserveGasCoins,
+				submit,
 			});
 		}
 	}

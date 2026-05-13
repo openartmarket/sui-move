@@ -1,11 +1,11 @@
 import type {
 	QueryTransactionBlocksParams,
-	SuiClient,
+	SuiJsonRpcClient,
 	SuiTransactionBlockResponse,
-} from "@mysten/sui/client";
+} from "@mysten/sui/jsonRpc";
 
 export async function findTransaction(
-	client: SuiClient,
+	client: SuiJsonRpcClient,
 	params: QueryTransactionBlocksParams,
 	predicate: (tx: SuiTransactionBlockResponse) => boolean,
 ) {

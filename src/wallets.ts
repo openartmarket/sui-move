@@ -1,24 +1,18 @@
-import { fromBase64 } from "@mysten/bcs";
 import type {
-	SuiClient,
+	SuiJsonRpcClient,
 	SuiTransactionBlockResponse,
-} from "@mysten/sui/client";
+} from "@mysten/sui/jsonRpc";
 import type { Keypair } from "@mysten/sui/cryptography";
 import { Transaction } from "@mysten/sui/transactions";
-import type {
-	GasStationClient,
-	KeyClient,
-	WalletClient,
-} from "@shinami/clients/sui";
-import {
-	buildGaslessTransaction,
-	ShinamiWalletSigner,
-} from "@shinami/clients/sui";
 
-import type { BuildTransaction, Wallet } from "./Wallet.js";
+import type {
+	BuildTransaction,
+	SponsoredSubmit,
+	Wallet,
+} from "./Wallet.js";
 
 export type SuiWalletParams = {
-	suiClient: SuiClient;
+	suiClient: SuiJsonRpcClient;
 	packageId: string;
 	keypair: Keypair;
 };
@@ -30,7 +24,7 @@ export class SuiWallet implements Wallet {
 		return this.params.keypair.toSuiAddress();
 	}
 
-	get suiClient(): SuiClient {
+	get suiClient(): SuiJsonRpcClient {
 		return this.params.suiClient;
 	}
 
@@ -57,28 +51,26 @@ export class SuiWallet implements Wallet {
 	}
 }
 
-export type ShinamiWalletParams = {
-	suiClient: SuiClient;
-	gasStationClient: GasStationClient;
-	walletClient: WalletClient;
-	keyClient: KeyClient;
+export type SponsoredWalletParams = {
+	suiClient: SuiJsonRpcClient;
 	packageId: string;
-	address: string;
-	walletId: string;
-	secret: string;
+	senderKeypair: Keypair;
+	sponsorAddress: string;
+	reserveGasCoins: () => Promise<
+		{ objectId: string; version: string; digest: string }[]
+	>;
+	submit: SponsoredSubmit;
 };
 
-const SUI_GAS_FEE_LIMIT = 5_000_000;
-
-export class ShinamiWallet implements Wallet {
-	constructor(private readonly params: ShinamiWalletParams) {}
-
-	get suiClient(): SuiClient {
-		return this.params.suiClient;
-	}
+export class SponsoredWallet implements Wallet {
+	constructor(private readonly params: SponsoredWalletParams) {}
 
 	get address(): string {
-		return this.params.address;
+		return this.params.senderKeypair.toSuiAddress();
+	}
+
+	get suiClient(): SuiJsonRpcClient {
+		return this.params.suiClient;
 	}
 
 	get packageId(): string {
@@ -88,45 +80,29 @@ export class ShinamiWallet implements Wallet {
 	async execute(build: BuildTransaction): Promise<SuiTransactionBlockResponse> {
 		const {
 			suiClient,
-			gasStationClient,
-			walletClient,
-			keyClient,
 			packageId,
-			walletId,
-			secret,
+			senderKeypair,
+			sponsorAddress,
+			reserveGasCoins,
+			submit,
 		} = this.params;
+		const senderAddress = senderKeypair.toSuiAddress();
 
-		const signer = new ShinamiWalletSigner(
-			walletId,
-			walletClient,
-			secret,
-			keyClient,
-		);
+		const tx = new Transaction();
+		await build(tx, packageId);
+		tx.setSender(senderAddress);
+		tx.setGasOwner(sponsorAddress);
+		const gasCoins = await reserveGasCoins();
+		tx.setGasPayment(gasCoins);
 
-		const gaslessTxn = await buildGaslessTransaction(
-			(txb) => build(txb, packageId),
-			{
-				sui: suiClient,
-			},
-		);
+		const transactionBytes = await tx.build({ client: suiClient });
+		const { signature: senderSignature } =
+			await senderKeypair.signTransaction(transactionBytes);
 
-		const sponsoredResponse = await gasStationClient.sponsorTransaction({
-			gasBudget: SUI_GAS_FEE_LIMIT,
-			txKind: gaslessTxn.txKind,
-			sender: this.address,
-		});
-		// Sign the sponsored tx.
-		const { signature } = await signer.signTransaction(
-			fromBase64(sponsoredResponse.txBytes),
-		);
-		const response = await suiClient.executeTransactionBlock({
-			transactionBlock: sponsoredResponse.txBytes,
-			signature: [signature, sponsoredResponse.signature],
-			requestType: "WaitForLocalExecution",
-			options: {
-				showObjectChanges: true,
-				showEffects: true,
-			},
+		const response = await submit({
+			transactionBytes,
+			senderSignature,
+			senderAddress,
 		});
 		return checkResponse(response);
 	}

@@ -1,4 +1,4 @@
-import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
+import type { SuiTransactionBlockResponse } from "@mysten/sui/jsonRpc";
 import { findTransaction } from "./findTransaction.js";
 import { getCreatedObjects } from "./getters.js";
 import type { Currency } from "./types.js";
@@ -124,7 +124,10 @@ export async function findContract(
 				if (input.type === "pure") {
 					return input.value;
 				}
-				return input.objectId;
+				if (input.type === "object") {
+					return input.objectId;
+				}
+				return undefined;
 			});
 			return inputValues.every((value, index) => {
 				if (index === 6) {

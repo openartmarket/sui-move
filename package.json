@@ -37,25 +37,24 @@
 	},
 	"repository": "openartmarket/sui-move",
 	"license": "MIT",
-	"packageManager": "pnpm@10.30.1",
+	"packageManager": "pnpm@11.1.1",
 	"dependencies": {
-		"@mysten/bcs": "1.9.2",
-		"@mysten/sui": "1.45.2",
-		"@shinami/clients": "0.10.0"
+		"@mysten/bcs": "2.0.5",
+		"@mysten/sui": "2.16.2"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.4.14",
-		"@types/node": "25.6.0",
-		"@vitest/coverage-v8": "4.1.5",
-		"@vitest/ui": "4.1.5",
+		"@biomejs/biome": "2.4.15",
+		"@types/node": "25.7.0",
+		"@vitest/coverage-v8": "4.1.6",
+		"@vitest/ui": "4.1.6",
 		"eslint": "10.3.0",
-		"np": "^11.2.0",
-		"npm-check-updates": "22.1.0",
+		"np": "11.2.1",
+		"npm-check-updates": "22.2.0",
 		"prettier": "3.8.3",
 		"tsx": "4.21.0",
 		"typescript": "6.0.3",
-		"vite": "8.0.10",
-		"vitest": "4.1.5"
+		"vite": "8.0.12",
+		"vitest": "4.1.6"
 	},
 	"np": {
 		"branch": "main"

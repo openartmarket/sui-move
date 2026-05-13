@@ -1,4 +1,4 @@
-import type { SuiTransactionBlockResponse } from "@mysten/sui/client";
+import type { SuiTransactionBlockResponse } from "@mysten/sui/jsonRpc";
 import { findTransaction } from "./findTransaction.js";
 import { getAddressOwner, getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
@@ -79,7 +79,10 @@ export async function findContractStock(
 				if (input.type === "pure") {
 					return input.value;
 				}
-				return input.objectId;
+				if (input.type === "object") {
+					return input.objectId;
+				}
+				return undefined;
 			});
 			return inputValues.every((value, index) => value === expected[index]);
 		},

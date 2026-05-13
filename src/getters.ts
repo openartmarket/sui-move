@@ -1,12 +1,12 @@
 import type {
 	MoveStruct,
-	SuiClient,
+	SuiJsonRpcClient,
 	SuiObjectChangeCreated,
 	SuiObjectData,
 	SuiObjectResponse,
 	SuiParsedData,
 	SuiTransactionBlockResponse,
-} from "@mysten/sui/client";
+} from "@mysten/sui/jsonRpc";
 
 import type { ReadonlyWallet } from "./Wallet.js";
 
@@ -74,7 +74,7 @@ export function getStringField(data: SuiParsedData, key: string): string {
  * Get the quantity of a contract or a contract stock.
  */
 export async function getQuantity(
-	suiClient: SuiClient,
+	suiClient: SuiJsonRpcClient,
 	id: string,
 ): Promise<number> {
 	const response = await suiClient.getObject({

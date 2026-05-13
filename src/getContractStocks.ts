@@ -1,4 +1,4 @@
-import type { SuiClient, SuiObjectData } from "@mysten/sui/client";
+import type { SuiJsonRpcClient, SuiObjectData } from "@mysten/sui/jsonRpc";
 
 import {
 	getObjectData,
@@ -8,7 +8,7 @@ import {
 } from "./getters.js";
 
 export type GetContractStocksParams = {
-	suiClient: SuiClient;
+	suiClient: SuiJsonRpcClient;
 	owner: string;
 	contractId: string;
 	packageId: string;
