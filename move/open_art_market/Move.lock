@@ -5,13 +5,13 @@
 version = 4
 
 [pinned.localnet.MoveStdlib]
-source = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/move-stdlib", rev = "6d4ec0b0621dd9555753c9ecd5be021b25a0d267" }
+source = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/move-stdlib", rev = "2f5992f189cd24445cd010ccf0aa7ff418ff93b1" }
 use_environment = "localnet"
 manifest_digest = "C4FE4C91DE74CBF223B2E380AE40F592177D21870DC2D7EB6227D2D694E05363"
 deps = {}
 
 [pinned.localnet.Sui]
-source = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "6d4ec0b0621dd9555753c9ecd5be021b25a0d267" }
+source = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "2f5992f189cd24445cd010ccf0aa7ff418ff93b1" }
 use_environment = "localnet"
 manifest_digest = "CC15CB146CA1113370B03476BFF694B88F43F77D8DEE7C23CC0C78AB0634420D"
 deps = { MoveStdlib = "MoveStdlib" }
@@ -19,5 +19,5 @@ deps = { MoveStdlib = "MoveStdlib" }
 [pinned.localnet.open_art_market]
 source = { root = true }
 use_environment = "localnet"
-manifest_digest = "A377B3D4F9D1819DE0C075CF6A1C5A24AED862A4EF4E70CE21DCC68F622EF49D"
+manifest_digest = "45311F36B64D84E9E6FC2243E60BB60949DFF7FD5F87DA53B2BD39EE7448922B"
 deps = { Sui = "Sui" }

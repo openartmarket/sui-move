@@ -13,10 +13,12 @@ jobs:
   test-sui-localnet:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: asdf-vm/actions/setup@v3
-    - run: ./scripts/asdf-install.sh
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
+      with:
+        node-version: "24"
     - uses: HatsuneMiku3939/direnv-action@v1
+    - run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
     - run: ./scripts/sui-install.sh
     - run: rm -rf ~/.sui
     - run: sui start > sui.log 2>&1 &
