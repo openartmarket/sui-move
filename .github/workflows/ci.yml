@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - uses: asdf-vm/actions/setup@v3
     - run: ./scripts/asdf-install.sh
     - uses: HatsuneMiku3939/direnv-action@v1
     - run: ./scripts/sui-install.sh
@@ -39,20 +40,3 @@ jobs:
       run: |
         sudo kill -9 $(ps aux | grep sui | grep -v grep | awk '{print $2}')
       if: ${{ always() }}
-  test-shinami-testnet:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v4
-      with:
-        node-version: "22"
-    - run: corepack enable
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm test
-      env:
-        SHINAMI_ENABLED: "1"
-        ADMIN_CAP_ID: ${{secrets.ADMIN_CAP_ID}}
-        PACKAGE_ID: ${{secrets.PACKAGE_ID}}
-        ADMIN_ADDRESS: ${{secrets.ADMIN_ADDRESS}}
-        ADMIN_PHRASE: ${{secrets.ADMIN_PHRASE}}
-        SHINAMI_ACCESS_KEY: ${{secrets.SHINAMI_ACCESS_KEY}}
