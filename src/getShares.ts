@@ -7,21 +7,21 @@ import {
 	getType,
 } from "./getters.js";
 
-export type GetContractStocksParams = {
+export type GetSharesParams = {
 	suiClient: SuiJsonRpcClient;
 	owner: string;
-	contractId: string;
+	assetId: string;
 	packageId: string;
 	cursor?: string;
 };
 
 /**
- * Returns all contract stocks of a contract owned by an address.
+ * Returns all Share NFTs of an asset owned by an address.
  */
-export async function getContractStocks(
-	params: GetContractStocksParams,
+export async function getShares(
+	params: GetSharesParams,
 ): Promise<readonly SuiObjectData[]> {
-	const { suiClient, owner, contractId, packageId, cursor } = params;
+	const { suiClient, owner, assetId, packageId, cursor } = params;
 	const response = await suiClient.getOwnedObjects({
 		owner,
 		options: {
@@ -31,14 +31,14 @@ export async function getContractStocks(
 	});
 	const data = response.data.map(getObjectData).filter((object) => {
 		const parsedData = getParsedData(object);
-		const type = `${packageId}::open_art_market::ContractStock`;
+		const type = `${packageId}::asset::Share`;
 		return (
 			getType(parsedData) === type &&
-			getStringField(parsedData, "contract_id") === contractId
+			getStringField(parsedData, "asset_id") === assetId
 		);
 	});
 	if (response.hasNextPage && response.nextCursor) {
-		const nextData = await getContractStocks({
+		const nextData = await getShares({
 			...params,
 			cursor: response.nextCursor,
 		});

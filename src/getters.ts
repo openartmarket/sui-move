@@ -71,9 +71,9 @@ export function getStringField(data: SuiParsedData, key: string): string {
 }
 
 /**
- * Get the quantity of a contract or a contract stock.
+ * Get the `amount` field of a Share NFT.
  */
-export async function getQuantity(
+export async function getAmount(
 	suiClient: SuiJsonRpcClient,
 	id: string,
 ): Promise<number> {
@@ -83,13 +83,29 @@ export async function getQuantity(
 	});
 	const objectData = getObjectData(response);
 	const parsedData = getParsedData(objectData);
-	return getIntField(parsedData, "shares");
+	return getIntField(parsedData, "amount");
 }
 
 /**
- * Get the quantity of a contract or a contract stock.
+ * Get the `available_shares` field of an Asset.
  */
-export async function getWalletQuantity(
+export async function getAvailableShares(
+	suiClient: SuiJsonRpcClient,
+	assetId: string,
+): Promise<number> {
+	const response = await suiClient.getObject({
+		id: assetId,
+		options: { showContent: true, showOwner: true },
+	});
+	const objectData = getObjectData(response);
+	const parsedData = getParsedData(objectData);
+	return getIntField(parsedData, "available_shares");
+}
+
+/**
+ * Get the amount of shares on a Share NFT owned by `wallet`.
+ */
+export async function getWalletAmount(
 	wallet: ReadonlyWallet,
 	id: string,
 ): Promise<number> {
@@ -107,7 +123,7 @@ export async function getWalletQuantity(
 	}
 
 	const parsedData = getParsedData(objectData);
-	return getIntField(parsedData, "shares");
+	return getIntField(parsedData, "amount");
 }
 
 export function getAddressOwner(objectData: SuiObjectData): string | null {

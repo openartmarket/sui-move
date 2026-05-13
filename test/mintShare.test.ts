@@ -1,28 +1,27 @@
 import assert from "node:assert";
 
 import { beforeEach, describe, expect, it } from "vitest";
-import { getQuantity } from "../src/getters.js";
-import { mintContract } from "../src/mintContract.js";
-import { mintContractStock } from "../src/mintContractStock.js";
+import { getAvailableShares } from "../src/getters.js";
+import { mintAsset } from "../src/mintAsset.js";
+import { mintShare } from "../src/mintShare.js";
 import type { Wallet } from "../src/Wallet.js";
 import {
 	ADMIN_CAP_ID,
 	adminWallet,
-	makeMintContractOptions,
+	makeMintAssetOptions,
 	makeWallet,
-} from "./test-helpers";
+} from "./test-helpers.js";
 
-describe("mintContractStock", () => {
-	let contractId: string;
+describe("mintShare", () => {
+	let assetId: string;
 
 	let wallet1: Wallet;
 	let wallet2: Wallet;
 
 	beforeEach(async () => {
-		const mintContractOptions = makeMintContractOptions();
-
-		const res = await mintContract(adminWallet, mintContractOptions);
-		contractId = res.contractId;
+		const mintOptions = makeMintAssetOptions();
+		const res = await mintAsset(adminWallet, mintOptions);
+		assetId = res.assetId;
 
 		wallet1 = await makeWallet();
 		wallet2 = await makeWallet();
@@ -30,47 +29,47 @@ describe("mintContractStock", () => {
 
 	it("should not issue new shares, when asking for too much", async () => {
 		await assert.rejects(
-			mintContractStock(adminWallet, {
+			mintShare(adminWallet, {
 				adminCapId: ADMIN_CAP_ID,
-				contractId,
-				quantity: 501,
+				assetId,
+				amount: 501,
 				receiverAddress: wallet1.address,
 			}),
 		);
 	}, 30_000);
 
 	it("should issue remaining shares", async () => {
-		const sharesLeftBefore = await getQuantity(
+		const sharesLeftBefore = await getAvailableShares(
 			adminWallet.suiClient,
-			contractId,
+			assetId,
 		);
 		expect(sharesLeftBefore).toEqual(500);
 
-		await mintContractStock(adminWallet, {
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
-			quantity: 498,
+			assetId,
+			amount: 498,
 			receiverAddress: wallet1.address,
 		});
 
-		await mintContractStock(adminWallet, {
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
-			quantity: 2,
+			assetId,
+			amount: 2,
 			receiverAddress: wallet1.address,
 		});
 
-		const sharesLeftAfter = await getQuantity(
+		const sharesLeftAfter = await getAvailableShares(
 			adminWallet.suiClient,
-			contractId,
+			assetId,
 		);
 		expect(sharesLeftAfter).toEqual(0);
 
 		await assert.rejects(
-			mintContractStock(adminWallet, {
+			mintShare(adminWallet, {
 				adminCapId: ADMIN_CAP_ID,
-				contractId,
-				quantity: 1,
+				assetId,
+				amount: 1,
 				receiverAddress: wallet1.address,
 			}),
 		);
@@ -78,19 +77,19 @@ describe("mintContractStock", () => {
 
 	it("should not issue more shares than available", async () => {
 		await assert.rejects(
-			mintContractStock(adminWallet, {
+			mintShare(adminWallet, {
 				adminCapId: ADMIN_CAP_ID,
-				contractId,
+				assetId,
 				receiverAddress: wallet2.address,
-				quantity: 501,
+				amount: 501,
 			}),
 		);
 	}, 30_000);
 
-	it.skip("can set the outgoing sale price of the contract", async () => {
+	it.skip("can set the outgoing sale price of the asset", async () => {
 		assert.ok(false);
 	});
-	it.skip("can burn the shares after contract is sold", async () => {
+	it.skip("can burn the shares after asset is sold", async () => {
 		assert.ok(false);
 	});
 });

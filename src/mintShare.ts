@@ -3,59 +3,56 @@ import { findTransaction } from "./findTransaction.js";
 import { getAddressOwner, getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
 
-export type MintContractStockParams = {
+export type MintShareParams = {
 	adminCapId: string;
-	contractId: string;
+	assetId: string;
 	receiverAddress: string;
-	quantity: number;
+	amount: number;
 };
 
-export type MintContractStockResult = {
-	contractStockId: string;
+export type MintShareResult = {
+	shareId: string;
 	digest: string;
 };
 
 /**
- * Mint a new contract stock.
+ * Mint a new share of an asset and transfer it to receiverAddress.
  *
- * This function is idempotent. If a contract stock with the same parameters already exists on the chain, it will be returned.
- *
- * @param wallet - The wallet to use to mint the contract stock.
- * @param params - The parameters for the contract stock.
- * @returns The result of the minting.
+ * This function is idempotent. If a share with the same parameters already
+ * exists on the chain, it will be returned.
  */
-export async function mintContractStock(
+export async function mintShare(
 	wallet: Wallet,
-	params: MintContractStockParams,
-): Promise<MintContractStockResult> {
-	const { adminCapId, contractId, quantity, receiverAddress } = params;
+	params: MintShareParams,
+): Promise<MintShareResult> {
+	const { adminCapId, assetId, amount, receiverAddress } = params;
 
 	const response = await wallet.execute(async (txb, packageId) => {
 		txb.moveCall({
-			target: `${packageId}::open_art_market::mint_contract_stock`,
+			target: `${packageId}::asset::mint_share`,
 			arguments: [
 				txb.object(adminCapId),
-				txb.object(contractId),
-				txb.pure.u64(quantity),
+				txb.object(assetId),
+				txb.pure.u64(amount),
 				txb.pure.address(receiverAddress),
 			],
 		});
 	});
 
-	return toMintContractStockResult(response);
+	return toMintShareResult(response);
 }
 
-export async function findContractStock(
+export async function findShare(
 	wallet: Wallet,
-	params: MintContractStockParams,
-): Promise<MintContractStockResult | null> {
+	params: MintShareParams,
+): Promise<MintShareResult | null> {
 	const response = await findTransaction(
 		wallet.suiClient,
 		{
 			filter: {
 				MoveFunction: {
-					function: "mint_contract_stock",
-					module: "open_art_market",
+					function: "mint_share",
+					module: "asset",
 					package: wallet.packageId,
 				},
 			},
@@ -65,8 +62,8 @@ export async function findContractStock(
 			},
 		},
 		(res: SuiTransactionBlockResponse) => {
-			const { adminCapId, contractId, quantity, receiverAddress } = params;
-			const expected = [adminCapId, contractId, quantity, receiverAddress].map(
+			const { adminCapId, assetId, amount, receiverAddress } = params;
+			const expected = [adminCapId, assetId, amount, receiverAddress].map(
 				(value) => value.toString(),
 			);
 			if (
@@ -90,12 +87,12 @@ export async function findContractStock(
 	if (!response) {
 		return null;
 	}
-	return toMintContractStockResult(response);
+	return toMintShareResult(response);
 }
 
-function toMintContractStockResult(
+function toMintShareResult(
 	response: SuiTransactionBlockResponse,
-): MintContractStockResult {
+): MintShareResult {
 	const { digest } = response;
 	const objects = getCreatedObjects(response);
 	const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
@@ -104,6 +101,6 @@ function toMintContractStockResult(
 			`Expected 1 owned objects, got ${JSON.stringify(ownedObjects, null, 2)}`,
 		);
 	}
-	const contractStockId = ownedObjects[0].objectId;
-	return { contractStockId, digest };
+	const shareId = ownedObjects[0].objectId;
+	return { shareId, digest };
 }

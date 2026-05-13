@@ -1,85 +1,105 @@
 import type { SuiTransactionBlockResponse } from "@mysten/sui/jsonRpc";
 import { findTransaction } from "./findTransaction.js";
 import { getCreatedObjects } from "./getters.js";
-import type { Currency } from "./types.js";
 import type { Wallet } from "./Wallet.js";
 
-export type MintContractParams = {
+export type MintAssetParams = {
 	adminCapId: string;
+	kind: string;
 	totalShareCount: number;
 	sharePrice: number;
 	outgoingPrice: number;
 	name: string;
-	artist: string;
-	creationTimestampMillis: number;
 	description: string;
-	currency: Currency;
-	productId: string;
+	currency: string;
+	reference: string;
+	metadata?: Record<string, string>;
 };
 
-export type MintContractResult = {
-	contractId: string;
+export type MintAssetResult = {
+	assetId: string;
 	digest: string;
 };
 
 /**
- * Mint a new contract.
+ * Mint a new asset.
  *
- * This function is idempotent. If a contract with the same parameters already exists on the chain, it will be returned.
- *
- * @param wallet - The wallet to use to mint the contract.
- * @param params - The parameters for the contract.
- * @returns The result of the minting.
+ * This function is idempotent. If an asset with the same parameters already
+ * exists on the chain, it will be returned.
  */
-export async function mintContract(
+export async function mintAsset(
 	wallet: Wallet,
-	params: MintContractParams,
-): Promise<MintContractResult> {
+	params: MintAssetParams,
+): Promise<MintAssetResult> {
 	const {
 		adminCapId,
+		kind,
 		totalShareCount,
 		sharePrice,
 		outgoingPrice,
 		name,
-		artist,
-		creationTimestampMillis,
 		description,
 		currency,
-		productId,
+		reference,
+		metadata,
 	} = params;
 
 	const response = await wallet.execute(async (txb, packageId) => {
 		txb.moveCall({
-			target: `${packageId}::open_art_market::mint_contract`,
+			target: `${packageId}::asset::mint_asset`,
 			arguments: [
 				txb.object(adminCapId),
+				txb.pure.string(kind),
 				txb.pure.u64(totalShareCount),
 				txb.pure.u64(sharePrice),
 				txb.pure.u64(outgoingPrice),
 				txb.pure.string(name),
-				txb.pure.string(artist),
-				txb.pure.u64(creationTimestampMillis),
 				txb.pure.string(description),
 				txb.pure.string(currency),
-				// AKA reference AKA image
-				txb.pure.string(productId),
+				txb.pure.string(reference),
 			],
 		});
 	});
-	return toMintContractResult(response);
+
+	const { digest } = response;
+	const objects = getCreatedObjects(response);
+	if (objects.length !== 1)
+		throw new Error(`Expected 1 asset, got ${JSON.stringify(objects)}`);
+	const assetId = objects[0].objectId;
+
+	if (metadata) {
+		const entries = Object.entries(metadata);
+		if (entries.length > 0) {
+			await wallet.execute(async (txb, packageId) => {
+				for (const [key, value] of entries) {
+					txb.moveCall({
+						target: `${packageId}::asset::set_metadata`,
+						arguments: [
+							txb.object(adminCapId),
+							txb.object(assetId),
+							txb.pure.string(key),
+							txb.pure.string(value),
+						],
+					});
+				}
+			});
+		}
+	}
+
+	return { assetId, digest };
 }
 
-export async function findContract(
+export async function findAsset(
 	wallet: Wallet,
-	params: MintContractParams,
-): Promise<MintContractResult | null> {
+	params: MintAssetParams,
+): Promise<MintAssetResult | null> {
 	const response = await findTransaction(
 		wallet.suiClient,
 		{
 			filter: {
 				MoveFunction: {
-					function: "mint_contract",
-					module: "open_art_market",
+					function: "mint_asset",
+					module: "asset",
 					package: wallet.packageId,
 				},
 			},
@@ -91,28 +111,26 @@ export async function findContract(
 		(res: SuiTransactionBlockResponse) => {
 			const {
 				adminCapId,
+				kind,
 				totalShareCount,
 				sharePrice,
 				outgoingPrice,
 				name,
-				artist,
-				creationTimestampMillis,
 				description,
 				currency,
-				productId,
+				reference,
 			} = params;
 
 			const expected = [
 				adminCapId,
+				kind,
 				totalShareCount,
 				sharePrice,
 				outgoingPrice,
 				name,
-				artist,
-				creationTimestampMillis,
 				description,
 				currency,
-				productId,
+				reference,
 			].map((value) => value.toString());
 			if (
 				res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction"
@@ -129,29 +147,16 @@ export async function findContract(
 				}
 				return undefined;
 			});
-			return inputValues.every((value, index) => {
-				if (index === 6) {
-					// We allow creationTimestampMillis to be different
-					return true;
-				}
-				return value === expected[index];
-			});
+			return inputValues.every((value, index) => value === expected[index]);
 		},
 	);
 	if (!response) {
 		return null;
 	}
-	return toMintContractResult(response);
-}
-
-function toMintContractResult(
-	response: SuiTransactionBlockResponse,
-): MintContractResult {
 	const { digest } = response;
 	const objects = getCreatedObjects(response);
 	if (objects.length !== 1)
-		throw new Error(`Expected 1 contract, got ${JSON.stringify(objects)}`);
-	const contractId = objects[0].objectId;
-
-	return { contractId, digest };
+		throw new Error(`Expected 1 asset, got ${JSON.stringify(objects)}`);
+	const assetId = objects[0].objectId;
+	return { assetId, digest };
 }

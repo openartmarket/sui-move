@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { newSuiAddress } from "../src/helpers.js";
-import type { MintContractParams } from "../src/mintContract.js";
+import type { MintAssetParams } from "../src/mintAsset.js";
 import type { NetworkName } from "../src/types.js";
 import type { Wallet } from "../src/Wallet.js";
 import { newWallet } from "../src/Wallet.js";
@@ -37,18 +37,24 @@ export async function makeAdminWallet(): Promise<Wallet> {
 
 export const adminWallet = await makeAdminWallet();
 
-export function makeMintContractOptions(): MintContractParams {
+export function makeMintAssetOptions(
+	overrides: Partial<MintAssetParams> = {},
+): MintAssetParams {
 	return {
 		adminCapId: ADMIN_CAP_ID,
+		kind: "painting",
 		totalShareCount: 500,
 		sharePrice: 10,
 		outgoingPrice: 100,
-		creationTimestampMillis: 1685548680595,
 		name: "Mona Lisa",
-		artist: "Leonardo da Vinci",
-		description: "Choconta painting",
+		description: "A painting",
 		currency: "USD",
-		productId: `mona-lisa-${randomUUID()}`,
+		reference: `mona-lisa-${randomUUID()}`,
+		metadata: {
+			artist: "Leonardo da Vinci",
+			creation_date: "1503-1519",
+		},
+		...overrides,
 	};
 }
 

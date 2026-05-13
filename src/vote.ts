@@ -1,7 +1,7 @@
 import type { Wallet } from "./Wallet.js";
 
 export type VoteParams = {
-	contractId: string;
+	assetId: string;
 	motionId: string;
 	choice: boolean;
 };
@@ -14,12 +14,12 @@ export async function vote(
 	wallet: Wallet,
 	params: VoteParams,
 ): Promise<VoteResult> {
-	const { contractId, motionId, choice } = params;
+	const { assetId, motionId, choice } = params;
 	const response = await wallet.execute(async (txb, packageId) => {
 		txb.moveCall({
-			target: `${packageId}::dao::vote`,
+			target: `${packageId}::governance::cast_vote`,
 			arguments: [
-				txb.object(contractId),
+				txb.object(assetId),
 				txb.object(motionId),
 				txb.pure.bool(choice),
 			],

@@ -3,7 +3,7 @@ import type { Wallet } from "./Wallet.js";
 
 export type StartMotionParams = {
 	adminCapId: string;
-	contractId: string;
+	assetId: string;
 	/**
 	 * The motion to vote on
 	 */
@@ -19,13 +19,13 @@ export async function startMotion(
 	wallet: Wallet,
 	params: StartMotionParams,
 ): Promise<StartMotionResult> {
-	const { adminCapId, contractId, motion } = params;
+	const { adminCapId, assetId, motion } = params;
 	const response = await wallet.execute(async (txb, packageId) => {
 		txb.moveCall({
-			target: `${packageId}::dao::start_vote`,
+			target: `${packageId}::governance::start_motion`,
 			arguments: [
 				txb.object(adminCapId),
-				txb.object(contractId),
+				txb.pure.id(assetId),
 				txb.pure.string(motion),
 			],
 		});
@@ -38,8 +38,7 @@ export async function startMotion(
 			`Expected 1 created object, got ${JSON.stringify(createdObjects)}`,
 		);
 	}
-	const createdObject = createdObjects[0];
-	const motionId = createdObject.objectId;
+	const motionId = createdObjects[0].objectId;
 
 	return { digest, motionId };
 }

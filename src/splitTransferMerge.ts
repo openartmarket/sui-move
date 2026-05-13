@@ -1,123 +1,112 @@
 import type { SuiObjectData } from "@mysten/sui/jsonRpc";
-import { getContractStocks } from "./getContractStocks.js";
-import { getWalletQuantity } from "./getters.js";
-import type { MergeContractStockParam } from "./mergeContractStock.js";
-import { mergeContractStock } from "./mergeContractStock.js";
-import { splitContractStock } from "./splitContractStock.js";
-import { transferContractStock } from "./transferContractStock.js";
+import { getShares } from "./getShares.js";
+import { getWalletAmount } from "./getters.js";
+import type { MergeSharesParam } from "./mergeShares.js";
+import { mergeShares } from "./mergeShares.js";
+import { splitShare } from "./splitShare.js";
+import { transferShare } from "./transferShare.js";
 import type { Wallet } from "./Wallet.js";
 
 export type SplitMergeTransferParams = {
 	packageId: string;
 	fromWallet: Wallet;
 	toWallet: Wallet;
-	contractId: string;
-	quantity: number;
+	assetId: string;
+	amount: number;
 };
 
 export type SplitMergeTransferResult = {
 	digest: string;
-	fromContractStockId: string;
-	toContractStockId: string;
+	fromShareId: string;
+	toShareId: string;
 };
 
 /**
- * Transfers a quantity of contract stock from one address to another.
- * Takes care of splitting and merging so that aftet the transfer,
- * both addresses have a single stock.
+ * Transfers an amount of shares from one address to another.
+ * Takes care of splitting and merging so that after the transfer,
+ * both addresses have a single Share.
  */
 export async function splitTransferMerge({
 	packageId,
 	fromWallet,
 	toWallet,
-	contractId,
-	quantity,
+	assetId,
+	amount,
 }: SplitMergeTransferParams): Promise<SplitMergeTransferResult> {
-	const fromContractStocks = await getContractStocks({
+	const fromShares = await getShares({
 		suiClient: fromWallet.suiClient,
 		owner: fromWallet.address,
-		contractId,
+		assetId,
 		packageId,
 	});
-	for (const {
-		fromContractStockId,
-		toContractStockId,
-	} of makeMergeContractStockParams(fromContractStocks)) {
-		await mergeContractStock(fromWallet, [
-			{ fromContractStockId, toContractStockId },
-		]);
+	for (const { fromShareId, toShareId } of makeMergeShareParams(fromShares)) {
+		await mergeShares(fromWallet, [{ fromShareId, toShareId }]);
 	}
 
-	// Check if we need to split the stock
-	const fromContractStocksAfterMerge = await getContractStocks({
+	const fromSharesAfterMerge = await getShares({
 		suiClient: fromWallet.suiClient,
 		owner: fromWallet.address,
-		contractId,
+		assetId,
 		packageId,
 	});
-	if (fromContractStocksAfterMerge.length !== 1) {
+	if (fromSharesAfterMerge.length !== 1) {
 		throw new Error(
-			`Expected a single stock after merge, but got ${JSON.stringify(
-				fromContractStocksAfterMerge,
+			`Expected a single share after merge, but got ${JSON.stringify(
+				fromSharesAfterMerge,
 				null,
 				2,
 			)}`,
 		);
 	}
 
-	const currentQuantity = await getWalletQuantity(
+	const currentAmount = await getWalletAmount(
 		fromWallet,
-		fromContractStocksAfterMerge[0].objectId,
+		fromSharesAfterMerge[0].objectId,
 	);
-	if (currentQuantity < quantity) {
+	if (currentAmount < amount) {
 		throw new Error(
-			`Cannot transfer ${quantity} stocks, because there are only ${currentQuantity} stocks`,
+			`Cannot transfer ${amount} shares, because there are only ${currentAmount} shares`,
 		);
 	}
-	let contractStockId: string;
-	if (currentQuantity > quantity) {
-		const { splitContractStockId } = await splitContractStock(fromWallet, {
-			contractStockId: fromContractStocksAfterMerge[0].objectId,
-			quantity,
+	let shareId: string;
+	if (currentAmount > amount) {
+		const { splitShareId } = await splitShare(fromWallet, {
+			shareId: fromSharesAfterMerge[0].objectId,
+			amount,
 		});
-		contractStockId = splitContractStockId;
+		shareId = splitShareId;
 	} else {
-		contractStockId = fromContractStocks[0].objectId;
+		shareId = fromShares[0].objectId;
 	}
 
-	const { digest } = await transferContractStock(fromWallet, {
-		contractId,
-		contractStockId,
+	const { digest } = await transferShare(fromWallet, {
+		assetId,
+		shareId,
 		toAddress: toWallet.address,
 	});
 
-	const toContractStocks = await getContractStocks({
+	const toShares = await getShares({
 		suiClient: toWallet.suiClient,
 		owner: toWallet.address,
-		contractId,
+		assetId,
 		packageId,
 	});
-	for (const {
-		fromContractStockId,
-		toContractStockId,
-	} of makeMergeContractStockParams(toContractStocks)) {
-		await mergeContractStock(toWallet, [
-			{ fromContractStockId, toContractStockId },
-		]);
+	for (const { fromShareId, toShareId } of makeMergeShareParams(toShares)) {
+		await mergeShares(toWallet, [{ fromShareId, toShareId }]);
 	}
 	return {
 		digest,
-		fromContractStockId: fromContractStocks[0].objectId,
-		toContractStockId: toContractStocks[0].objectId,
+		fromShareId: fromShares[0].objectId,
+		toShareId: toShares[0].objectId,
 	};
 }
 
-function makeMergeContractStockParams(
-	contractStocks: readonly SuiObjectData[],
-): readonly MergeContractStockParam[] {
-	const stocksToMerge = contractStocks.slice(1);
-	return stocksToMerge.map((stock) => ({
-		fromContractStockId: stock.objectId,
-		toContractStockId: contractStocks[0].objectId,
+function makeMergeShareParams(
+	shares: readonly SuiObjectData[],
+): readonly MergeSharesParam[] {
+	const sharesToMerge = shares.slice(1);
+	return sharesToMerge.map((share) => ({
+		fromShareId: share.objectId,
+		toShareId: shares[0].objectId,
 	}));
 }

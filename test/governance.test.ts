@@ -1,8 +1,8 @@
 import assert from "node:assert";
 import { beforeEach, describe, it } from "vitest";
 import { endMotion } from "../src/endMotion.js";
-import { mintContract } from "../src/mintContract.js";
-import { mintContractStock } from "../src/mintContractStock.js";
+import { mintAsset } from "../src/mintAsset.js";
+import { mintShare } from "../src/mintShare.js";
 import { startMotion } from "../src/startMotion.js";
 import { vote } from "../src/vote.js";
 import type { Wallet } from "../src/Wallet.js";
@@ -10,63 +10,63 @@ import {
 	ADMIN_ADDRESS,
 	ADMIN_CAP_ID,
 	adminWallet,
-	makeMintContractOptions,
+	makeMintAssetOptions,
 	makeWallet,
 } from "./test-helpers.js";
 
-describe("DAO Voting structure", () => {
-	let contractId: string;
+describe("governance", () => {
+	let assetId: string;
 	let user1: Wallet;
 	let user2: Wallet;
 	let user3: Wallet;
 
 	beforeEach(async () => {
-		const mintContractOptions = makeMintContractOptions();
-		const res = await mintContract(adminWallet, mintContractOptions);
-		contractId = res.contractId;
+		const mintOptions = makeMintAssetOptions();
+		const res = await mintAsset(adminWallet, mintOptions);
+		assetId = res.assetId;
 
 		user1 = await makeWallet();
 		user2 = await makeWallet();
 		user3 = await makeWallet();
 
-		await mintContractStock(adminWallet, {
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
+			assetId,
 			receiverAddress: ADMIN_ADDRESS,
-			quantity: 151,
+			amount: 151,
 		});
-		await mintContractStock(adminWallet, {
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
+			assetId,
 			receiverAddress: user1.address,
-			quantity: 249,
+			amount: 249,
 		});
-		await mintContractStock(adminWallet, {
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
+			assetId,
 			receiverAddress: user2.address,
-			quantity: 100,
+			amount: 100,
 		});
 	}, 30_000);
 
 	it("can start a motion", async () => {
-		const voteRequest = await startMotion(adminWallet, {
+		const motion = await startMotion(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
-			motion: "Request to sell artwork to Museum",
+			assetId,
+			motion: "Sell asset to a buyer",
 		});
-		assert.ok(voteRequest);
+		assert.ok(motion);
 	}, 30_000);
 
 	it("can vote as a shareholder", async () => {
 		const { motionId } = await startMotion(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
-			motion: "Request to sell artwork to Museum",
+			assetId,
+			motion: "Sell asset to a buyer",
 		});
 
 		await vote(user1, {
-			contractId,
+			assetId,
 			motionId,
 			choice: true,
 		});
@@ -75,18 +75,18 @@ describe("DAO Voting structure", () => {
 	it("cannot double vote as a shareholder", async () => {
 		const { motionId } = await startMotion(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
-			motion: "Request to sell artwork to Museum",
+			assetId,
+			motion: "Sell asset to a buyer",
 		});
 
 		await vote(user1, {
-			contractId,
+			assetId,
 			motionId,
 			choice: true,
 		});
 		await assert.rejects(
 			vote(user1, {
-				contractId,
+				assetId,
 				motionId,
 				choice: true,
 			}),
@@ -96,13 +96,13 @@ describe("DAO Voting structure", () => {
 	it("cannot vote if not a shareholder", async () => {
 		const { motionId } = await startMotion(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
-			motion: "Request to sell artwork to Museum",
+			assetId,
+			motion: "Sell asset to a buyer",
 		});
 
 		await assert.rejects(
 			vote(user3, {
-				contractId,
+				assetId,
 				motionId,
 				choice: true,
 			}),
@@ -112,8 +112,8 @@ describe("DAO Voting structure", () => {
 	it("cannot vote if motion is closed", async () => {
 		const { motionId } = await startMotion(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
-			motion: "Request to sell artwork to Museum",
+			assetId,
+			motion: "Sell asset to a buyer",
 		});
 
 		await endMotion(adminWallet, {
@@ -123,7 +123,7 @@ describe("DAO Voting structure", () => {
 
 		await assert.rejects(
 			vote(user1, {
-				contractId,
+				assetId,
 				motionId,
 				choice: true,
 			}),

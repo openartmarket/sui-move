@@ -16,7 +16,7 @@ export async function endMotion(
 	const { adminCapId, motionId } = params;
 	const response = await wallet.execute(async (txb, packageId) => {
 		txb.moveCall({
-			target: `${packageId}::dao::end_vote`,
+			target: `${packageId}::governance::end_motion`,
 			arguments: [txb.object(adminCapId), txb.object(motionId)],
 		});
 	});

@@ -1,12 +1,12 @@
 {
 	"name": "@coownable/sui",
-	"version": "0.6.1",
+	"version": "1.0.0",
 	"publishConfig": {
 		"access": "public"
 	},
-	"description": "Contracts for Open Art Market (https://www.openartmarket.com/)",
+	"description": "Sui Move contract for Coownable — fractional ownership of any asset class",
 	"author": {
-		"name": "Open Art Market",
+		"name": "Coownable",
 		"email": "hi@openartmarket.com",
 		"url": "https://github.com/openartmarket/sui-move"
 	},

@@ -1,10 +1,10 @@
 [package]
-name = "open_art_market"
-version = "0.0.1"
+name = "coownable"
+version = "1.0.0"
 
 [dependencies]
 # Keep the version in sync with scripts/install-sui.sh
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "mainnet-v1.71.1" }
 
 [addresses]
-open_art_market = "0x0"
+coownable = "0x0"
