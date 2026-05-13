@@ -40,12 +40,12 @@ export class SuiWallet implements Wallet {
 		const response = await suiClient.signAndExecuteTransaction({
 			signer: keypair,
 			transaction: txn,
-			requestType: "WaitForLocalExecution",
 			options: {
 				showObjectChanges: true,
 				showEffects: true,
 			},
 		});
+		await suiClient.waitForTransaction({ digest: response.digest });
 
 		return checkResponse(response);
 	}
@@ -104,6 +104,7 @@ export class SponsoredWallet implements Wallet {
 			senderSignature,
 			senderAddress,
 		});
+		await suiClient.waitForTransaction({ digest: response.digest });
 		return checkResponse(response);
 	}
 }
