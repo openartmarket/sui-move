@@ -15,6 +15,8 @@ import {
 	makeWallet,
 } from "./test-helpers.js";
 
+const ONE_HOUR_MS = 60 * 60 * 1000;
+
 describe("governance", () => {
 	let assetId: AssetId;
 	let user1: Wallet;
@@ -55,8 +57,17 @@ describe("governance", () => {
 			adminCapId: ADMIN_CAP_ID,
 			assetId,
 			motion: "Sell asset to a buyer",
+			durationMs: ONE_HOUR_MS,
 		});
 		assert.ok(motion);
+
+		// Always end the motion so the asset's freeze flag is released
+		// for the next test in the describe block.
+		await endMotion(adminWallet, {
+			adminCapId: ADMIN_CAP_ID,
+			assetId,
+			motionId: motion.motionId,
+		});
 	}, 30_000);
 
 	it("can vote as a shareholder", async () => {
@@ -64,12 +75,19 @@ describe("governance", () => {
 			adminCapId: ADMIN_CAP_ID,
 			assetId,
 			motion: "Sell asset to a buyer",
+			durationMs: ONE_HOUR_MS,
 		});
 
 		await vote(user1, {
 			assetId,
 			motionId,
 			choice: true,
+		});
+
+		await endMotion(adminWallet, {
+			adminCapId: ADMIN_CAP_ID,
+			assetId,
+			motionId,
 		});
 	}, 30_000);
 
@@ -78,6 +96,7 @@ describe("governance", () => {
 			adminCapId: ADMIN_CAP_ID,
 			assetId,
 			motion: "Sell asset to a buyer",
+			durationMs: ONE_HOUR_MS,
 		});
 
 		await vote(user1, {
@@ -92,6 +111,12 @@ describe("governance", () => {
 				choice: true,
 			}),
 		);
+
+		await endMotion(adminWallet, {
+			adminCapId: ADMIN_CAP_ID,
+			assetId,
+			motionId,
+		});
 	}, 30_000);
 
 	it("cannot vote if not a shareholder", async () => {
@@ -99,6 +124,7 @@ describe("governance", () => {
 			adminCapId: ADMIN_CAP_ID,
 			assetId,
 			motion: "Sell asset to a buyer",
+			durationMs: ONE_HOUR_MS,
 		});
 
 		await assert.rejects(
@@ -108,6 +134,12 @@ describe("governance", () => {
 				choice: true,
 			}),
 		);
+
+		await endMotion(adminWallet, {
+			adminCapId: ADMIN_CAP_ID,
+			assetId,
+			motionId,
+		});
 	}, 30_000);
 
 	it("cannot vote if motion is closed", async () => {
@@ -115,10 +147,12 @@ describe("governance", () => {
 			adminCapId: ADMIN_CAP_ID,
 			assetId,
 			motion: "Sell asset to a buyer",
+			durationMs: ONE_HOUR_MS,
 		});
 
 		await endMotion(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
+			assetId,
 			motionId,
 		});
 

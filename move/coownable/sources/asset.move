@@ -11,6 +11,8 @@ module coownable::asset {
     use sui::dynamic_field::{Self as df};
     use sui::event;
 
+    friend coownable::governance;
+
     // Error codes
     const EInsufficientShares: u64 = 0;
     const EIncompatibleShareTypes: u64 = 1;
@@ -20,18 +22,18 @@ module coownable::asset {
     const EInvalidSharePrice: u64 = 5;
     const EInvalidOutgoingPrice: u64 = 6;
     const EInvalidAmount: u64 = 7;
+    const EAssetFrozen: u64 = 8;
 
-    // A fractional Share of an Asset, owned by a shareholder
+    // A fractional Share of an Asset, owned by a shareholder. The struct
+    // is intentionally minimal: descriptive fields (name, kind, currency, …)
+    // are resolved through `asset_id`, avoiding duplication and drift.
     struct Share has key {
         id: UID,
         asset_id: ID,
-        kind: String,
         amount: u64,
+        // The share price at mint time; useful for historical accounting.
+        // The Asset carries the current share price.
         share_price: u64,
-        name: String,
-        description: String,
-        currency: String,
-        reference: String,
     }
 
     // The Asset object — shared, fractionally owned via Share NFTs.
@@ -49,6 +51,10 @@ module coownable::asset {
         name: String,
         description: String,
         reference: String,
+        // Count of open governance Motions. While non-zero, mint / transfer /
+        // burn of Shares is blocked so vote weights cannot be manipulated
+        // after a motion has started.
+        active_motion_count: u64,
     }
 
     // Admin capability guarding privileged operations
@@ -133,6 +139,31 @@ module coownable::asset {
         new_outgoing_price: u64,
     }
 
+    struct SharePriceUpdated has copy, drop {
+        asset_id: ID,
+        new_share_price: u64,
+    }
+
+    struct NameUpdated has copy, drop {
+        asset_id: ID,
+        new_name: String,
+    }
+
+    struct DescriptionUpdated has copy, drop {
+        asset_id: ID,
+        new_description: String,
+    }
+
+    struct CurrencyUpdated has copy, drop {
+        asset_id: ID,
+        new_currency: String,
+    }
+
+    struct ReferenceUpdated has copy, drop {
+        asset_id: ID,
+        new_reference: String,
+    }
+
     // Called on package publish
     fun init(otw: ASSET, ctx: &mut TxContext) {
         package::claim_and_keep(otw, ctx);
@@ -168,6 +199,7 @@ module coownable::asset {
             name,
             description,
             reference,
+            active_motion_count: 0,
         };
         event::emit(AssetMinted {
             asset_id: object::uid_to_inner(&asset.id),
@@ -219,6 +251,7 @@ module coownable::asset {
         receiver: address,
         ctx: &mut TxContext
     ) {
+        assert!(asset.active_motion_count == 0, EAssetFrozen);
         assert!(amount > 0, EInvalidAmount);
         let remaining = asset.available_shares;
         assert!(amount <= remaining, EInsufficientShares);
@@ -229,13 +262,8 @@ module coownable::asset {
         let share = Share {
             id: object::new(ctx),
             asset_id: object::uid_to_inner(&asset.id),
-            kind: asset.kind,
             amount,
             share_price: asset.share_price,
-            name: asset.name,
-            description: asset.description,
-            currency: asset.currency,
-            reference: asset.reference,
         };
 
         event::emit(ShareMinted {
@@ -255,6 +283,7 @@ module coownable::asset {
         new_owner: address,
         ctx: &mut TxContext
     ) {
+        assert!(asset.active_motion_count == 0, EAssetFrozen);
         let sender = tx_context::sender(ctx);
         let amount = share.amount;
         let share_id = object::uid_to_inner(&share.id);
@@ -276,25 +305,15 @@ module coownable::asset {
 
     // Internal: burn a Share unconditionally, returning the amount it contained
     fun burn_share(share: Share): u64 {
-        let Share {
-            id,
-            asset_id: _,
-            kind: _,
-            amount,
-            share_price: _,
-            name: _,
-            description: _,
-            currency: _,
-            reference: _,
-        } = share;
+        let Share { id, asset_id: _, amount, share_price: _ } = share;
         object::delete(id);
         amount
     }
 
     // Burn a Share after the ITO has finished, returning the amount. Also
-    // decrements the burner's Holding so per-holder balances stay accurate
-    // (the original implementation didn't, leaving phantom voting weight).
+    // decrements the burner's Holding so per-holder balances stay accurate.
     public fun safe_burn_share(asset: &mut Asset, share: Share, ctx: &mut TxContext): u64 {
+        assert!(asset.active_motion_count == 0, EAssetFrozen);
         assert!(object::uid_to_inner(&asset.id) == share.asset_id, EInvalidAsset);
         assert!(asset.available_shares == 0, EITONotFinished);
 
@@ -314,7 +333,9 @@ module coownable::asset {
         amount
     }
 
-    // Merge share2 into share1 (burns share2)
+    // Merge share2 into share1 (burns share2). Not gated by the freeze
+    // flag: merging within a single holder's wallet cannot change voting
+    // weight, since the holder's Holding stays the same.
     public fun merge_shares(share1: &mut Share, share2: Share) {
         assert!(share1.asset_id == share2.asset_id, EIncompatibleShareTypes);
         let kept_share_id = object::uid_to_inner(&share1.id);
@@ -330,7 +351,9 @@ module coownable::asset {
         });
     }
 
-    // Split off `amount` from `share` into a new Share returned to the sender
+    // Split off `amount` from `share` into a new Share returned to the
+    // sender. Not gated by the freeze flag: splitting within a single
+    // holder's wallet cannot change voting weight.
     public fun split_share(share: &mut Share, amount: u64, ctx: &mut TxContext) {
         assert!(amount > 0, EInvalidAmount);
         assert!(share.amount > amount, EInsufficientShares);
@@ -338,13 +361,8 @@ module coownable::asset {
         let new_share = Share {
             id: object::new(ctx),
             asset_id: share.asset_id,
-            kind: share.kind,
             amount,
             share_price: share.share_price,
-            name: share.name,
-            description: share.description,
-            currency: share.currency,
-            reference: share.reference,
         };
         share.amount = share.amount - amount;
         event::emit(ShareSplit {
@@ -356,13 +374,69 @@ module coownable::asset {
         transfer::transfer(new_share, tx_context::sender(ctx));
     }
 
-    // Update the outgoing (exit) price of an Asset
+    // Admin setters for the mutable fields of an Asset. `kind` and
+    // `total_supply` remain immutable — changing them would break the
+    // semantic identity of the asset.
+
     public fun update_outgoing_price(_: &AdminCap, asset: &mut Asset, new_outgoing_price: u64) {
+        assert!(new_outgoing_price > 0, EInvalidOutgoingPrice);
         asset.outgoing_price = new_outgoing_price;
         event::emit(OutgoingPriceUpdated {
             asset_id: object::uid_to_inner(&asset.id),
             new_outgoing_price,
         });
+    }
+
+    public fun update_share_price(_: &AdminCap, asset: &mut Asset, new_share_price: u64) {
+        assert!(new_share_price > 0, EInvalidSharePrice);
+        asset.share_price = new_share_price;
+        event::emit(SharePriceUpdated {
+            asset_id: object::uid_to_inner(&asset.id),
+            new_share_price,
+        });
+    }
+
+    public fun update_name(_: &AdminCap, asset: &mut Asset, new_name: String) {
+        asset.name = new_name;
+        event::emit(NameUpdated {
+            asset_id: object::uid_to_inner(&asset.id),
+            new_name: asset.name,
+        });
+    }
+
+    public fun update_description(_: &AdminCap, asset: &mut Asset, new_description: String) {
+        asset.description = new_description;
+        event::emit(DescriptionUpdated {
+            asset_id: object::uid_to_inner(&asset.id),
+            new_description: asset.description,
+        });
+    }
+
+    public fun update_currency(_: &AdminCap, asset: &mut Asset, new_currency: String) {
+        asset.currency = new_currency;
+        event::emit(CurrencyUpdated {
+            asset_id: object::uid_to_inner(&asset.id),
+            new_currency: asset.currency,
+        });
+    }
+
+    public fun update_reference(_: &AdminCap, asset: &mut Asset, new_reference: String) {
+        asset.reference = new_reference;
+        event::emit(ReferenceUpdated {
+            asset_id: object::uid_to_inner(&asset.id),
+            new_reference: asset.reference,
+        });
+    }
+
+    // Friend hooks for the governance module to freeze share movement
+    // while a Motion is active. Only `coownable::governance` may call.
+
+    public(friend) fun bump_active_motion(asset: &mut Asset) {
+        asset.active_motion_count = asset.active_motion_count + 1;
+    }
+
+    public(friend) fun release_active_motion(asset: &mut Asset) {
+        asset.active_motion_count = asset.active_motion_count - 1;
     }
 
     // Internal Holding helpers. Maintain the invariant that a Holding DF
@@ -406,5 +480,9 @@ module coownable::asset {
 
     public fun get_available_shares(asset: &Asset): u64 {
         asset.available_shares
+    }
+
+    public fun get_active_motion_count(asset: &Asset): u64 {
+        asset.active_motion_count
     }
 }

@@ -3,6 +3,8 @@ import { toDigest, toMotionId } from "./brands.js";
 import { getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
 
+const SUI_CLOCK_OBJECT_ID = "0x6";
+
 export type StartMotionParams = {
 	adminCapId: AdminCapId;
 	assetId: AssetId;
@@ -10,6 +12,11 @@ export type StartMotionParams = {
 	 * The motion to vote on
 	 */
 	motion: string;
+	/**
+	 * Voting window length in milliseconds. The deadline is set to the
+	 * current chain time plus this duration.
+	 */
+	durationMs: number;
 };
 
 export type StartMotionResult = {
@@ -21,14 +28,16 @@ export async function startMotion(
 	wallet: Wallet,
 	params: StartMotionParams,
 ): Promise<StartMotionResult> {
-	const { adminCapId, assetId, motion } = params;
+	const { adminCapId, assetId, motion, durationMs } = params;
 	const response = await wallet.execute(async (txb, packageId) => {
 		txb.moveCall({
 			target: `${packageId}::governance::start_motion`,
 			arguments: [
 				txb.object(adminCapId),
-				txb.pure.id(assetId),
+				txb.object(assetId),
 				txb.pure.string(motion),
+				txb.pure.u64(durationMs),
+				txb.object(SUI_CLOCK_OBJECT_ID),
 			],
 		});
 	});

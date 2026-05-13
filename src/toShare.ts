@@ -9,7 +9,6 @@ export type Share = {
 	digest: Digest;
 	assetId: AssetId;
 	amount: number;
-	reference: string;
 };
 
 export function toShare(objectData: SuiObjectData): Share {
@@ -20,6 +19,5 @@ export function toShare(objectData: SuiObjectData): Share {
 		digest: toDigest(objectData.digest),
 		assetId: toAssetId(getStringField(parsedData, "asset_id")),
 		amount: getIntField(parsedData, "amount"),
-		reference: getStringField(parsedData, "reference"),
 	};
 }

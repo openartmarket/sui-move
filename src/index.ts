@@ -1,6 +1,7 @@
 export * from "./brands.js";
 export * from "./createDisplay.js";
 export * from "./endMotion.js";
+export * from "./finalizeExpiredMotion.js";
 export * from "./getShares.js";
 export * from "./getters.js";
 export * from "./mergeShares.js";
