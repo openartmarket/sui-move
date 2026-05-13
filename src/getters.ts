@@ -8,6 +8,8 @@ import type {
 	SuiTransactionBlockResponse,
 } from "@mysten/sui/jsonRpc";
 
+import type { Address, AssetId, ShareId } from "./brands.js";
+import { toAddress } from "./brands.js";
 import type { ReadonlyWallet } from "./Wallet.js";
 
 export function getCreatedObjects(
@@ -75,10 +77,10 @@ export function getStringField(data: SuiParsedData, key: string): string {
  */
 export async function getAmount(
 	suiClient: SuiJsonRpcClient,
-	id: string,
+	shareId: ShareId,
 ): Promise<number> {
 	const response = await suiClient.getObject({
-		id,
+		id: shareId,
 		options: { showContent: true, showOwner: true },
 	});
 	const objectData = getObjectData(response);
@@ -91,7 +93,7 @@ export async function getAmount(
  */
 export async function getAvailableShares(
 	suiClient: SuiJsonRpcClient,
-	assetId: string,
+	assetId: AssetId,
 ): Promise<number> {
 	const response = await suiClient.getObject({
 		id: assetId,
@@ -103,15 +105,15 @@ export async function getAvailableShares(
 }
 
 /**
- * Get the amount of shares on a Share NFT owned by `wallet`.
+ * Get the `amount` field of a Share NFT, asserting it is owned by `wallet`.
  */
 export async function getWalletAmount(
 	wallet: ReadonlyWallet,
-	id: string,
+	shareId: ShareId,
 ): Promise<number> {
 	const { suiClient } = wallet;
 	const response = await suiClient.getObject({
-		id,
+		id: shareId,
 		options: { showContent: true, showOwner: true },
 	});
 	const objectData = getObjectData(response);
@@ -126,14 +128,14 @@ export async function getWalletAmount(
 	return getIntField(parsedData, "amount");
 }
 
-export function getAddressOwner(objectData: SuiObjectData): string | null {
+export function getAddressOwner(objectData: SuiObjectData): Address | null {
 	const owner = objectData.owner;
 	if (!owner) throw new Error(`Object ${objectData} has no owner`);
 	if (typeof owner === "string") {
 		throw new Error(`Object ${objectData} has a string owner ${owner}`);
 	}
 	if ("AddressOwner" in owner) {
-		return owner.AddressOwner;
+		return toAddress(owner.AddressOwner);
 	}
 	return null;
 }

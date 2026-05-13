@@ -1,4 +1,6 @@
 import type { SuiObjectData } from "@mysten/sui/jsonRpc";
+import type { AssetId, Digest, PackageId, ShareId } from "./brands.js";
+import { toShareId } from "./brands.js";
 import { getShares } from "./getShares.js";
 import { getWalletAmount } from "./getters.js";
 import type { MergeSharesParam } from "./mergeShares.js";
@@ -8,17 +10,17 @@ import { transferShare } from "./transferShare.js";
 import type { Wallet } from "./Wallet.js";
 
 export type SplitMergeTransferParams = {
-	packageId: string;
+	packageId: PackageId;
 	fromWallet: Wallet;
 	toWallet: Wallet;
-	assetId: string;
+	assetId: AssetId;
 	amount: number;
 };
 
 export type SplitMergeTransferResult = {
-	digest: string;
-	fromShareId: string;
-	toShareId: string;
+	digest: Digest;
+	fromShareId: ShareId;
+	toShareId: ShareId;
 };
 
 /**
@@ -59,24 +61,22 @@ export async function splitTransferMerge({
 		);
 	}
 
-	const currentAmount = await getWalletAmount(
-		fromWallet,
-		fromSharesAfterMerge[0].objectId,
-	);
+	const mergedShareId = toShareId(fromSharesAfterMerge[0].objectId);
+	const currentAmount = await getWalletAmount(fromWallet, mergedShareId);
 	if (currentAmount < amount) {
 		throw new Error(
 			`Cannot transfer ${amount} shares, because there are only ${currentAmount} shares`,
 		);
 	}
-	let shareId: string;
+	let shareId: ShareId;
 	if (currentAmount > amount) {
 		const { splitShareId } = await splitShare(fromWallet, {
-			shareId: fromSharesAfterMerge[0].objectId,
+			shareId: mergedShareId,
 			amount,
 		});
 		shareId = splitShareId;
 	} else {
-		shareId = fromShares[0].objectId;
+		shareId = toShareId(fromShares[0].objectId);
 	}
 
 	const { digest } = await transferShare(fromWallet, {
@@ -96,17 +96,18 @@ export async function splitTransferMerge({
 	}
 	return {
 		digest,
-		fromShareId: fromShares[0].objectId,
-		toShareId: toShares[0].objectId,
+		fromShareId: toShareId(fromShares[0].objectId),
+		toShareId: toShareId(toShares[0].objectId),
 	};
 }
 
 function makeMergeShareParams(
 	shares: readonly SuiObjectData[],
 ): readonly MergeSharesParam[] {
-	const sharesToMerge = shares.slice(1);
-	return sharesToMerge.map((share) => ({
-		fromShareId: share.objectId,
-		toShareId: shares[0].objectId,
+	if (shares.length === 0) return [];
+	const head = toShareId(shares[0].objectId);
+	return shares.slice(1).map((share) => ({
+		fromShareId: toShareId(share.objectId),
+		toShareId: head,
 	}));
 }

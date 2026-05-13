@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
+import { toAssetKind } from "../src/brands.js";
 import { mintAsset } from "../src/mintAsset.js";
 import {
 	ADMIN_CAP_ID,
@@ -23,7 +24,7 @@ describe("mintAsset", () => {
 			adminWallet,
 			makeMintAssetOptions({
 				adminCapId: ADMIN_CAP_ID,
-				kind: "wine",
+				kind: toAssetKind("wine"),
 				name: "Château Margaux 2010",
 				description: "First-growth Bordeaux",
 				reference: `wine-${randomUUID()}`,

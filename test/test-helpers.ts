@@ -1,16 +1,23 @@
 import { randomUUID } from "node:crypto";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import {
+	toAddress,
+	toAdminCapId,
+	toAssetKind,
+	toPackageId,
+	toPhrase,
+} from "../src/brands.js";
 import { newSuiAddress } from "../src/helpers.js";
 import type { MintAssetParams } from "../src/mintAsset.js";
 import type { NetworkName } from "../src/types.js";
 import type { Wallet } from "../src/Wallet.js";
 import { newWallet } from "../src/Wallet.js";
 
-export const ADMIN_CAP_ID = getEnv("ADMIN_CAP_ID");
-export const ADMIN_ADDRESS = getEnv("ADMIN_ADDRESS");
-export const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
+export const ADMIN_CAP_ID = toAdminCapId(getEnv("ADMIN_CAP_ID"));
+export const ADMIN_ADDRESS = toAddress(getEnv("ADMIN_ADDRESS"));
+export const ADMIN_PHRASE = toPhrase(getEnv("ADMIN_PHRASE"));
 
-export const PACKAGE_ID = getEnv("PACKAGE_ID");
+export const PACKAGE_ID = toPackageId(getEnv("PACKAGE_ID"));
 
 export async function makeWallet(): Promise<Wallet> {
 	const suiAddress = await newSuiAddress();
@@ -42,7 +49,7 @@ export function makeMintAssetOptions(
 ): MintAssetParams {
 	return {
 		adminCapId: ADMIN_CAP_ID,
-		kind: "painting",
+		kind: toAssetKind("painting"),
 		totalShareCount: 500,
 		sharePrice: 10,
 		outgoingPrice: 100,

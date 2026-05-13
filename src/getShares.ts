@@ -1,5 +1,6 @@
 import type { SuiJsonRpcClient, SuiObjectData } from "@mysten/sui/jsonRpc";
 
+import type { Address, AssetId, PackageId } from "./brands.js";
 import {
 	getObjectData,
 	getParsedData,
@@ -9,9 +10,9 @@ import {
 
 export type GetSharesParams = {
 	suiClient: SuiJsonRpcClient;
-	owner: string;
-	assetId: string;
-	packageId: string;
+	owner: Address;
+	assetId: AssetId;
+	packageId: PackageId;
 	cursor?: string;
 };
 

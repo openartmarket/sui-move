@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { AssetId } from "../src/brands.js";
 import { getWalletAmount } from "../src/getters.js";
 import { mintAsset } from "../src/mintAsset.js";
 import { mintShare } from "../src/mintShare.js";
@@ -12,7 +13,7 @@ import {
 } from "./test-helpers.js";
 
 describe("splitShare", () => {
-	let assetId: string;
+	let assetId: AssetId;
 	let wallet: Wallet;
 
 	beforeEach(async () => {

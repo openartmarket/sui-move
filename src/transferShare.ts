@@ -1,13 +1,15 @@
+import type { Address, AssetId, Digest, ShareId } from "./brands.js";
+import { toDigest } from "./brands.js";
 import type { Wallet } from "./Wallet.js";
 
 export type TransferShareParams = {
-	assetId: string;
-	shareId: string;
-	toAddress: string;
+	assetId: AssetId;
+	shareId: ShareId;
+	toAddress: Address;
 };
 
 export type TransferShareResult = {
-	digest: string;
+	digest: Digest;
 };
 
 export async function transferShare(
@@ -25,6 +27,5 @@ export async function transferShare(
 			],
 		});
 	});
-	const { digest } = response;
-	return { digest };
+	return { digest: toDigest(response.digest) };
 }

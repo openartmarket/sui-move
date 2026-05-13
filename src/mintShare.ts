@@ -1,18 +1,26 @@
 import type { SuiTransactionBlockResponse } from "@mysten/sui/jsonRpc";
+import type {
+	Address,
+	AdminCapId,
+	AssetId,
+	Digest,
+	ShareId,
+} from "./brands.js";
+import { toDigest, toShareId } from "./brands.js";
 import { findTransaction } from "./findTransaction.js";
 import { getAddressOwner, getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
 
 export type MintShareParams = {
-	adminCapId: string;
-	assetId: string;
-	receiverAddress: string;
+	adminCapId: AdminCapId;
+	assetId: AssetId;
+	receiverAddress: Address;
 	amount: number;
 };
 
 export type MintShareResult = {
-	shareId: string;
-	digest: string;
+	shareId: ShareId;
+	digest: Digest;
 };
 
 /**
@@ -93,7 +101,7 @@ export async function findShare(
 function toMintShareResult(
 	response: SuiTransactionBlockResponse,
 ): MintShareResult {
-	const { digest } = response;
+	const digest = toDigest(response.digest);
 	const objects = getCreatedObjects(response);
 	const ownedObjects = objects.filter((obj) => getAddressOwner(obj) !== null);
 	if (ownedObjects.length !== 1) {
@@ -101,6 +109,6 @@ function toMintShareResult(
 			`Expected 1 owned objects, got ${JSON.stringify(ownedObjects, null, 2)}`,
 		);
 	}
-	const shareId = ownedObjects[0].objectId;
+	const shareId = toShareId(ownedObjects[0].objectId);
 	return { shareId, digest };
 }

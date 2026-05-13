@@ -1,12 +1,14 @@
+import type { Digest, ShareId } from "./brands.js";
+import { toDigest } from "./brands.js";
 import type { Wallet } from "./Wallet.js";
 
 export type MergeSharesParam = {
-	toShareId: string;
-	fromShareId: string;
+	toShareId: ShareId;
+	fromShareId: ShareId;
 };
 
 export type MergeSharesResult = {
-	digest: string;
+	digest: Digest;
 };
 
 export async function mergeShares(
@@ -22,6 +24,5 @@ export async function mergeShares(
 		}
 	});
 
-	const { digest } = response;
-	return { digest };
+	return { digest: toDigest(response.digest) };
 }

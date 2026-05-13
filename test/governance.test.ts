@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import { beforeEach, describe, it } from "vitest";
+import type { AssetId } from "../src/brands.js";
 import { endMotion } from "../src/endMotion.js";
 import { mintAsset } from "../src/mintAsset.js";
 import { mintShare } from "../src/mintShare.js";
@@ -15,7 +16,7 @@ import {
 } from "./test-helpers.js";
 
 describe("governance", () => {
-	let assetId: string;
+	let assetId: AssetId;
 	let user1: Wallet;
 	let user2: Wallet;
 	let user3: Wallet;

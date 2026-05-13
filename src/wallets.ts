@@ -5,26 +5,28 @@ import type {
 } from "@mysten/sui/jsonRpc";
 import { Transaction } from "@mysten/sui/transactions";
 
+import type { Address, PackageId } from "./brands.js";
+import { toAddress } from "./brands.js";
 import type { BuildTransaction, SponsoredSubmit, Wallet } from "./Wallet.js";
 
 export type SuiWalletParams = {
 	suiClient: SuiJsonRpcClient;
-	packageId: string;
+	packageId: PackageId;
 	keypair: Keypair;
 };
 
 export class SuiWallet implements Wallet {
 	constructor(private readonly params: SuiWalletParams) {}
 
-	get address(): string {
-		return this.params.keypair.toSuiAddress();
+	get address(): Address {
+		return toAddress(this.params.keypair.toSuiAddress());
 	}
 
 	get suiClient(): SuiJsonRpcClient {
 		return this.params.suiClient;
 	}
 
-	get packageId(): string {
+	get packageId(): PackageId {
 		return this.params.packageId;
 	}
 
@@ -49,9 +51,9 @@ export class SuiWallet implements Wallet {
 
 export type SponsoredWalletParams = {
 	suiClient: SuiJsonRpcClient;
-	packageId: string;
+	packageId: PackageId;
 	senderKeypair: Keypair;
-	sponsorAddress: string;
+	sponsorAddress: Address;
 	reserveGasCoins: () => Promise<
 		{ objectId: string; version: string; digest: string }[]
 	>;
@@ -61,15 +63,15 @@ export type SponsoredWalletParams = {
 export class SponsoredWallet implements Wallet {
 	constructor(private readonly params: SponsoredWalletParams) {}
 
-	get address(): string {
-		return this.params.senderKeypair.toSuiAddress();
+	get address(): Address {
+		return toAddress(this.params.senderKeypair.toSuiAddress());
 	}
 
 	get suiClient(): SuiJsonRpcClient {
 		return this.params.suiClient;
 	}
 
-	get packageId(): string {
+	get packageId(): PackageId {
 		return this.params.packageId;
 	}
 
@@ -82,7 +84,7 @@ export class SponsoredWallet implements Wallet {
 			reserveGasCoins,
 			submit,
 		} = this.params;
-		const senderAddress = senderKeypair.toSuiAddress();
+		const senderAddress = toAddress(senderKeypair.toSuiAddress());
 
 		const tx = new Transaction();
 		await build(tx, packageId);

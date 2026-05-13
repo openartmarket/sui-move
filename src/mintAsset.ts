@@ -1,11 +1,13 @@
 import type { SuiTransactionBlockResponse } from "@mysten/sui/jsonRpc";
+import type { AdminCapId, AssetId, AssetKind, Digest } from "./brands.js";
+import { toAssetId, toDigest } from "./brands.js";
 import { findTransaction } from "./findTransaction.js";
 import { getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
 
 export type MintAssetParams = {
-	adminCapId: string;
-	kind: string;
+	adminCapId: AdminCapId;
+	kind: AssetKind;
 	totalShareCount: number;
 	sharePrice: number;
 	outgoingPrice: number;
@@ -17,8 +19,8 @@ export type MintAssetParams = {
 };
 
 export type MintAssetResult = {
-	assetId: string;
-	digest: string;
+	assetId: AssetId;
+	digest: Digest;
 };
 
 /**
@@ -61,11 +63,11 @@ export async function mintAsset(
 		});
 	});
 
-	const { digest } = response;
+	const digest = toDigest(response.digest);
 	const objects = getCreatedObjects(response);
 	if (objects.length !== 1)
 		throw new Error(`Expected 1 asset, got ${JSON.stringify(objects)}`);
-	const assetId = objects[0].objectId;
+	const assetId = toAssetId(objects[0].objectId);
 
 	if (metadata) {
 		const entries = Object.entries(metadata);
@@ -153,10 +155,10 @@ export async function findAsset(
 	if (!response) {
 		return null;
 	}
-	const { digest } = response;
+	const digest = toDigest(response.digest);
 	const objects = getCreatedObjects(response);
 	if (objects.length !== 1)
 		throw new Error(`Expected 1 asset, got ${JSON.stringify(objects)}`);
-	const assetId = objects[0].objectId;
+	const assetId = toAssetId(objects[0].objectId);
 	return { assetId, digest };
 }

@@ -1,12 +1,14 @@
+import type { AdminCapId, Digest, MotionId } from "./brands.js";
+import { toDigest } from "./brands.js";
 import type { Wallet } from "./Wallet.js";
 
 export type EndMotionParams = {
-	adminCapId: string;
-	motionId: string;
+	adminCapId: AdminCapId;
+	motionId: MotionId;
 };
 
 export type EndMotionResult = {
-	digest: string;
+	digest: Digest;
 };
 
 export async function endMotion(
@@ -20,7 +22,6 @@ export async function endMotion(
 			arguments: [txb.object(adminCapId), txb.object(motionId)],
 		});
 	});
-	const { digest } = response;
 
-	return { digest };
+	return { digest: toDigest(response.digest) };
 }

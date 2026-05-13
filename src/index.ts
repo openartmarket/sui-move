@@ -1,3 +1,4 @@
+export * from "./brands.js";
 export * from "./createDisplay.js";
 export * from "./endMotion.js";
 export * from "./getShares.js";

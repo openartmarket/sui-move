@@ -1,14 +1,16 @@
+import type { Address, Digest, PublisherId } from "./brands.js";
+import { toDigest } from "./brands.js";
 import type { Wallet } from "./Wallet.js";
 
 export type CreateDisplayParams = {
-	publisherId: string;
+	publisherId: PublisherId;
 	fields: Record<string, string>;
 	type: "Asset" | "Share";
-	address: string;
+	address: Address;
 };
 
 export type CreateDisplayResult = {
-	digest: string;
+	digest: Digest;
 };
 
 /**
@@ -58,6 +60,5 @@ export async function createDisplay(
 		txb.transferObjects([display], txb.pure.address(address));
 	});
 
-	const { digest } = response;
-	return { digest };
+	return { digest: toDigest(response.digest) };
 }

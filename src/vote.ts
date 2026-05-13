@@ -1,13 +1,15 @@
+import type { AssetId, Digest, MotionId } from "./brands.js";
+import { toDigest } from "./brands.js";
 import type { Wallet } from "./Wallet.js";
 
 export type VoteParams = {
-	assetId: string;
-	motionId: string;
+	assetId: AssetId;
+	motionId: MotionId;
 	choice: boolean;
 };
 
 export type VoteResult = {
-	digest: string;
+	digest: Digest;
 };
 
 export async function vote(
@@ -25,6 +27,5 @@ export async function vote(
 			],
 		});
 	});
-	const { digest } = response;
-	return { digest };
+	return { digest: toDigest(response.digest) };
 }

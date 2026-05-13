@@ -1,14 +1,16 @@
+import type { Digest, ShareId } from "./brands.js";
+import { toDigest, toShareId } from "./brands.js";
 import { getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
 
 export type SplitShareParams = {
-	shareId: string;
+	shareId: ShareId;
 	amount: number;
 };
 
 export type SplitShareResult = {
-	digest: string;
-	splitShareId: string;
+	digest: Digest;
+	splitShareId: ShareId;
 };
 
 export async function splitShare(
@@ -22,7 +24,7 @@ export async function splitShare(
 			arguments: [txb.object(shareId), txb.pure.u64(amount)],
 		});
 	});
-	const { digest } = response;
+	const digest = toDigest(response.digest);
 
 	const createdObjects = getCreatedObjects(response);
 	if (createdObjects.length !== 1) {
@@ -30,7 +32,7 @@ export async function splitShare(
 			`Expected 1 created object, got ${JSON.stringify(createdObjects)}`,
 		);
 	}
-	const splitShareId = createdObjects[0].objectId;
+	const splitShareId = toShareId(createdObjects[0].objectId);
 
 	return { digest, splitShareId };
 }

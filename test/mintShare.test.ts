@@ -1,6 +1,7 @@
 import assert from "node:assert";
 
 import { beforeEach, describe, expect, it } from "vitest";
+import type { AssetId } from "../src/brands.js";
 import { getAvailableShares } from "../src/getters.js";
 import { mintAsset } from "../src/mintAsset.js";
 import { mintShare } from "../src/mintShare.js";
@@ -13,7 +14,7 @@ import {
 } from "./test-helpers.js";
 
 describe("mintShare", () => {
-	let assetId: string;
+	let assetId: AssetId;
 
 	let wallet1: Wallet;
 	let wallet2: Wallet;

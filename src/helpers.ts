@@ -1,5 +1,8 @@
 import { exec } from "node:child_process";
 
+import type { Address, Phrase } from "./brands.js";
+import { toAddress, toPhrase } from "./brands.js";
+
 type Json =
 	| string
 	| number
@@ -14,8 +17,8 @@ async function getSuiCoinObjectId(): Promise<string> {
 }
 
 export type SuiAddress = {
-	readonly address: string;
-	readonly phrase: string;
+	readonly address: Address;
+	readonly phrase: Phrase;
 };
 
 /**
@@ -30,7 +33,7 @@ export async function newSuiAddress(
 	}>("sui client new-address ed25519 --json");
 	const suiCoinObjectId = await getSuiCoinObjectId();
 	await transferSui({ to: address, suiCoinObjectId, amount: balance });
-	return { address, phrase: recoveryPhrase };
+	return { address: toAddress(address), phrase: toPhrase(recoveryPhrase) };
 }
 
 type TransferSuiParams = {
