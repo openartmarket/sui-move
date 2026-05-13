@@ -58,11 +58,11 @@ module open_art_market::dao {
 
         // Make sure that the caller has shares of the contract that the question was posted for
         let contract_id = oam::get_contract_id(contract);
-        assert!(df::exists_(contract_id, sender) == true, ECallerNotAShareHolder);
+        assert!(df::exists(contract_id, sender) == true, ECallerNotAShareHolder);
         // Ensure that vote request period has not ended
         assert!(vote_request.is_active == true, EVotingPeriodEnded);
         // Make sure that the caller has not voted yet
-        let has_voted = df::exists_(&mut vote_request.id, sender);
+        let has_voted = df::exists(&vote_request.id, sender);
         assert!(has_voted == false, ECallerAlreadyVoted);
 
         let caller_shares_s = df::borrow<address, Shares>(oam::get_contract_id(contract), sender);

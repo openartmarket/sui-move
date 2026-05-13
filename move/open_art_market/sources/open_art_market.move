@@ -18,8 +18,6 @@ module open_art_market::open_art_market {
     const EInvalidSupply: u64 = 4;
     const EInvalidSharePrice: u64 = 5;
     const EInvalidOutgoingPrice: u64 = 6;
-    const EInvalidShares: u64 = 7;
-    const ECallerNotAShareHolder: u64 = 8;
 
     // Structs
     // An ContractStock NFT
@@ -116,7 +114,7 @@ module open_art_market::open_art_market {
         let new_shares_balance = remaining_shares - shares;
         contract.shares = new_shares_balance;
 
-        let is_receiver_shareholder = df::exists_(&contract.id, receiver);
+        let is_receiver_shareholder = df::exists(&contract.id, receiver);
 
         if(is_receiver_shareholder){
             let df_shares = df::borrow_mut<address, Shares>(&mut contract.id, receiver);
@@ -143,7 +141,7 @@ module open_art_market::open_art_market {
 
     public fun transfer_contract_stock(contract: &mut Contract, contract_stock: ContractStock, new_owner: address, ctx: &mut TxContext) {
         // @todo: what checks need to be made here?
-        let is_receiver_shareholder = df::exists_(&contract.id, new_owner);
+        let is_receiver_shareholder = df::exists(&contract.id, new_owner);
 
         // Make sure the df share balances of receiver under contract are kept up to date
         if(is_receiver_shareholder) {
