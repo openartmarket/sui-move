@@ -1,9 +1,9 @@
+import type { Keypair } from "@mysten/sui/cryptography";
 import type {
 	SuiObjectRef,
 	SuiTransactionBlockResponse,
 } from "@mysten/sui/jsonRpc";
 import { getJsonRpcFullnodeUrl, SuiJsonRpcClient } from "@mysten/sui/jsonRpc";
-import type { Keypair } from "@mysten/sui/cryptography";
 import type { Transaction } from "@mysten/sui/transactions";
 
 import type { NetworkName } from "./types.js";

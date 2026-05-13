@@ -1,15 +1,11 @@
+import type { Keypair } from "@mysten/sui/cryptography";
 import type {
 	SuiJsonRpcClient,
 	SuiTransactionBlockResponse,
 } from "@mysten/sui/jsonRpc";
-import type { Keypair } from "@mysten/sui/cryptography";
 import { Transaction } from "@mysten/sui/transactions";
 
-import type {
-	BuildTransaction,
-	SponsoredSubmit,
-	Wallet,
-} from "./Wallet.js";
+import type { BuildTransaction, SponsoredSubmit, Wallet } from "./Wallet.js";
 
 export type SuiWalletParams = {
 	suiClient: SuiJsonRpcClient;

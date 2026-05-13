@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-import type { MintContractParams } from "../src/mintContract.js";
 import { newSuiAddress } from "../src/helpers.js";
+import type { MintContractParams } from "../src/mintContract.js";
 import type { NetworkName } from "../src/types.js";
 import type { Wallet } from "../src/Wallet.js";
 import { newWallet } from "../src/Wallet.js";
