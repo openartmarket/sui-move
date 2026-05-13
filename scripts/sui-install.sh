@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # Keep the version in sync with Move.toml
-sui_version="1.70.2"
+sui_version="1.71.1"
 
 if command -v sui &> /dev/null
 then
