@@ -4,28 +4,30 @@ import type { Wallet } from "./Wallet.js";
 
 const SUI_CLOCK_OBJECT_ID = "0x6";
 
-export type VoteParams = {
+export type FinalizeExpiredMotionParams = {
 	assetId: AssetId;
 	motionId: MotionId;
-	choice: boolean;
 };
 
-export type VoteResult = {
+export type FinalizeExpiredMotionResult = {
 	digest: Digest;
 };
 
-export async function vote(
+/**
+ * Permissionless: close a Motion whose deadline has passed. Releases the
+ * asset's active-motion lock so Share movement can resume.
+ */
+export async function finalizeExpiredMotion(
 	wallet: Wallet,
-	params: VoteParams,
-): Promise<VoteResult> {
-	const { assetId, motionId, choice } = params;
+	params: FinalizeExpiredMotionParams,
+): Promise<FinalizeExpiredMotionResult> {
+	const { assetId, motionId } = params;
 	const response = await wallet.execute(async (txb, packageId) => {
 		txb.moveCall({
-			target: `${packageId}::governance::cast_vote`,
+			target: `${packageId}::governance::finalize_expired_motion`,
 			arguments: [
 				txb.object(assetId),
 				txb.object(motionId),
-				txb.pure.bool(choice),
 				txb.object(SUI_CLOCK_OBJECT_ID),
 			],
 		});

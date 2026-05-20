@@ -1,106 +1,95 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { getWalletQuantity } from "../src/getters.js";
-import { mintContract } from "../src/mintContract.js";
-import { mintContractStock } from "../src/mintContractStock.js";
+import type { AssetId } from "../src/brands.js";
+import { getWalletAmount } from "../src/getters.js";
+import { mintAsset } from "../src/mintAsset.js";
+import { mintShare } from "../src/mintShare.js";
 import { splitTransferMerge } from "../src/splitTransferMerge.js";
 import {
 	ADMIN_CAP_ID,
 	adminWallet,
-	makeMintContractOptions,
+	makeMintAssetOptions,
 	makeWallet,
 	PACKAGE_ID,
 } from "./test-helpers.js";
 
 describe("splitTransferMerge", () => {
-	let contractId: string;
+	let assetId: AssetId;
 	beforeEach(async () => {
-		const mintContractOptions = makeMintContractOptions();
-
-		const res = await mintContract(adminWallet, mintContractOptions);
-		contractId = res.contractId;
+		const mintOptions = makeMintAssetOptions();
+		const res = await mintAsset(adminWallet, mintOptions);
+		assetId = res.assetId;
 	}, 30_000);
 
-	it("should transfer stocks and make sure everything is merged", async () => {
+	it("should transfer shares and make sure everything is merged", async () => {
 		const fromWallet = await makeWallet();
 		const toWallet = await makeWallet();
 
-		await mintContractStock(
-			adminWallet,
-			// User 1 has bought stocks in 3 batches. Total: 9
-			{
-				adminCapId: ADMIN_CAP_ID,
-				contractId,
-				receiverAddress: fromWallet.address,
-				quantity: 1,
-			},
-		);
-		await mintContractStock(adminWallet, {
+		// User 1 has bought shares in 3 batches. Total: 9
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
+			assetId,
 			receiverAddress: fromWallet.address,
-			quantity: 3,
+			amount: 1,
 		});
-		await mintContractStock(adminWallet, {
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
+			assetId,
 			receiverAddress: fromWallet.address,
-			quantity: 5,
+			amount: 3,
 		});
-		// User 2 has bought stocks in 2 batches. Total: 16
-		await mintContractStock(adminWallet, {
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
-			receiverAddress: toWallet.address,
-			quantity: 7,
+			assetId,
+			receiverAddress: fromWallet.address,
+			amount: 5,
 		});
-		await mintContractStock(adminWallet, {
+		// User 2 has bought shares in 2 batches. Total: 16
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
+			assetId,
 			receiverAddress: toWallet.address,
-			quantity: 9,
+			amount: 7,
+		});
+		await mintShare(adminWallet, {
+			adminCapId: ADMIN_CAP_ID,
+			assetId,
+			receiverAddress: toWallet.address,
+			amount: 9,
 		});
 
-		const { fromContractStockId, toContractStockId } = await splitTransferMerge(
-			{
-				packageId: PACKAGE_ID,
-				fromWallet: fromWallet,
-				toWallet: toWallet,
-				contractId,
-				quantity: 2,
-			},
-		);
+		const { fromShareId, toShareId } = await splitTransferMerge({
+			packageId: PACKAGE_ID,
+			fromWallet,
+			toWallet,
+			assetId,
+			amount: 2,
+		});
 
-		expect(await getWalletQuantity(fromWallet, fromContractStockId)).toEqual(7);
-		expect(await getWalletQuantity(toWallet, toContractStockId)).toEqual(18);
-
-		// TODO: verify that user1 has one stock with 7 and user2 has one stock with 18
+		expect(await getWalletAmount(fromWallet, fromShareId)).toEqual(7);
+		expect(await getWalletAmount(toWallet, toShareId)).toEqual(18);
 	}, 60_000);
 
-	it("should not split when stock is already the size of the transfer quantity", async () => {
+	it("should not split when share is already the size of the transfer amount", async () => {
 		const fromWallet = await makeWallet();
 		const toWallet = await makeWallet();
 
-		await mintContractStock(adminWallet, {
+		await mintShare(adminWallet, {
 			adminCapId: ADMIN_CAP_ID,
-			contractId,
+			assetId,
 			receiverAddress: fromWallet.address,
-			quantity: 3,
+			amount: 3,
 		});
 
-		const { fromContractStockId, toContractStockId } = await splitTransferMerge(
-			{
-				packageId: PACKAGE_ID,
-				fromWallet,
-				toWallet,
-				contractId,
-				quantity: 3,
-			},
-		);
+		const { fromShareId, toShareId } = await splitTransferMerge({
+			packageId: PACKAGE_ID,
+			fromWallet,
+			toWallet,
+			assetId,
+			amount: 3,
+		});
 
-		expect(fromContractStockId).toEqual(toContractStockId);
-		expect(await getWalletQuantity(toWallet, toContractStockId)).toEqual(3);
-
-		// TODO: verify that user1 has one stock with 7 and user2 has one stock with 18
+		expect(fromShareId).toEqual(toShareId);
+		expect(await getWalletAmount(toWallet, toShareId)).toEqual(3);
 	}, 30_000);
 });

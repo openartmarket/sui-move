@@ -6,13 +6,15 @@ import type {
 import { getJsonRpcFullnodeUrl, SuiJsonRpcClient } from "@mysten/sui/jsonRpc";
 import type { Transaction } from "@mysten/sui/transactions";
 
+import type { Address, PackageId } from "./brands.js";
+import { toAddress } from "./brands.js";
 import type { NetworkName } from "./types.js";
 import { SponsoredWallet, SuiWallet } from "./wallets.js";
 
 export type ReadonlyWallet = {
-	readonly address: string;
+	readonly address: Address;
 	readonly suiClient: SuiJsonRpcClient;
-	readonly packageId: string;
+	readonly packageId: PackageId;
 };
 
 export interface Wallet extends ReadonlyWallet {
@@ -21,13 +23,13 @@ export interface Wallet extends ReadonlyWallet {
 
 export type BuildTransaction = (
 	txb: Transaction,
-	packageId: string,
+	packageId: PackageId,
 ) => Promise<void>;
 
 export type SponsoredSubmitRequest = {
 	transactionBytes: Uint8Array;
 	senderSignature: string;
-	senderAddress: string;
+	senderAddress: Address;
 };
 
 export type SponsoredSubmit = (
@@ -38,17 +40,17 @@ export type NewWalletParams = NewSuiWalletParams | NewSponsoredWalletParams;
 
 export type NewSuiWalletParams = {
 	type: "sui";
-	packageId: string;
+	packageId: PackageId;
 	network: NetworkName;
 	keypair: Keypair;
 };
 
 export type NewSponsoredWalletParams = {
 	type: "sponsored";
-	packageId: string;
+	packageId: PackageId;
 	network: NetworkName;
 	senderKeypair: Keypair;
-	sponsorAddress: string;
+	sponsorAddress: Address;
 	reserveGasCoins: () => Promise<SuiObjectRef[]>;
 	submit: SponsoredSubmit;
 };
@@ -87,3 +89,7 @@ export function newWallet(params: NewWalletParams): Wallet {
 		}
 	}
 }
+
+// Re-export so callers building a Wallet from a raw keypair can brand its
+// address without importing brands.ts directly.
+export { toAddress };

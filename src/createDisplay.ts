@@ -1,34 +1,33 @@
+import type { Address, Digest, PublisherId } from "./brands.js";
+import { toDigest } from "./brands.js";
 import type { Wallet } from "./Wallet.js";
 
 export type CreateDisplayParams = {
-	publisherId: string;
+	publisherId: PublisherId;
 	fields: Record<string, string>;
-	type: "Contract" | "ContractStock";
-	address: string;
+	type: "Asset" | "Share";
+	address: Address;
 };
 
 export type CreateDisplayResult = {
-	digest: string;
+	digest: Digest;
 };
 
-export const ContractFields = {
-	name: "{name}",
-	artist: "{artist}",
-	description: "{description}",
-	currency: "{currency}",
-	image_url: "https://openartmarket.com/image/{reference}",
-	project_url: "https://openartmarket.com/perma/{reference}",
-};
-
-export const ContractStockFields = {
-	name: "{name}",
-	artist: "{artist}",
-	description: "{description}",
-	currency: "{currency}",
-	image_url: "https://openartmarket.com/image/{reference}",
-	thumbnail_url: "https://openartmarket.com/image/{reference}?thumb=1",
-	project_url: "https://openartmarket.com/perma/{reference}",
-};
+/**
+ * Build a default set of Display field templates for an Asset or Share.
+ * Pass a merchant-specific baseUrl (e.g. "https://coownable.example.com")
+ * and override individual entries as needed.
+ */
+export function defaultDisplayFields(baseUrl: string): Record<string, string> {
+	return {
+		name: "{name}",
+		description: "{description}",
+		currency: "{currency}",
+		kind: "{kind}",
+		image_url: `${baseUrl}/image/{reference}`,
+		project_url: `${baseUrl}/perma/{reference}`,
+	};
+}
 
 export async function createDisplay(
 	wallet: Wallet,
@@ -37,12 +36,12 @@ export async function createDisplay(
 	const { publisherId, fields, type, address } = params;
 
 	const response = await wallet.execute(async (txb, packageId) => {
-		const typeArgument = `${packageId}::open_art_market::${type}`;
+		const typeArgument = `${packageId}::asset::${type}`;
 
 		const keys = Object.keys(fields);
 		const values = Object.values(fields);
 
-		const contractDisplay = txb.moveCall({
+		const display = txb.moveCall({
 			target: "0x2::display::new_with_fields",
 			arguments: [
 				txb.object(publisherId),
@@ -54,13 +53,12 @@ export async function createDisplay(
 
 		txb.moveCall({
 			target: "0x2::display::update_version",
-			arguments: [contractDisplay],
+			arguments: [display],
 			typeArguments: [typeArgument],
 		});
 
-		txb.transferObjects([contractDisplay], txb.pure.address(address));
+		txb.transferObjects([display], txb.pure.address(address));
 	});
 
-	const { digest } = response;
-	return { digest };
+	return { digest: toDigest(response.digest) };
 }

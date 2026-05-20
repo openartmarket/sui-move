@@ -1,6 +1,6 @@
 # Contributing
 
-This document describes how to contribute to the Open Art Market SUI Move contracts.
+This document describes how to contribute to the Coownable Sui Move contract.
 
 ## Install dependencies
 
@@ -48,7 +48,7 @@ Add the following to your `.sui.env` file:
 export SHINAMI_ENABLED=1
 # Copy the "SUI Testnet" access key from https://app.shinami.com/access-keys
 export SHINAMI_ACCESS_KEY="..."
-# Copy the SUI_TESTNET_* values from openartmarket/server/.envrc
+# Copy the SUI_TESTNET_* values from your coownable backend's .envrc
 export ADMIN_CAP_ID="..."
 export PACKAGE_ID="..."
 export ADMIN_ADDRESS="..."

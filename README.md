@@ -1,48 +1,78 @@
 [![Continuous Integration](https://github.com/openartmarket/sui-move/actions/workflows/ci.yml/badge.svg)](https://github.com/openartmarket/sui-move/actions/workflows/ci.yml)
 
-# Open Art Market SUI Move contracts
+# Coownable Sui Move contract
 
-[Open Art Market](https://openartmarket.com) uses blockchain technology to provide a public, transparent and decentralized way to manage unique artwork assets and their shares.
+[Coownable](https://coownable.com) is a platform for fractional co-ownership of
+real-world assets — paintings, sculptures, wine, whisky, Pokemon cards, and
+whatever comes next. This repository contains the on-chain Sui Move contract
+and the TypeScript SDK that backs it.
 
-These contracts are deployed publicly on the [SUI blockchain](https://sui.io/) where anyone can verify the code. 
-All assets, asset shares and votes are represented on the blockchain, allowing anyone to verify the state of the system.
+The contract is **closed for modification, open for extension**: a single
+`Asset` type supports any asset class without redeploying the package. Each
+asset carries a `kind` discriminator (e.g. `"wine"`, `"painting"`,
+`"pokemon_card"`) and stores class-specific metadata in dynamic fields keyed
+by name. Adding a new asset class never requires touching this code.
 
-This repository contains the smart contracts for Open Art Market.
+## Modules
 
-## Contracts
+* [`coownable::asset`](./move/coownable/sources/asset.move) — Assets, Shares,
+  per-holder Holdings, and the metadata extension API.
+* [`coownable::governance`](./move/coownable/sources/governance.move) —
+  Motions and weighted shareholder voting against an Asset.
 
-* [Open Art Market](./move/sources/open_art_market.move) manages unique artwork assets their shares.
-* [DAO voting](./move/sources/dao.move) manages vote proposals and votes.
+## Concepts
+
+### `Asset`
+
+A shared object representing the underlying co-owned thing. Generic fields:
+`kind`, `name`, `description`, `reference`, `currency`, `total_supply`,
+`available_shares`, `share_price`, `outgoing_price`. Class-specific fields
+(e.g. `vintage`, `artist`, `region`, `grading`) live as dynamic-field
+metadata managed via `set_metadata` / `get_metadata`.
+
+### `Share`
+
+An owned NFT representing a fractional stake in an Asset. Carries an `amount`
+plus a snapshot of the parent Asset's display fields. Supports `split`,
+`merge`, `transfer`, and `safe_burn` (post-ITO).
+
+### `Holding`
+
+A dynamic field attached to an Asset, keyed by the holder's address. Tracks
+the running total of an address's stake across many Share NFTs. Read by the
+governance module to weight votes.
+
+### `Motion` (governance)
+
+A shared object representing a proposal put to shareholders of one Asset.
+Yes/no votes weighted by `Holding.value`. One vote per address per motion.
+
+## Extending to a new asset class
+
+No Move changes. Mint an Asset with the new `kind` and the metadata you need:
+
+```ts
+import { mintAsset } from "@coownable/sui";
+
+await mintAsset(adminWallet, {
+  adminCapId,
+  kind: "pokemon_card",
+  totalShareCount: 1000,
+  sharePrice: 5,
+  outgoingPrice: 10_000,
+  name: "Charizard 1st Edition Shadowless",
+  description: "PSA 10",
+  currency: "USD",
+  reference: "charizard-base-set-4",
+  metadata: {
+    grading: "PSA 10",
+    edition: "1st Edition Shadowless",
+    set: "Base Set",
+    year: "1999",
+  },
+});
+```
 
 ## Contributing
 
-Open Art Market invites anyone to review and improve the code for the smart contracts. 
-If you are interested in contributing, please read our [contributing guidelines](CONTRIBUTING.md).
-
-# Smart Contracts
-
-PoC contracts modeling Open Art Market use case, where only the admin can create an Contract and ContractStocks for this contract. 
-The users can own shares of an contract. 
-The admin can create new voting requests for DAO operations. 
-Multiple shareholders can vote whether they agree or not to vote requests.
-
-### open-art-market module
-
-<b>Structs of the module:</b>
-
-* Contract - The Contract NFT is a shared object and it is created only by the admin.
-* ContractStock - Represents shares of an Contract NFT and it is owned by a shareholder.
-* AdminCap - Admin capability to guard access restricted methods.
-* Shares - Represents the number of the shares owned by an address for an Contract.
-
-In this module the admin can create a new Contract and ContractStocks. There are also the methods to transfer ownership of the ContractStock, to merge multiple stocks that are owned by the same address or even burn an ContractStock.
-
-### dao module
-
-<b>Structs of the module:</b>
-
-* VoteRequest - This struct represents a question that can be voted on by shareholders.
-* Vote
-
-In this module the admin can create a new voting request for the shareholders of an Contract. Then the shareholders can vote as long as the vote request is active.
-
+See [CONTRIBUTING.md](CONTRIBUTING.md).
