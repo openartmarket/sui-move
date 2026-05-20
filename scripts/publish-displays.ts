@@ -9,15 +9,16 @@ import { adminWallet, getEnv } from "../test/test-helpers.js";
 
 const PUBLISHER_ID = toPublisherId(getEnv("PUBLISHER_ID"));
 const ADMIN_PHRASE = getEnv("ADMIN_PHRASE");
-// Off-chain URL templates baked into Display objects. Merchant-specific; defaults
-// to the public Coownable host so CI / localnet runs don't need to set anything.
-const DISPLAY_BASE_URL = process.env.DISPLAY_BASE_URL ?? "https://coownable.com";
+// Project URL baked into the Display objects as the static `project_url`
+// field. Merchant-specific; defaults to the public Coownable host so CI /
+// localnet runs don't need to set anything.
+const PROJECT_URL = process.env.PROJECT_URL ?? "https://coownable.com";
 
 async function main() {
 	const keypair = Ed25519Keypair.deriveKeypair(ADMIN_PHRASE);
 	const address = toAddress(keypair.getPublicKey().toSuiAddress());
 
-	const fields = defaultDisplayFields(DISPLAY_BASE_URL);
+	const fields = defaultDisplayFields(PROJECT_URL);
 
 	await createDisplay(adminWallet, {
 		publisherId: PUBLISHER_ID,
@@ -26,12 +27,15 @@ async function main() {
 		type: "Asset",
 	});
 
+	// Share Display: the Share struct only carries id / asset_id / amount /
+	// share_price, so most `{field}` templates resolve to empty. We expose
+	// just the minimal surface here; richer Share rendering would require
+	// embedding asset metadata onto Share at mint time.
 	await createDisplay(adminWallet, {
 		publisherId: PUBLISHER_ID,
 		address,
 		fields: {
-			...fields,
-			thumbnail_url: `${DISPLAY_BASE_URL}/image/{reference}?thumb=1`,
+			project_url: PROJECT_URL,
 		},
 		type: "Share",
 	});

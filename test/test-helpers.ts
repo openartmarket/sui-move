@@ -47,6 +47,7 @@ export const adminWallet = await makeAdminWallet();
 export function makeMintAssetOptions(
 	overrides: Partial<MintAssetParams> = {},
 ): MintAssetParams {
+	const slug = `mona-lisa-${randomUUID()}`;
 	return {
 		adminCapId: ADMIN_CAP_ID,
 		kind: toAssetKind("painting"),
@@ -56,9 +57,11 @@ export function makeMintAssetOptions(
 		name: "Mona Lisa",
 		description: "A painting",
 		currency: "USD",
-		reference: `mona-lisa-${randomUUID()}`,
+		imageUrl: `https://example.com/image/${slug}`,
+		thumbnailUrl: `https://example.com/thumbnail/${slug}`,
+		link: `https://example.com/asset/${slug}`,
+		creator: "Leonardo da Vinci",
 		metadata: {
-			artist: "Leonardo da Vinci",
 			creation_date: "1503-1519",
 		},
 		...overrides,

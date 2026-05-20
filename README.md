@@ -25,10 +25,12 @@ by name. Adding a new asset class never requires touching this code.
 ### `Asset`
 
 A shared object representing the underlying co-owned thing. Generic fields:
-`kind`, `name`, `description`, `reference`, `currency`, `total_supply`,
-`available_shares`, `share_price`, `outgoing_price`. Class-specific fields
-(e.g. `vintage`, `artist`, `region`, `grading`) live as dynamic-field
-metadata managed via `set_metadata` / `get_metadata`.
+`kind`, `name`, `description`, `currency`, `total_supply`,
+`available_shares`, `share_price`, `outgoing_price`, plus the
+[Sui Display](https://docs.sui.io/standards/display)-aligned fields
+`image_url`, `thumbnail_url`, `link`, `creator`. Class-specific fields
+(e.g. `vintage`, `region`, `grading`) live as dynamic-field metadata
+managed via `set_metadata` / `get_metadata`.
 
 ### `Share`
 
@@ -63,7 +65,10 @@ await mintAsset(adminWallet, {
   name: "Charizard 1st Edition Shadowless",
   description: "PSA 10",
   currency: "USD",
-  reference: "charizard-base-set-4",
+  imageUrl: "https://example.com/cards/charizard-base-set-4/image",
+  thumbnailUrl: "https://example.com/cards/charizard-base-set-4/thumb",
+  link: "https://example.com/cards/charizard-base-set-4",
+  creator: "Wizards of the Coast",
   metadata: {
     grading: "PSA 10",
     edition: "1st Edition Shadowless",

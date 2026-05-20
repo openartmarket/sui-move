@@ -40,6 +40,9 @@ module coownable::asset {
     // The on-chain shape is fixed; class-specific metadata lives in
     // dynamic fields keyed by MetaKey, so new asset classes need no
     // changes to this module.
+    // Display-relevant fields (image_url, thumbnail_url, link, creator) follow
+    // the Sui Object Display Standard so that wallets and explorers can render
+    // assets consistently. See https://docs.sui.io/standards/display.
     struct Asset has key, store {
         id: UID,
         kind: String,
@@ -50,7 +53,18 @@ module coownable::asset {
         currency: String,
         name: String,
         description: String,
-        reference: String,
+        // Full URL to the canonical image. Surfaced as the `image_url`
+        // Display field.
+        image_url: String,
+        // Full URL to a smaller preview image. Surfaced as the
+        // `thumbnail_url` Display field.
+        thumbnail_url: String,
+        // Full URL to the per-asset info / detail page in the consuming
+        // application. Surfaced as the `link` Display field.
+        link: String,
+        // Human-readable creator / author name. Surfaced as the `creator`
+        // Display field.
+        creator: String,
         // Count of open governance Motions. While non-zero, mint / transfer /
         // burn of Shares is blocked so vote weights cannot be manipulated
         // after a motion has started.
@@ -89,7 +103,10 @@ module coownable::asset {
         currency: String,
         name: String,
         description: String,
-        reference: String,
+        image_url: String,
+        thumbnail_url: String,
+        link: String,
+        creator: String,
     }
 
     struct MetadataSet has copy, drop {
@@ -159,9 +176,24 @@ module coownable::asset {
         new_currency: String,
     }
 
-    struct ReferenceUpdated has copy, drop {
+    struct ImageUrlUpdated has copy, drop {
         asset_id: ID,
-        new_reference: String,
+        new_image_url: String,
+    }
+
+    struct ThumbnailUrlUpdated has copy, drop {
+        asset_id: ID,
+        new_thumbnail_url: String,
+    }
+
+    struct LinkUpdated has copy, drop {
+        asset_id: ID,
+        new_link: String,
+    }
+
+    struct CreatorUpdated has copy, drop {
+        asset_id: ID,
+        new_creator: String,
     }
 
     // Called on package publish
@@ -171,7 +203,9 @@ module coownable::asset {
         transfer::public_transfer(admin_cap, tx_context::sender(ctx));
     }
 
-    // Mint a new Asset as a shared object
+    // Mint a new Asset as a shared object. The image_url / thumbnail_url /
+    // link / creator parameters are surfaced via the Sui Object Display
+    // Standard. See https://docs.sui.io/standards/display.
     public fun mint_asset(
         _: &AdminCap,
         kind: String,
@@ -181,7 +215,10 @@ module coownable::asset {
         name: String,
         description: String,
         currency: String,
-        reference: String,
+        image_url: String,
+        thumbnail_url: String,
+        link: String,
+        creator: String,
         ctx: &mut TxContext
     ) {
         assert!(total_supply > 0, EInvalidSupply);
@@ -198,7 +235,10 @@ module coownable::asset {
             currency,
             name,
             description,
-            reference,
+            image_url,
+            thumbnail_url,
+            link,
+            creator,
             active_motion_count: 0,
         };
         event::emit(AssetMinted {
@@ -210,7 +250,10 @@ module coownable::asset {
             currency: asset.currency,
             name: asset.name,
             description: asset.description,
-            reference: asset.reference,
+            image_url: asset.image_url,
+            thumbnail_url: asset.thumbnail_url,
+            link: asset.link,
+            creator: asset.creator,
         });
         transfer::public_share_object<Asset>(asset);
     }
@@ -420,11 +463,35 @@ module coownable::asset {
         });
     }
 
-    public fun update_reference(_: &AdminCap, asset: &mut Asset, new_reference: String) {
-        asset.reference = new_reference;
-        event::emit(ReferenceUpdated {
+    public fun update_image_url(_: &AdminCap, asset: &mut Asset, new_image_url: String) {
+        asset.image_url = new_image_url;
+        event::emit(ImageUrlUpdated {
             asset_id: object::uid_to_inner(&asset.id),
-            new_reference: asset.reference,
+            new_image_url: asset.image_url,
+        });
+    }
+
+    public fun update_thumbnail_url(_: &AdminCap, asset: &mut Asset, new_thumbnail_url: String) {
+        asset.thumbnail_url = new_thumbnail_url;
+        event::emit(ThumbnailUrlUpdated {
+            asset_id: object::uid_to_inner(&asset.id),
+            new_thumbnail_url: asset.thumbnail_url,
+        });
+    }
+
+    public fun update_link(_: &AdminCap, asset: &mut Asset, new_link: String) {
+        asset.link = new_link;
+        event::emit(LinkUpdated {
+            asset_id: object::uid_to_inner(&asset.id),
+            new_link: asset.link,
+        });
+    }
+
+    public fun update_creator(_: &AdminCap, asset: &mut Asset, new_creator: String) {
+        asset.creator = new_creator;
+        event::emit(CreatorUpdated {
+            asset_id: object::uid_to_inner(&asset.id),
+            new_creator: asset.creator,
         });
     }
 

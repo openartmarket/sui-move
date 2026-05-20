@@ -20,6 +20,7 @@ describe("mintAsset", () => {
 			region: "Bordeaux",
 			abv: "13.5",
 		};
+		const slug = `wine-${randomUUID()}`;
 		const { assetId } = await mintAsset(
 			adminWallet,
 			makeMintAssetOptions({
@@ -27,7 +28,10 @@ describe("mintAsset", () => {
 				kind: toAssetKind("wine"),
 				name: "Château Margaux 2010",
 				description: "First-growth Bordeaux",
-				reference: `wine-${randomUUID()}`,
+				imageUrl: `https://example.com/image/${slug}`,
+				thumbnailUrl: `https://example.com/thumbnail/${slug}`,
+				link: `https://example.com/asset/${slug}`,
+				creator: "Château Margaux",
 				metadata,
 			}),
 		);

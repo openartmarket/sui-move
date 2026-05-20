@@ -14,18 +14,31 @@ export type CreateDisplayResult = {
 };
 
 /**
- * Build a default set of Display field templates for an Asset or Share.
- * Pass a merchant-specific baseUrl (e.g. "https://coownable.example.com")
- * and override individual entries as needed.
+ * Build a default set of Sui Object Display field templates for an Asset.
+ *
+ * The returned fields are the seven standard keys recognized by wallets and
+ * explorers; each value (except `project_url`) is a `{field}` template that
+ * substitutes the corresponding String field on the Asset struct at display
+ * time.
+ *
+ * @param projectUrl Full URL to the consuming application's homepage. This
+ *   is rendered verbatim as the static `project_url` Display field — the
+ *   per-asset detail page belongs in the `link` field (which substitutes
+ *   from the Asset's `link` field).
+ *
+ * @see https://docs.sui.io/standards/display
  */
-export function defaultDisplayFields(baseUrl: string): Record<string, string> {
+export function defaultDisplayFields(
+	projectUrl: string,
+): Record<string, string> {
 	return {
 		name: "{name}",
 		description: "{description}",
-		currency: "{currency}",
-		kind: "{kind}",
-		image_url: `${baseUrl}/image/{reference}`,
-		project_url: `${baseUrl}/perma/{reference}`,
+		link: "{link}",
+		image_url: "{image_url}",
+		thumbnail_url: "{thumbnail_url}",
+		project_url: projectUrl,
+		creator: "{creator}",
 	};
 }
 

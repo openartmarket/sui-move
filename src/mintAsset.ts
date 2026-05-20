@@ -5,6 +5,15 @@ import { findTransaction } from "./findTransaction.js";
 import { getCreatedObjects } from "./getters.js";
 import type { Wallet } from "./Wallet.js";
 
+/**
+ * Parameters for minting a new Asset.
+ *
+ * `imageUrl`, `thumbnailUrl`, `link`, and `creator` are surfaced on-chain
+ * via the Sui Object Display Standard so that wallets and explorers
+ * render the asset consistently.
+ *
+ * @see https://docs.sui.io/standards/display
+ */
 export type MintAssetParams = {
 	adminCapId: AdminCapId;
 	kind: AssetKind;
@@ -14,7 +23,36 @@ export type MintAssetParams = {
 	name: string;
 	description: string;
 	currency: string;
-	reference: string;
+	/**
+	 * Full URL to the canonical image for this asset.
+	 *
+	 * Surfaced as the Sui Display `image_url` field.
+	 * @see https://docs.sui.io/standards/display
+	 */
+	imageUrl: string;
+	/**
+	 * Full URL to a smaller preview image suitable for wallets and listings.
+	 *
+	 * Surfaced as the Sui Display `thumbnail_url` field.
+	 * @see https://docs.sui.io/standards/display
+	 */
+	thumbnailUrl: string;
+	/**
+	 * Full URL to the per-asset info / detail page in the consuming
+	 * application — what wallets and explorers link to when a user clicks
+	 * through the asset.
+	 *
+	 * Surfaced as the Sui Display `link` field.
+	 * @see https://docs.sui.io/standards/display
+	 */
+	link: string;
+	/**
+	 * Human-readable creator / author name (e.g. the artist for an artwork).
+	 *
+	 * Surfaced as the Sui Display `creator` field.
+	 * @see https://docs.sui.io/standards/display
+	 */
+	creator: string;
 	metadata?: Record<string, string>;
 };
 
@@ -42,7 +80,10 @@ export async function mintAsset(
 		name,
 		description,
 		currency,
-		reference,
+		imageUrl,
+		thumbnailUrl,
+		link,
+		creator,
 		metadata,
 	} = params;
 
@@ -58,7 +99,10 @@ export async function mintAsset(
 				txb.pure.string(name),
 				txb.pure.string(description),
 				txb.pure.string(currency),
-				txb.pure.string(reference),
+				txb.pure.string(imageUrl),
+				txb.pure.string(thumbnailUrl),
+				txb.pure.string(link),
+				txb.pure.string(creator),
 			],
 		});
 	});
@@ -120,7 +164,10 @@ export async function findAsset(
 				name,
 				description,
 				currency,
-				reference,
+				imageUrl,
+				thumbnailUrl,
+				link,
+				creator,
 			} = params;
 
 			const expected = [
@@ -132,7 +179,10 @@ export async function findAsset(
 				name,
 				description,
 				currency,
-				reference,
+				imageUrl,
+				thumbnailUrl,
+				link,
+				creator,
 			].map((value) => value.toString());
 			if (
 				res.transaction?.data?.transaction?.kind !== "ProgrammableTransaction"
